@@ -1,6 +1,11 @@
+.settings
+.classpath
+.project
+target/
+bin/
 *.class
-
-# Package Files #
 *.jar
 *.war
 *.ear
+faces-config.xml
+*.iml
