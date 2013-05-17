@@ -1,4 +1,4 @@
-package org.infobip.mplatform.help.it.business;
+package org.infobip.mplatform.help.it.repo.vo;
 
 import java.io.Serializable;
 

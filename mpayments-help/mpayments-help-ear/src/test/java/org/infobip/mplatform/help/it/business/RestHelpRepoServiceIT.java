@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MediaType;
 
+import org.infobip.mplatform.help.it.repo.vo.TestResponseVO;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.junit.After;
@@ -50,7 +51,7 @@ public class RestHelpRepoServiceIT  {
 		ClientResponse<TestResponseVO> response = null;
 		
 		String contentType = MediaType.APPLICATION_FORM_URLENCODED;
-		String uri = "http://localhost:8080/help/test";
+		String uri = "http://localhost:8080/helprepo/test";
 		Map<String, String> params = new HashMap<String, String>();
 		
 		try {

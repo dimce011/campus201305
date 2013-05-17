@@ -1,6 +1,7 @@
 package org.infobip.mpayments.help.repo.rest;
 
 import javax.ejb.Stateless;
+import javax.jcr.Node;
 import javax.jcr.Repository;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
@@ -36,8 +37,24 @@ public class RestHelpRepoService implements RestHelpRepo {
 			sess = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 		    
 		    // Do something interesting with the Session ...
-		    logger.info(sess.getRootNode().getPrimaryNodeType().getName());
-
+		    logger.info("name: {}", sess.getRootNode().getName());
+		    logger.info("type name: {}", sess.getRootNode().getPrimaryNodeType().getName());
+		    logger.info("path: {}", sess.getRootNode().getPath());
+		    
+		    Node node = sess.getNode("/");
+		    logger.info("node: {}", node==null?null:node);
+		    
+		    node.setProperty("name", "root");
+		    node.addNode("help", "nt:folder");
+		    
+		    node = sess.getNode("/help");
+		    logger.info("node: {}", node==null?null:node);
+		    
+		    node = sess.getNode("/");
+		    
+		    logger.info("name: {}", node==null?null:node.getName());
+		    logger.info("node: {}", node==null?null:node);
+		    
 		} catch (Exception ex) {
 			error = true;
 			responseVO.setErrorMessage("Internal service error!");

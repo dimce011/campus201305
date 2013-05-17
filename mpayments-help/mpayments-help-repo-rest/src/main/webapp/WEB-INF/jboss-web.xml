@@ -4,6 +4,6 @@
     xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-web_6_0.xsd"
     version="6.0">
 
-    <context-root>/help</context-root>
+    <context-root>/helprepo</context-root>
     
 </jboss-web>
