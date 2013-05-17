@@ -71,11 +71,6 @@
 				<artifactId>maven-ear-plugin</artifactId>
 				<configuration>
 					<modules>
-						<ejbModule>
-							<groupId>org.infobip.mpayments.help</groupId>
-	       					<artifactId>mpayments-help-ejb</artifactId>
-	       					<bundleFileName>mpayments-help-ejb.jar</bundleFileName>
-	      				</ejbModule>
 	      				<webModule>
 	       					<groupId>org.infobip.mpayments.help</groupId>
 	       					<artifactId>mpayments-help-repo-rest</artifactId>
@@ -89,20 +84,6 @@
 	
 	<dependencies>
 		<dependency>
-	  		<groupId>org.infobip.mpayments.help</groupId>
-	  		<artifactId>mpayments-help-spi</artifactId>
-	  		<version>0.0.1-SNAPSHOT</version>
-	  		<type>jar</type>
-	  		<scope>compile</scope>
-		</dependency>
-	  	<dependency>
-	  		<groupId>org.infobip.mpayments.help</groupId>
-	  		<artifactId>mpayments-help-ejb</artifactId>
-	  		<version>0.0.1-SNAPSHOT</version>
-	  		<type>ejb</type>
-	  		<scope>compile</scope>
-	  	</dependency>
-		<dependency>
 			<groupId>org.infobip.mpayments.help</groupId>
 			<artifactId>mpayments-help-repo-rest</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
@@ -113,13 +94,6 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-<!-- 	<dependency>
-			<groupId>org.jboss.jbossas</groupId>
-			<artifactId>jboss-as-client-reduced</artifactId>
-			<version>6.0.0.Final</version>
-			<type>pom</type>
-			<scope>test</scope>
-		</dependency> -->
 		<dependency>
 			<groupId>javax.jcr</groupId>
 			<artifactId>jcr</artifactId>
