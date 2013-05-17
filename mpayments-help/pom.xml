@@ -11,6 +11,7 @@
   
   	<modules>
 		<module>mpayments-help-repo-rest</module>
+		<module>mpayments-help-web</module>
 		<module>mpayments-help-ear</module>
 	</modules>
 	

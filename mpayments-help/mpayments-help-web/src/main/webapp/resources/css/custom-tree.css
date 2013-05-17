@@ -1,0 +1,24 @@
+/* 
+    Document   : custom-tree.css
+    Created on : Apr 3, 2012, 8:57:53 AM
+    Author     : John Yeary <jyeary@bluelotussoftware.com>
+    Description: Custom CSS for modifying icons on a PrimeFaces tree component.
+*/
+
+.folder-open {
+    background: url('#{facesContext.externalContext.requestContextPath}/resources/images/node-select16x16.png')!important;
+    height: 16px;
+    width: 16px;
+}
+
+.folder-collapsed {
+    background: url('#{facesContext.externalContext.requestContextPath}/resources/images/node16x16.png')!important;
+    height: 16px;
+    width: 16px;
+}
+
+.document-node {
+    background: url('#{facesContext.externalContext.requestContextPath}/resources/images/document-node16x16.png')!important;
+    height: 16px;
+    width: 16px;
+}

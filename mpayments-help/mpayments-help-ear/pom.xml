@@ -76,6 +76,11 @@
 	       					<artifactId>mpayments-help-repo-rest</artifactId>
 	       					<bundleFileName>mpayments-help-repo-rest.war</bundleFileName>
 	      				</webModule>
+	      				<webModule>
+	       					<groupId>org.infobip.mpayments.help</groupId>
+	       					<artifactId>mpayments-help-web</artifactId>
+	       					<bundleFileName>mpayments-help-web.war</bundleFileName>
+	      				</webModule>
 					</modules>
 				</configuration>
 			</plugin>
@@ -86,6 +91,13 @@
 		<dependency>
 			<groupId>org.infobip.mpayments.help</groupId>
 			<artifactId>mpayments-help-repo-rest</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>war</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.infobip.mpayments.help</groupId>
+			<artifactId>mpayments-help-web</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<type>war</type>
 			<scope>compile</scope>
