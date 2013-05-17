@@ -18,6 +18,7 @@
 	</properties>
 
 	<build>
+		<finalName>mpayments-help</finalName>
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
@@ -65,6 +66,24 @@
 			      <wtpversion>2.0</wtpversion>
 			    </configuration>
 	  		</plugin>
+	  		<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<configuration>
+					<modules>
+						<ejbModule>
+							<groupId>org.infobip.mpayments.help</groupId>
+	       					<artifactId>mpayments-help-ejb</artifactId>
+	       					<bundleFileName>mpayments-help-ejb.jar</bundleFileName>
+	      				</ejbModule>
+	      				<webModule>
+	       					<groupId>org.infobip.mpayments.help</groupId>
+	       					<artifactId>mpayments-help-repo-rest</artifactId>
+	       					<bundleFileName>mpayments-help-repo-rest.war</bundleFileName>
+	      				</webModule>
+					</modules>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	
@@ -83,6 +102,13 @@
 	  		<type>ejb</type>
 	  		<scope>compile</scope>
 	  	</dependency>
+		<dependency>
+			<groupId>org.infobip.mpayments.help</groupId>
+			<artifactId>mpayments-help-repo-rest</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<type>war</type>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

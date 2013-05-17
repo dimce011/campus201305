@@ -12,6 +12,7 @@
   	<modules>
   		<module>mpayments-help-spi</module>
 		<module>mpayments-help-ejb</module>
+		<module>mpayments-help-repo-rest</module>
 		<module>mpayments-help-ear</module>
 	</modules>
 	
