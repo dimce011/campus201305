@@ -9,3 +9,4 @@ bin/
 *.ear
 faces-config.xml
 *.iml
+*.tmp
