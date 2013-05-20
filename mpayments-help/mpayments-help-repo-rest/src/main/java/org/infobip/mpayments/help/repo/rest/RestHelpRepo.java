@@ -25,4 +25,9 @@ public interface RestHelpRepo {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 	public Response test(@Context HttpServletRequest request);
 
+	@GET
+	@Path("/sayHello")
+	@Produces(MediaType.TEXT_HTML)
+	public String sayHtmlHello();
+
 }

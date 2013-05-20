@@ -69,5 +69,11 @@ public class RestHelpRepoService implements RestHelpRepo {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseVO).build();
 		}
 	}
+	
+	@Override
+	public String sayHtmlHello() {
+		return "<html> " + "<title>" + "Hello guys" + "</title>"
+		        + "<body><h1>" + "Hello guys" + "</body></h1>" + "</html> ";
+	}
 
 }
