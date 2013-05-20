@@ -21,6 +21,6 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/sayHello")
 	@Produces(MediaType.TEXT_HTML)
-	public String sayHtmlHello();
+	public String sayHtmlHello(); 
 
 }
