@@ -1,5 +1,8 @@
 package org.infobip.mpayments.help.repo.rest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ejb.Stateless;
 import javax.jcr.Node;
 import javax.jcr.Repository;
@@ -9,6 +12,7 @@ import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.infobip.mpayments.help.repo.rest.vo.TestResponseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +83,21 @@ public class RestHelpRepoService implements RestHelpRepo {
 	public String sayHtmlHello() {
 		return "<html> " + "<title>" + "Hello guys" + "</title>" + "<body><h1>"
 				+ "Hello guys" + "</body></h1>" + "</html> ";
+	}
+
+	@Override
+	public String getDocument(String language) {
+
+		Map<String, Object> inputMap = new HashMap<String, Object>();
+
+		inputMap.put("telefon", "38160123456");
+		inputMap.put("adresa", "address");
+		inputMap.put("firma", language);
+
+		FreeMarker fm = new FreeMarker();
+		String s = fm.process(inputMap);
+
+		return s;
 	}
 
 }
