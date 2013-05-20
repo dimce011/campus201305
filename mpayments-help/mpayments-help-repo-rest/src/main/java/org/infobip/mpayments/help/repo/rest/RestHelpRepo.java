@@ -9,13 +9,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-/**
- * Exposed to Merchants - users of Centili premium API
- * 
- * @author sivkovic
- * 
- */
-
 @Local
 @Path("/")
 public interface RestHelpRepo {
