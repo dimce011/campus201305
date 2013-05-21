@@ -20,8 +20,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class RestHelpRepoService implements RestHelpRepo {
 
-	static final Logger logger = LoggerFactory
-			.getLogger(RestHelpRepoService.class);
+	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 
 	@Override
 	public Response test(HttpServletRequest request) {
@@ -38,13 +37,11 @@ public class RestHelpRepoService implements RestHelpRepo {
 		try {
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
-			sess = repository.login(new SimpleCredentials("admin", "admin"
-					.toCharArray()));
+			sess = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
 			// Do something interesting with the Session ...
 			logger.info("name: {}", sess.getRootNode().getName());
-			logger.info("type name: {}", sess.getRootNode()
-					.getPrimaryNodeType().getName());
+			logger.info("type name: {}", sess.getRootNode().getPrimaryNodeType().getName());
 			logger.info("path: {}", sess.getRootNode().getPath());
 
 			Node node = sess.getNode("/");
@@ -71,26 +68,24 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 
 		if (!error) {
-			return Response.status(Response.Status.OK).entity(responseVO)
-					.build();
+			return Response.status(Response.Status.OK).entity(responseVO).build();
 		} else {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity(responseVO).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseVO).build();
 		}
 	}
 
 	@Override
 	public String sayHtmlHello() {
-		return "<html> " + "<title>" + "Hello guys" + "</title>" + "<body><h1>"
-				+ "Hello guys" + "</body></h1>" + "</html> ";
+		return "<html> " + "<title>" + "Hello guys" + "</title>" + "<body><h1>" + "Hello guys" + "</body></h1>"
+				+ "</html> ";
 	}
 
 	@Override
-	public String getDocument(String language) {
+	public String getDocument(String language, String phone) {
 
 		Map<String, Object> inputMap = new HashMap<String, Object>();
 
-		inputMap.put("telefon", "38160123456");
+		inputMap.put("telefon", phone);
 		inputMap.put("adresa", "address");
 		inputMap.put("firma", language);
 

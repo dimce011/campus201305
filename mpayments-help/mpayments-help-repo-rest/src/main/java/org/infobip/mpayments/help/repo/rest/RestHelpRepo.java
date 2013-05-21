@@ -27,6 +27,6 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/document")
 	@Produces(MediaType.TEXT_HTML)
-	public String getDocument(@QueryParam("language") String language);
+	public String getDocument(@QueryParam("language") String language, @QueryParam("phone") String phone);
 
 }
