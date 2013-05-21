@@ -13,25 +13,20 @@
 	<name>mpayments-help-web</name>
 	<description>Mobile Payments Help WEB Application</description>
 	
-	<properties>
-  		<skipDeploy>true</skipDeploy>
-		<skipIntegrationTests>false</skipIntegrationTests>
-	</properties>
-	
 	<dependencies>
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>2.3.19</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>  
 			<groupId>org.primefaces</groupId>  
 			<artifactId>primefaces</artifactId>  
 			<version>3.5</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>  
 		<dependency>
 			<groupId>org.apache.myfaces.core</groupId>

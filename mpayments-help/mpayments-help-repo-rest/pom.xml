@@ -13,18 +13,13 @@
 	<name>mpayments-help-repo-rest</name>
 	<description>Mobile Payments Content Repository Rest API Service</description>
 
-  	<properties>
-  		<skipDeploy>true</skipDeploy>
-		<skipIntegrationTests>false</skipIntegrationTests>
-	</properties>
-
     <dependencies>
     	<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
 			<version>2.3.19</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax</groupId>
