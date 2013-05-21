@@ -10,6 +10,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.infobip.mpayments.help.dto.DocumentNode;
+
 @Local
 @Path("/")
 public interface RestHelpRepo {
@@ -27,6 +29,11 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/document")
 	@Produces(MediaType.TEXT_HTML)
-	public String getDocument(@QueryParam("language") String language, @QueryParam("phone") String phone);
+	public String getDocument(@QueryParam("language") String language, @QueryParam("test") String test);
+	
+	@GET
+	@Path("/testJSON")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getJSON();
 
 }
