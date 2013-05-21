@@ -13,7 +13,7 @@ public class DocumentNode {
 	DocumentNode parent = null;
 
 	public DocumentNode() {
-
+		children = new ArrayList<DocumentNode>();
 	}
 
 	public DocumentNode(String key, String title, String category, String type, DocumentNode parent, String selfPath) {
