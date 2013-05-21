@@ -9,4 +9,4 @@
 
 </div>
 
-<#include "./common/footer.ftl"> 
+<#include "./common/footer.ftl">
