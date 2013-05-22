@@ -15,10 +15,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import org.jsoup.Jsoup;
@@ -34,27 +31,22 @@ public class RestAPIService implements RestAPI {
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 
 	@Override
-	public String getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language) {
+	public String getParagraph(@PathParam("parID") String parID, @QueryParam("reseller") String reseller,
+			@QueryParam("language") String language) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
 		File f = null;
-		StringBuffer result = new StringBuffer();
+		String result = null;
 		try {
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
-<<<<<<< HEAD
-//			Node target = session.getNode("/help/pp/service/1/en");
-			logger.info("name: {}", session.getNode("/help/"+app+"/"+topic+"/" + reseller + "/" + language + ""));
-			Node target = session.getNode("/help/"+app+"/"+topic+"/" + reseller + "/" + language + "");
-=======
-			Node target = session.getNode("/help/pp/service/1/en");
+			Node target = session.getNode("/help[3]/pp/service/1/en");
 //			Node target = session.getNode("/help[3]/" + app + "/" + topic + "/" + reseller + "/" + language + "");
->>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
 
-		
+//			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
 //			ispisiSvuDecu(session.getNode("/"));
 			// Node content = en.addNode("jcr:content", "nt:resource");
 			Node content = target.getNode("jcr:content");
@@ -74,8 +66,15 @@ public class RestAPIService implements RestAPI {
 			output.close();
 			input.close();
 			
+			Document doc = Jsoup.parse(readFile(f));
+			Elements divs = doc.getElementsByTag("div");
+			for (Element elem : divs) {
+				if (elem.id().equals(parID)) {
+					result = elem.toString();
+				}
+			}
+
 		} catch (Exception ex) {
-			logger.info("ovde3");
 			error = true;
 			ex.printStackTrace();
 		} finally {
@@ -83,29 +82,10 @@ public class RestAPIService implements RestAPI {
 				session.logout();
 		}
 		if (!error) {
-			logger.info("ovde1");
-			String toProcess = null;
-			try {
-				toProcess = readFile(f);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			Document doc = Jsoup.parse(toProcess);
-			Elements divs = doc.getElementsByTag("div");
-			for (Element elem : divs) {
-				if (elem.id().equals(parID)) {
-//				if (elem.className().equals(parID)) {
-					result.append(elem.toString());
-					logger.info("ovde div");
-				}
-			}
-			logger.info("ovde2");
-			logger.info(result.toString());
-			return result.toString();
+			return result;
 		} else {
 			return "error";
 		}
-		
 	}
 
 	@Override
@@ -123,14 +103,10 @@ public class RestAPIService implements RestAPI {
 
 			System.out.println("ovde");
 
-<<<<<<< HEAD
-			// Node en = session.getNode("/help/pp/service/1/en");
-=======
 			// Node en = session.getNode("/help[3]/pp/service/1/en");
->>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
-			Node target = session.getNode("/help/" + app + "/" + topic + "/" + reseller + "/" + language + "");
+			Node target = session.getNode("/help[3]/" + app + "/" + topic + "/" + reseller + "/" + language + "");
 
-			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
+			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
 			ispisiSvuDecu(session.getNode("/"));
 			// Node content = en.addNode("jcr:content", "nt:resource");
 			Node content = target.getNode("jcr:content");
@@ -171,8 +147,6 @@ public class RestAPIService implements RestAPI {
 		}
 		return "error";
 	}
-	
-	
 
 	private String readFile(File file) throws IOException {
 
@@ -223,76 +197,13 @@ public class RestAPIService implements RestAPI {
 			System.out.println("ovde");
 			
 			
-			Node en = session.getNode("/help/pp/service/1/en");
-<<<<<<< HEAD
-		    //Node target = session.getNode("/help/"+app+"/"+topic+"/"+reseller+"/"+language+"");
-=======
+			Node en = session.getNode("/help[3]/pp/service/1/en");
 		    //Node target = session.getNode("/help[3]/"+app+"/"+topic+"/"+reseller+"/"+language+"");
->>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
 			Node target = session.getNodeByIdentifier(en.getIdentifier());
 			
-			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
+			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
 			ispisiSvuDecu(session.getNode("/"));
 			//Node content = en.addNode("jcr:content", "nt:resource");
-			Node content = target.getNode("jcr:content");
-			InputStream input = content.getProperty("jcr:data").getBinary().getStream();
-
-			f = new File("template.html");
-			OutputStream output = new FileOutputStream(f);
-
-			byte[] buffer = new byte[input.available()];
-			while (input.read(buffer) != -1) {
-				output.write(buffer);
-				buffer = new byte[input.available() + 1];
-
-			}
-			output.write('\n');
-			output.flush();
-			output.close();
-			input.close();
-
-		} catch (Exception ex) {
-			error = true;
-
-			ex.printStackTrace();
-		} finally {
-			if (session != null)
-				session.logout();
-		}
-
-		if (!error) {
-			try {
-				return readFile(f);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else {
-			return "error";
-		}
-		return "error";
-	}
-
-	@Override
-	public String getDoc(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("reseller") String reseller,
-			@PathParam("language") String language) {
-		Session session = null;
-		Repository repository = null;
-		boolean error = false;
-		File f = null;
-		try {
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-
-			System.out.println("ovde");
-
-			// Node en = session.getNode("/help/pp/service/1/en");
-			Node target = session.getNode("/help/" + app + "/" + topic + "/" + reseller + "/" + language + "");
-
-			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
-			ispisiSvuDecu(session.getNode("/"));
-			// Node content = en.addNode("jcr:content", "nt:resource");
 			Node content = target.getNode("jcr:content");
 			InputStream input = content.getProperty("jcr:data").getBinary().getStream();
 
