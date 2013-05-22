@@ -20,21 +20,29 @@
  */
 package com.bluelotussoftware.example.jsf;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 
-import paket.Node;
-
 /**
  * Page backing bean which manages page data and events.
- *
+ * 
  * @author John Yeary <jyeary@bluelotussoftware.com>
  * @version 1.0
  */
@@ -42,115 +50,172 @@ import paket.Node;
 @ViewScoped
 public class TreeBean implements Serializable {
 
-    private static final long serialVersionUID = 2417620239014385855L;
-    private TreeNode root;
-    private TreeNode selectedNode;
+	private static final long serialVersionUID = 2417620239014385855L;
+	private TreeNode root;
+	private TreeNode selectedNode;
+	private DocumentNode object;
 
-    /**
-     * Default constructor
-     */
-    public TreeBean() {
-        root = new TreeNodeImpl("Root", null);
-        TreeNode node0 = new TreeNodeImpl("Segment 0", root);
-        TreeNode node1 = new TreeNodeImpl("Segment 1", root);
-        TreeNode node2 = new TreeNodeImpl("Segment 2", root);
-        TreeNode node00 = new TreeNodeImpl("Segment 0.0", node0);
-        TreeNode node01 = new TreeNodeImpl("Segment 0.1", node0);
-        TreeNode node10 = new TreeNodeImpl("Segment 1.0", node1);
-        TreeNode node11 = new TreeNodeImpl("Segment 1.1", node1);
-        TreeNode node000 = new TreeNodeImpl("Segment 0.0.0", node00);
-        TreeNode node001 = new TreeNodeImpl("Segment 0.0.1", node00);
-        TreeNode node010 = new TreeNodeImpl("Segment 0.1.0", node01);
-        TreeNode node100 = new TreeNodeImpl("Segment 1.0.0", node10);
+	/**
+	 * Default constructor
+	 * 
+	 * @throws JsonMappingException
+	 * @throws JsonParseException
+	 * 
+	 * @throws IOException
+	 */
+	public TreeBean() throws JsonParseException, JsonMappingException, IOException {
 
-  
-        
-        
-    }
-
-    /**
-     * This method returns the tree model based on the root node.
-     *
-     * @return root node.
-     */
-    public TreeNode getModel() {
-        return root;
-    }
-    
-	public void RecursionTree(Node node) {
+		makeFromJsonTree();
+		root = new TreeNodeImpl("Root", null);
+		TreeNode node0 = new TreeNodeImpl(object.getTitle(), root);
+		createNodes(object, node0);
+		System.out.println("Izasao");
 		
-		TreeNode treeNode = null;
 
-		// root = new TreeNodeImpl(node.getName(), null);
-
-		if (node.getParent() == null) {
-			// System.out.println(node.name);
-			root = new TreeNodeImpl(node.getName(), null);
-
-		}
-		if (node.getChildNodes() != null) {
-			for (Node child : node.getChildNodes()) {
-				
-				System.out.println(child.getName());
-				
-				//treeNode = new TreeNodeImpl(child.getName(), child.getParent());
-				RecursionTree(child);
-			}
-		}
 	}
 
-    /**
-     * Gets the selected node in the tree.
-     *
-     * @return selected node in tree.
-     */
-    public TreeNode getSelectedNode() {
-        return selectedNode;
-    }
+	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException {
+		// TODO Auto-generated method stub
+		ObjectMapper mapper = new ObjectMapper();
+		setObject(mapper.readValue(new File("C:\\Users\\mratkovic\\Desktop\\jsonTwoTest.json"), DocumentNode.class));
+		System.out.println(getObject());
+	}
 
-    /**
-     * Sets the selected node in the tree.
-     *
-     * @param selectedNode node to be set as selected.
-     */
-    public void setSelectedNode(TreeNode selectedNode) {
-        this.selectedNode = selectedNode;
-    }
+	public void createNodes(DocumentNode object, TreeNode root) {
+		if (object.getChildren() != null) {
+			for (DocumentNode list : object.getChildren()) {
+				TreeNode node1 = new TreeNodeImpl(list.getTitle(), root);
+				createNodes(list, node1);
+			}
+		}
 
-    /**
-     * {@inheritDoc }
-     *
-     * Adds a {@link javax.faces.application.FacesMessage} with event data to
-     * the {@link javax.faces.context.FacesContext}.
-     */
-    public void onNodeSelect(NodeSelectEvent event) {
-        System.out.println("NodeSelectEvent Fired");
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", event.getTreeNode().getData().toString());
-        FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
-    }
+	}
 
-    /**
-     * {@inheritDoc}
-     *
-     * Adds a {@link javax.faces.application.FacesMessage} with event data to
-     * the {@link javax.faces.context.FacesContext}.
-     */
-    public void onNodeExpand(NodeExpandEvent event) {
+	public void jsonParse(File file) throws IOException {
 
-        System.out.println("NodeExpandEvent Fired");
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", event.getTreeNode().getData().toString());
-        FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
-    }
+		JsonFactory jfactory = new JsonFactory();
 
-    /**
-     * {@inheritDoc}
-     *
-     * Adds a {@link javax.faces.application.FacesMessage} with event data to
-     * the {@link javax.faces.context.FacesContext}.
-     */
-    public void onNodeCollapse(NodeCollapseEvent event) {
-        System.out.println("NodeCollapseEvent Fired");
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", event.getTreeNode().getData().toString());
-        FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
-    }
+		/*** read from file ***/
+		JsonParser jParser = jfactory.createJsonParser(file);
+
+		// loop until token equal to "}"
+		while (jParser.nextToken() != JsonToken.END_OBJECT) {
+
+			// Get field name
+			String fieldname = jParser.getCurrentName();
+			System.out.println("File name: " + fieldname);
+
+			if ("documents".equals(fieldname)) {
+				// move to next, which is "name"'s value
+				jParser.nextToken();
+				System.out.println("This is documents: " + jParser.getText()); // display
+																				// mkyong
+
+			} else
+				System.out.println("There is no documents");
+
+			if ("key".equals(fieldname)) {
+
+				// current token is "age",
+				// move to next, which is "name"'s value
+				jParser.nextToken();
+				System.out.println("This is key: " + jParser.getIntValue()); // display
+																				// 29
+
+			}
+
+			if ("type".equals(fieldname)) {
+
+				jParser.nextToken(); // current token is "[", move next
+
+				// messages is array, loop until token equal to "]"
+				while (jParser.nextToken() != JsonToken.END_ARRAY) {
+
+					// display msg1, msg2, msg3
+					System.out.println("This is type:" + jParser.getText());
+
+				}
+
+			}
+
+		}
+		jParser.close();
+
+	}
+
+	/**
+	 * This method returns the tree model based on the root node.
+	 * 
+	 * @return root node.
+	 */
+	public TreeNode getModel() {
+		return root;
+	}
+
+	/**
+	 * Gets the selected node in the tree.
+	 * 
+	 * @return selected node in tree.
+	 */
+	public TreeNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	/**
+	 * Sets the selected node in the tree.
+	 * 
+	 * @param selectedNode
+	 *            node to be set as selected.
+	 */
+	public void setSelectedNode(TreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+	}
+
+	/**
+	 * {@inheritDoc }
+	 * 
+	 * Adds a {@link javax.faces.application.FacesMessage} with event data to
+	 * the {@link javax.faces.context.FacesContext}.
+	 */
+	public void onNodeSelect(NodeSelectEvent event) {
+		System.out.println("NodeSelectEvent Fired");
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", event.getTreeNode().getData()
+				.toString());
+		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Adds a {@link javax.faces.application.FacesMessage} with event data to
+	 * the {@link javax.faces.context.FacesContext}.
+	 */
+	public void onNodeExpand(NodeExpandEvent event) {
+
+		System.out.println("NodeExpandEvent Fired");
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", event.getTreeNode().getData()
+				.toString());
+		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Adds a {@link javax.faces.application.FacesMessage} with event data to
+	 * the {@link javax.faces.context.FacesContext}.
+	 */
+	public void onNodeCollapse(NodeCollapseEvent event) {
+		System.out.println("NodeCollapseEvent Fired");
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", event.getTreeNode().getData()
+				.toString());
+		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+	}
+
+	private DocumentNode getObject() {
+		return object;
+	}
+
+	private void setObject(DocumentNode object) {
+		this.object = object;
+	}
 }
