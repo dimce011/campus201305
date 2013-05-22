@@ -23,9 +23,13 @@ public interface RestAPI {
 	public String getPage(@PathParam("id") String id);
 	
 	@GET
-	@Path("/getPage/document/{id}/content")
+	@Path("/getPage")
 	@Produces(MediaType.TEXT_HTML)
 	public String getPage(@QueryParam("app") String app, @QueryParam("topic") String topic,
 			@QueryParam("reseller") String reseller, @QueryParam("language") String language);
 	
+	@GET
+	@Path("/getParagraph/document/{parID}")
+	@Produces(MediaType.TEXT_HTML)
+	public String getParagraph(@PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
 }
