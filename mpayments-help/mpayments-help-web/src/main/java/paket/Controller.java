@@ -42,8 +42,6 @@ public class Controller {
 				bean.setHtml(s);
 				System.out.println("Zavsen proces");
 				String opcija1 = "opcija1";
-				
-		
 		return opcija1;
 	}
 	
@@ -56,16 +54,17 @@ public class Controller {
 	public String obradaOpcije3(){
 		RestClient<String> rs = new RestClient<String>();
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("mila", "mkyong");
+		params = null;
 		System.out.println("proso1");
 		
-		webServiceRestString = (String)rs.getRequest("http://localhost:8080/RESTfulExample/rest/message", null, String.class);
+		webServiceRestString = (String)rs.getRequest("http://localhost:8080/helprepo/testJSON", params, String.class);
 		
 		System.out.println("proso2");
-		if(webServiceRestString.equals("Restful"))
-				return "strana3";
+		/*if(webServiceRestString.equals("Restful"))
+				return "strana3";*/
 		return "tree"; 
 	}
 	
+
 
 }
