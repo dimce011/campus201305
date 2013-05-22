@@ -23,10 +23,11 @@
                     <p:treeNode type="node"
                                 expandedIcon="folder-open"
                                 collapsedIcon="folder-collapsed">
-                        <h:outputText value="#{node}"/>
+                        
+                        <h:outputText value="#{treeBean.model.data.title}" />
                     </p:treeNode>
                     <p:treeNode type="leaf" icon="document-node">
-                        <h:outputText value="#{node}" />
+                        <h:outputText value="#{treeBean.model.data.title}" />
                     </p:treeNode>
                 </p:tree>
             </p:panel>

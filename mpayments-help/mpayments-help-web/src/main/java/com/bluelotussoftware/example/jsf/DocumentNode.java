@@ -2,6 +2,11 @@ package com.bluelotussoftware.example.jsf;
 
 import java.util.ArrayList;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+@ManagedBean
+@ViewScoped
 public class DocumentNode {
 
 	String key;

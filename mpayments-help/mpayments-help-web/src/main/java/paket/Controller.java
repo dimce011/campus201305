@@ -2,9 +2,11 @@ package paket;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.primefaces.model.TreeNode;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+
+import com.bluelotussoftware.example.jsf.DocumentNode;
 
 @ManagedBean(name = "controller")
 @SessionScoped
@@ -24,6 +26,13 @@ public class Controller {
 	}
 
 	private BeanObrada bean;
+	
+	public String getString(String node){
+		//DocumentNode dNode = (DocumentNode) node.getData();
+		//String s = dNode.getTitle();
+		System.out.println("Ispis noda" +node);
+		return node;
+	}
 	
 	public String obradaOpcije1(){
 		
