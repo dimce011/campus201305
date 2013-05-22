@@ -1,6 +1,7 @@
 package org.infobip.mpayments.help.dto;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class DocumentNode {
 
@@ -10,13 +11,13 @@ public class DocumentNode {
 	String type;
 	String selfPath;
 	ArrayList<DocumentNode> children = null;
-	DocumentNode parent = null;
+	String parent = null;
 
 	public DocumentNode() {
-
+		children= new ArrayList<DocumentNode>();
 	}
 
-	public DocumentNode(String key, String title, String category, String type, DocumentNode parent, String selfPath) {
+	public DocumentNode(String key, String title, String category, String type, String parent, String selfPath) {
 		super();
 		this.key = key;
 		this.title = title;
@@ -67,11 +68,11 @@ public class DocumentNode {
 		this.children = children;
 	}
 
-	public DocumentNode getParent() {
+	public String getParent() {
 		return parent;
 	}
 
-	public void setParent(DocumentNode parent) {
+	public void setParent(String parent) {
 		this.parent = parent;
 	}
 
@@ -87,4 +88,24 @@ public class DocumentNode {
 		this.selfPath = selfPath;
 	}
 
+	//	@Override public String toString() {
+	//		StringBuilder result = new StringBuilder();
+	//		String NEW_LINE = System.getProperty("line.separator");
+	//
+	//		result.append(this.getClass().getName() + " Object {" + NEW_LINE);
+	//		result.append(" key: " + key + NEW_LINE);
+	//		result.append(" title " + title + NEW_LINE);
+	//		result.append(" category " + category + NEW_LINE );
+	//		result.append(" type: " + type + NEW_LINE);
+	//		result.append(" selfPath: " + selfPath + NEW_LINE);
+	//		result.append(" parent: " + parent + NEW_LINE);
+	//		result.append(" selfPath: " + selfPath + NEW_LINE);
+	//		for(Iterator<DocumentNode> i = this.getChildren().iterator(); i.hasNext(); ) {
+	//			DocumentNode item = i.next();
+	//			result.append(" children " + item + NEW_LINE);
+	//		}
+	//		result.append("}");
+	//
+	//		return result.toString();
+	//}
 }
