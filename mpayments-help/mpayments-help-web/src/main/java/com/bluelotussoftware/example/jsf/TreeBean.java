@@ -83,7 +83,8 @@ public class TreeBean implements Serializable {
 	public void createNodes(DocumentNode object, TreeNode root) {
 		if (object.getChildren() != null) {
 			for (DocumentNode list : object.getChildren()) {
-				TreeNode node1 = new TreeNodeImpl(list.getTitle(), root);
+				TreeNode node1 = new TreeNodeImpl(list, root);
+				System.out.println("Ispis " + list.getSelfPath());
 				createNodes(list, node1);
 			}
 		}
@@ -176,13 +177,18 @@ public class TreeBean implements Serializable {
 	 * Adds a {@link javax.faces.application.FacesMessage} with event data to
 	 * the {@link javax.faces.context.FacesContext}.
 	 */
-	
+
 	public void onNodeSelect(NodeSelectEvent event) {
-		System.out.println("NodeSelectEvent Fired");
-		path = event.getTreeNode().getData().toString();
-		//path = path + "/" + event.getTreeNode().getData().toString();
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,"Selected" ,path);
-		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
+			System.out.println("NodeExpandEvent Fired");
+			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", event.getTreeNode().getData()
+					.toString());
+			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+		} else {
+			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
+			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelfPath());
+
+		}
 	}
 
 	/**
@@ -197,6 +203,7 @@ public class TreeBean implements Serializable {
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", event.getTreeNode().getData()
 				.toString());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+
 	}
 
 	/**
@@ -207,7 +214,7 @@ public class TreeBean implements Serializable {
 	 */
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
-		
+
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", event.getTreeNode().getData()
 				.toString());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
