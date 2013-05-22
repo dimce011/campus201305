@@ -1,9 +1,12 @@
 package org.infobip.mpayments.help.repo.rest;
 
+import java.net.URI;
+
 import javax.ejb.Local;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -28,16 +31,14 @@ public interface RestHelpRepo {
 	@Path("/document")
 	@Produces(MediaType.TEXT_HTML)
 	public String getDocument(@QueryParam("language") String language, @QueryParam("test") String test);
-	
+
 	@GET
 	@Path("/testJSON")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getJSON();
 
 	@GET
-	@Path("/getOneLevelJSON/{.*}")
+	@Path("/getOneLevelJSON/{nodePath:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOneLevelJSON(@PathParam("nodePath") String nodePath);
-	
-
 }

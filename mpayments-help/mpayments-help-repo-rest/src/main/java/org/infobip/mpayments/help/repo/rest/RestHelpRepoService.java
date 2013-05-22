@@ -16,10 +16,7 @@ import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -49,14 +46,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Test Called.");
 		}
-
-		Session session = null;
-		Repository repository = null;
 		boolean error = false;
 		try {
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			openSession();
 
 			// Node root = session.getRootNode();
 			// Node help = root.addNode("help", NodeType.NT_FOLDER);
@@ -118,7 +110,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			ex.printStackTrace();
 		} finally {
 			if (session != null)
-				session.logout();
+				closeSession();
 		}
 
 		if (!error) {
@@ -146,7 +138,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 		FreeMarker fm = new FreeMarker();
 		String s = fm.process(inputMap);
-
 		return s;
 	}
 
@@ -156,23 +147,17 @@ public class RestHelpRepoService implements RestHelpRepo {
 			while (it.hasNext()) {
 				Node dete = it.nextNode();
 				logger.info(dete.getPath());
-				// System.out.println(dete.getPath());
 				ispisiSvuDecu(dete);
 			}
 		}
 	}
 
 	public DocumentNode createTree(Node node) {
-
-		DocumentNode dn = new DocumentNode();
+		DocumentNode dn = null;
 		try {
-			dn.setTitle(node.getName());
-			dn.setKey(node.getIdentifier());
 			String[] niz = node.getPath().split("/");
-			dn.setCategory(niz[1].toUpperCase());
-			dn.setParent(node.getParent().getPath());
-			dn.setSelfPath(node.getPath());
-			dn.setType(node.getPrimaryNodeType().getName());
+			dn = new DocumentNode(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node.getPrimaryNodeType()
+					.getName(), node.getParent().getPath(), node.getPath());
 
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
@@ -193,36 +178,24 @@ public class RestHelpRepoService implements RestHelpRepo {
 		String response = null;
 		DocumentNode help = null;
 		try {
-			Session session = null;
-			Repository repository = null;
-			InitialContext initialContext;
-
-			initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			try {
-				session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-				ispisiSvuDecu(session.getNode("/help"));
-			} catch (LoginException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (RepositoryException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			try {
-				help = createTree(session.getNode("/help"));
-			} catch (PathNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (RepositoryException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} catch (NamingException e1) {
+			openSession();
+			ispisiSvuDecu(session.getNode("/help"));
+		} catch (LoginException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			help = createTree(session.getNode("/help"));
+		} catch (PathNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		// TODO Auto-generated method stub
@@ -284,35 +257,24 @@ public class RestHelpRepoService implements RestHelpRepo {
 			e.printStackTrace();
 		}
 
+		finally {
+			if (session != null)
+				closeSession();
+		}
+
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
 
 	@Override
 	public Response getOneLevelJSON(@PathParam("nodePath") String nodePath) {
-		logger.info("NODE PATH - {}",nodePath);
 		openSession();
-
-		logger.info("NODE PATH - {}",nodePath);
 		String response = null;
-		Node node= null;
+		Node node = null;
 		try {
-			node = session.getNode(nodePath);
-		} catch (PathNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (RepositoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		DocumentNode dn = new DocumentNode();
-		try {
-			dn.setTitle(node.getName());
-			dn.setKey(node.getIdentifier());
+			node = session.getNode("/" + nodePath);
 			String[] niz = node.getPath().split("/");
-			dn.setCategory(niz[1].toUpperCase());
-			dn.setParent(node.getParent().getPath());
-			dn.setSelfPath(node.getPath());
-			dn.setType(node.getPrimaryNodeType().getName());
+			DocumentNode dn = new DocumentNode(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
+					.getPrimaryNodeType().getName(), node.getParent().getPath(), node.getPath());
 
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
@@ -322,10 +284,14 @@ public class RestHelpRepoService implements RestHelpRepo {
 					dn.addChild(dnc);
 				}
 			}
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(node);
-		} catch (RepositoryException e) {
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dn);
+
+		} catch (PathNotFoundException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -335,6 +301,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
@@ -357,4 +326,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 	}
 
+	public void closeSession() {
+		session.logout();
+	}
 }
