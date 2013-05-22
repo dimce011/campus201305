@@ -1,10 +1,15 @@
 package org.infobip.mpayments.help.repo.rest;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.ejb.Stateless;
+import javax.jcr.Binary;
 import javax.jcr.LoginException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -13,6 +18,7 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.nodetype.NodeType;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,18 +75,19 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// Node three = service.addNode("3", NodeType.NT_FOLDER);
 			// Node seven = service.addNode("4", NodeType.NT_FOLDER);
 
-			// Node en = one.addNode("en", NodeType.NT_FILE);
-			// //Node cro = one.addNode("cro", NodeType.NT_FILE);
+			//			Node one =session.getNode("/help/pp/service/1");
+			//			Node en = one.addNode("en", NodeType.NT_FILE);
+			//			//Node cro = one.addNode("cro", NodeType.NT_FILE);
 			//
-			// Node content = en.addNode("jcr:content", "nt:resource");
+			//			Node content = en.addNode("jcr:content", "nt:resource");
 			//
-			// File f = new File("template.ftl");
-			// InputStream stream = new BufferedInputStream(new
-			// FileInputStream(f));
-			// Binary binary = session.getValueFactory().createBinary(stream);
-			// content.setProperty("jcr:data", binary);
-
-			// session.save();
+			//			File f = new File("template.ftl");
+			//			InputStream stream = new BufferedInputStream(new
+			//					FileInputStream(f));
+			//			Binary binary = session.getValueFactory().createBinary(stream);
+			//			content.setProperty("jcr:data", binary);
+			//
+			//			session.save();
 			ispisiSvuDecu(session.getNode("/help"));
 
 			// Do something interesting with the Session ...
