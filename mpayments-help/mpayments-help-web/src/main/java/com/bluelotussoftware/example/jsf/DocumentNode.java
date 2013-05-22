@@ -1,4 +1,4 @@
-package org.infobip.mpayments.help.dto;
+package com.bluelotussoftware.example.jsf;
 
 import java.util.ArrayList;
 
@@ -9,11 +9,12 @@ public class DocumentNode {
 	String category;
 	String type;
 	String selfPath;
-	ArrayList<DocumentNode> children = new ArrayList<DocumentNode>();
+	
+	ArrayList<DocumentNode> children = null;
 	String parent = null;
 
 	public DocumentNode() {
-		
+
 	}
 
 	public DocumentNode(String key, String title, String category, String type, String parent, String selfPath) {
@@ -24,6 +25,7 @@ public class DocumentNode {
 		this.type = type;
 		this.parent = parent;
 		this.selfPath = selfPath;
+		children = new ArrayList<DocumentNode>();
 	}
 
 	public String getKey() {
@@ -84,6 +86,10 @@ public class DocumentNode {
 
 	public void setSelfPath(String selfPath) {
 		this.selfPath = selfPath;
+	}
+	@Override
+	public String toString() {
+		return "DocumentNode " + "[ key: " + key + ", title: " + title + ", category: " + category + ", type: " + type + ", parent: " + parent + ", selfPath: " + selfPath + "children: " + children;
 	}
 
 }
