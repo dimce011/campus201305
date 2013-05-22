@@ -7,7 +7,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 @Local
 @Path("/")
@@ -32,7 +31,13 @@ public interface RestAPI {
 			@QueryParam("reseller") String reseller, @QueryParam("language") String language);
 	
 	@GET
-	@Path("/getParagraph/document/{parID}")
+	@Path("/getParagraph/document/{app}/{topic}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
-	public String getParagraph(@PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
+	public String getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
+	
+	@GET
+	@Path("/getPage/document/{app}/{topic}/content/{reseller}/{language}")
+	@Produces(MediaType.TEXT_HTML)
+	public String getDoc(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("reseller") String reseller, @PathParam("language") String language);
+
 }
