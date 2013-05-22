@@ -4,31 +4,31 @@
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
-	
+
 	<display-name>Mobile Payments Help Repo API REST Interface</display-name>
-   
+
 	<context-param>
-	   <param-name>resteasy.servlet.mapping.prefix</param-name>
-	   <param-value>/</param-value>
+		<param-name>resteasy.servlet.mapping.prefix</param-name>
+		<param-value>/</param-value>
 	</context-param>
 
 	<context-param>
 		<param-name>resteasy.jndi.resources</param-name>
-		<param-value>mpayments-help/RestHelpRepoService/local</param-value>
+		<param-value>mpayments-help/RestAPIService/local,mpayments-help/RestHelpRepoService/local</param-value>
 	</context-param>
 
 	<listener>
 		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
 	</listener>
-	
+
 	<servlet>
 		<servlet-name>Resteasy</servlet-name>
 		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>Resteasy</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
-	
+
 </web-app>
