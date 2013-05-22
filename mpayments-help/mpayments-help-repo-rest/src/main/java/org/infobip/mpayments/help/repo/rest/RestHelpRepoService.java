@@ -11,6 +11,7 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.nodetype.NodeType;
 import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -47,24 +48,24 @@ public class RestHelpRepoService implements RestHelpRepo {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
-			// Node root = session.getRootNode();
-			// Node help = root.addNode("help", NodeType.NT_FOLDER);
-			//
-			// Node pp = help.addNode("pp", NodeType.NT_FOLDER);
-			// Node cs = help.addNode("cs", NodeType.NT_FOLDER);
-			// Node wd = help.addNode("wd", NodeType.NT_FOLDER);
-			// Node fi = help.addNode("fi", NodeType.NT_FOLDER);
-			// Node ami = help.addNode("ami", NodeType.NT_FOLDER);
-			//
-			// Node service = pp.addNode("service", NodeType.NT_FOLDER);
-			// Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
-			// Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
-			// Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
-			//
-			// Node one = service.addNode("1", NodeType.NT_FOLDER);
-			// Node two = service.addNode("2", NodeType.NT_FOLDER);
-			// Node three = service.addNode("3", NodeType.NT_FOLDER);
-			// Node seven = service.addNode("4", NodeType.NT_FOLDER);
+			 Node root = session.getRootNode();
+			 Node help = root.addNode("help", NodeType.NT_FOLDER);
+			
+			 Node pp = help.addNode("pp", NodeType.NT_FOLDER);
+			 Node cs = help.addNode("cs", NodeType.NT_FOLDER);
+			 Node wd = help.addNode("wd", NodeType.NT_FOLDER);
+			 Node fi = help.addNode("fi", NodeType.NT_FOLDER);
+			 Node ami = help.addNode("ami", NodeType.NT_FOLDER);
+			
+			 Node service = pp.addNode("service", NodeType.NT_FOLDER);
+			 Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
+			 Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
+			 Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
+			
+			 Node one = service.addNode("1", NodeType.NT_FOLDER);
+			 Node two = service.addNode("2", NodeType.NT_FOLDER);
+			 Node three = service.addNode("3", NodeType.NT_FOLDER);
+			 Node seven = service.addNode("4", NodeType.NT_FOLDER);
 
 			// Node en = one.addNode("en", NodeType.NT_FILE);
 			// //Node cro = one.addNode("cro", NodeType.NT_FILE);
@@ -164,26 +165,14 @@ public class RestHelpRepoService implements RestHelpRepo {
 		DocumentNode cs = new DocumentNode();
 		DocumentNode help = new DocumentNode();
 
-		cs.setCategory("HELP");
-		cs.setKey("1666-sssss-ddddd-33333");
-		cs.setParent(help.getSelfPath());
-		cs.setSelfPath("/help/cs");
-		cs.setTitle("CS");
-		cs.setType("nt:FOLDER");
-
-		service.setCategory("HELP");
-		service.setKey("1666-ddddd-ddddd-33333");
-		service.setParent(pp.getSelfPath());
-		service.setSelfPath("/help/cs/service");
-		service.setTitle("service");
-		service.setType("nt:FOLDER");
-
-		tran.setCategory("HELP");
-		tran.setKey("1666-ddddd-99999-33333");
-		tran.setParent(pp.getSelfPath());
-		tran.setSelfPath("/help/cs/tran");
-		tran.setTitle("tran");
-		tran.setType("nt:FOLDER");
+		help.setCategory("Help");
+		help.addChild(pp);
+		help.addChild(cs);
+		help.setKey("1111-sssss-ddddd-22222");
+		help.setParent(null);
+		help.setSelfPath("/help");
+		help.setTitle("Help");
+		help.setType("nt:FOLDER");
 
 		pp.setCategory("HELP");
 		pp.setKey("1111-sssss-ddddd-33333");
@@ -194,14 +183,26 @@ public class RestHelpRepoService implements RestHelpRepo {
 		pp.addChild(service);
 		pp.addChild(tran);
 
-		help.setCategory("Help");
-		help.addChild(pp);
-		help.addChild(cs);
-		help.setKey("1111-sssss-ddddd-22222");
-		help.setParent(null);
-		help.setSelfPath("/help");
-		help.setTitle("Help");
-		help.setType("nt:FOLDER");
+		cs.setCategory("HELP");
+		cs.setKey("1666-sssss-ddddd-33333");
+		cs.setParent(help.getSelfPath());
+		cs.setSelfPath("/help/cs");
+		cs.setTitle("CS");
+		cs.setType("nt:FOLDER");
+
+		tran.setCategory("HELP");
+		tran.setKey("1666-ddddd-99999-33333");
+		tran.setParent(pp.getSelfPath());
+		tran.setSelfPath("/help/cs/tran");
+		tran.setTitle("tran");
+		tran.setType("nt:FOLDER");
+
+		service.setCategory("HELP");
+		service.setKey("1666-ddddd-ddddd-33333");
+		service.setParent(pp.getSelfPath());
+		service.setSelfPath("/help/cs/service");
+		service.setTitle("service");
+		service.setType("nt:FOLDER");
 
 		try {
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(help);
