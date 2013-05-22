@@ -1,6 +1,6 @@
 <#include "./common/header.ftl"> 
 <div>
-<!-- test only -->
+<!-- Milan -->
 <ul>
 
 </ul>
