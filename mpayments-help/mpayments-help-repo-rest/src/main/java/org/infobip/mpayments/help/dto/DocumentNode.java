@@ -9,14 +9,14 @@ public class DocumentNode {
 	String category;
 	String type;
 	String selfPath;
-	ArrayList<DocumentNode> children = null;
-	DocumentNode parent = null;
+	ArrayList<DocumentNode> children = new ArrayList<DocumentNode>();
+	String parent = null;
 
 	public DocumentNode() {
-
+		
 	}
 
-	public DocumentNode(String key, String title, String category, String type, DocumentNode parent, String selfPath) {
+	public DocumentNode(String key, String title, String category, String type, String parent, String selfPath) {
 		super();
 		this.key = key;
 		this.title = title;
@@ -24,7 +24,6 @@ public class DocumentNode {
 		this.type = type;
 		this.parent = parent;
 		this.selfPath = selfPath;
-		children = new ArrayList<DocumentNode>();
 	}
 
 	public String getKey() {
@@ -67,11 +66,11 @@ public class DocumentNode {
 		this.children = children;
 	}
 
-	public DocumentNode getParent() {
+	public String getParent() {
 		return parent;
 	}
 
-	public void setParent(DocumentNode parent) {
+	public void setParent(String parent) {
 		this.parent = parent;
 	}
 

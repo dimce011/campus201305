@@ -1,13 +1,8 @@
 package org.infobip.mpayments.help.repo.rest;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import javax.ejb.Stateless;
 import javax.jcr.Node;
@@ -18,7 +13,6 @@ import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -53,7 +47,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
-			Node root = session.getRootNode();
+			// Node root = session.getRootNode();
 			// Node help = root.addNode("help", NodeType.NT_FOLDER);
 			//
 			// Node pp = help.addNode("pp", NodeType.NT_FOLDER);
@@ -71,39 +65,20 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// Node two = service.addNode("2", NodeType.NT_FOLDER);
 			// Node three = service.addNode("3", NodeType.NT_FOLDER);
 			// Node seven = service.addNode("4", NodeType.NT_FOLDER);
-			// //
+
 			// Node en = one.addNode("en", NodeType.NT_FILE);
 			// //Node cro = one.addNode("cro", NodeType.NT_FILE);
 			//
 			// Node content = en.addNode("jcr:content", "nt:resource");
-
+			//
 			// File f = new File("template.ftl");
 			// InputStream stream = new BufferedInputStream(new
 			// FileInputStream(f));
 			// Binary binary = session.getValueFactory().createBinary(stream);
 			// content.setProperty("jcr:data", binary);
+
 			// session.save();
-
-			// Node root = session.getRootNode();
-			// Node help = session.getNode("/help");
-			//
-			// Node pp = help.addNode("pp", NodeType.NT_FOLDER);
-		
-			/*String path = new java.io.File(".").getCanonicalPath();
-			System.out.println("ovde - "+path);
-			Node one = session.getNode("/help[3]/pp/service/1");
-			Node en = one.addNode("en", NodeType.NT_FILE);
-			Node content = en.addNode("jcr:content", "nt:resource");
-			File f = new File("template.ftl");
-			
-			InputStream stream = new BufferedInputStream(new FileInputStream(f));
-			Binary binary = session.getValueFactory().createBinary(stream);
-			content.setProperty("jcr:data", binary);
-
-			logger.info("name: {}", session.getNode("/help[3]/pp/service/1"));
-			ispisiSvuDecu(session.getNode("/"));
-			session.save();*/
-			//
+			ispisiSvuDecu(session.getNode("/help"));
 
 			// Do something interesting with the Session ...
 			// logger.info("name: {}", sess.getRootNode().getName());
@@ -191,28 +166,28 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 		cs.setCategory("HELP");
 		cs.setKey("1666-sssss-ddddd-33333");
-
+		cs.setParent(help.getSelfPath());
 		cs.setSelfPath("/help/cs");
 		cs.setTitle("CS");
 		cs.setType("nt:FOLDER");
 
 		service.setCategory("HELP");
 		service.setKey("1666-ddddd-ddddd-33333");
-
+		service.setParent(pp.getSelfPath());
 		service.setSelfPath("/help/cs/service");
 		service.setTitle("service");
 		service.setType("nt:FOLDER");
 
 		tran.setCategory("HELP");
 		tran.setKey("1666-ddddd-99999-33333");
-
+		tran.setParent(pp.getSelfPath());
 		tran.setSelfPath("/help/cs/tran");
 		tran.setTitle("tran");
 		tran.setType("nt:FOLDER");
 
 		pp.setCategory("HELP");
 		pp.setKey("1111-sssss-ddddd-33333");
-
+		pp.setParent(help.getSelfPath());
 		pp.setSelfPath("/help/pp");
 		pp.setTitle("PP");
 		pp.setType("nt:FOLDER");
@@ -228,15 +203,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 		help.setTitle("Help");
 		help.setType("nt:FOLDER");
 
-		cs.setParent(help);
-
-		pp.setParent(help);
-
-		service.setParent(pp);
-		tran.setParent(pp);
-
 		try {
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(pp);
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(help);
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -250,8 +218,5 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
-	
-
-
 
 }
