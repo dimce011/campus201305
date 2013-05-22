@@ -43,7 +43,7 @@ public class RestAPIService implements RestAPI {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
-			Node target = session.getNode("/help[3]/pp/service/1/en");
+			Node target = session.getNode("/help/pp/service/1/en");
 //			Node target = session.getNode("/help[3]/" + app + "/" + topic + "/" + reseller + "/" + language + "");
 
 //			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
@@ -104,9 +104,9 @@ public class RestAPIService implements RestAPI {
 			System.out.println("ovde");
 
 			// Node en = session.getNode("/help[3]/pp/service/1/en");
-			Node target = session.getNode("/help[3]/" + app + "/" + topic + "/" + reseller + "/" + language + "");
+			Node target = session.getNode("/help/" + app + "/" + topic + "/" + reseller + "/" + language + "");
 
-			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
+			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
 			ispisiSvuDecu(session.getNode("/"));
 			// Node content = en.addNode("jcr:content", "nt:resource");
 			Node content = target.getNode("jcr:content");
@@ -197,11 +197,11 @@ public class RestAPIService implements RestAPI {
 			System.out.println("ovde");
 			
 			
-			Node en = session.getNode("/help[3]/pp/service/1/en");
+			Node en = session.getNode("/help/pp/service/1/en");
 		    //Node target = session.getNode("/help[3]/"+app+"/"+topic+"/"+reseller+"/"+language+"");
 			Node target = session.getNodeByIdentifier(en.getIdentifier());
 			
-			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
+			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
 			ispisiSvuDecu(session.getNode("/"));
 			//Node content = en.addNode("jcr:content", "nt:resource");
 			Node content = target.getNode("jcr:content");
