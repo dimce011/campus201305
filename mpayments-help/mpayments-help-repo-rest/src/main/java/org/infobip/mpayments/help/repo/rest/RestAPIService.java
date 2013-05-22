@@ -41,13 +41,11 @@ public class RestAPIService implements RestAPI {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
-			System.out.println("ovde");
-
 			Node target = session.getNode("/help[3]/pp/service/1/en");
 //			Node target = session.getNode("/help[3]/" + app + "/" + topic + "/" + reseller + "/" + language + "");
 
-			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
-			ispisiSvuDecu(session.getNode("/"));
+//			logger.info("name: {}", session.getNode("/help[3]/pp/service/1/en"));
+//			ispisiSvuDecu(session.getNode("/"));
 			// Node content = en.addNode("jcr:content", "nt:resource");
 			Node content = target.getNode("jcr:content");
 			InputStream input = content.getProperty("jcr:data").getBinary().getStream();
