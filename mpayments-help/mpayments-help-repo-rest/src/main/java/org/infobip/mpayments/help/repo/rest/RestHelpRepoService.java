@@ -1,15 +1,10 @@
 package org.infobip.mpayments.help.repo.rest;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.ejb.Stateless;
-import javax.jcr.Binary;
 import javax.jcr.LoginException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -18,7 +13,6 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
-import javax.jcr.nodetype.NodeType;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -170,7 +164,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			dn.setCategory(niz[1].toUpperCase());
 			dn.setParent(node.getParent().getPath());
 			dn.setSelfPath(node.getPath());
-			dn.setType(node.getPrimaryNodeType().toString());
+			dn.setType(node.getPrimaryNodeType().getName());
 
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {

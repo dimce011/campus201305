@@ -54,6 +54,7 @@ public class TreeBean implements Serializable {
 	private TreeNode root;
 	private TreeNode selectedNode;
 	private DocumentNode object;
+	private String path;
 
 	/**
 	 * Default constructor
@@ -70,8 +71,6 @@ public class TreeBean implements Serializable {
 		TreeNode node0 = new TreeNodeImpl(object.getTitle(), root);
 		createNodes(object, node0);
 		System.out.println("Izasao");
-		
-
 	}
 
 	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException {
@@ -177,10 +176,12 @@ public class TreeBean implements Serializable {
 	 * Adds a {@link javax.faces.application.FacesMessage} with event data to
 	 * the {@link javax.faces.context.FacesContext}.
 	 */
+	
 	public void onNodeSelect(NodeSelectEvent event) {
 		System.out.println("NodeSelectEvent Fired");
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", event.getTreeNode().getData()
-				.toString());
+		path = event.getTreeNode().getData().toString();
+		//path = path + "/" + event.getTreeNode().getData().toString();
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,"Selected" ,path);
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 	}
 
@@ -206,6 +207,7 @@ public class TreeBean implements Serializable {
 	 */
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
+		
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", event.getTreeNode().getData()
 				.toString());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);

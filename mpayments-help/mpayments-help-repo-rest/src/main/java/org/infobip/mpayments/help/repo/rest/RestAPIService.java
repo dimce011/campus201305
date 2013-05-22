@@ -45,9 +45,14 @@ public class RestAPIService implements RestAPI {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
+<<<<<<< HEAD
 //			Node target = session.getNode("/help/pp/service/1/en");
 			logger.info("name: {}", session.getNode("/help/"+app+"/"+topic+"/" + reseller + "/" + language + ""));
 			Node target = session.getNode("/help/"+app+"/"+topic+"/" + reseller + "/" + language + "");
+=======
+			Node target = session.getNode("/help/pp/service/1/en");
+//			Node target = session.getNode("/help[3]/" + app + "/" + topic + "/" + reseller + "/" + language + "");
+>>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
 
 		
 //			ispisiSvuDecu(session.getNode("/"));
@@ -118,7 +123,11 @@ public class RestAPIService implements RestAPI {
 
 			System.out.println("ovde");
 
+<<<<<<< HEAD
 			// Node en = session.getNode("/help/pp/service/1/en");
+=======
+			// Node en = session.getNode("/help[3]/pp/service/1/en");
+>>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
 			Node target = session.getNode("/help/" + app + "/" + topic + "/" + reseller + "/" + language + "");
 
 			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
@@ -215,7 +224,11 @@ public class RestAPIService implements RestAPI {
 			
 			
 			Node en = session.getNode("/help/pp/service/1/en");
+<<<<<<< HEAD
 		    //Node target = session.getNode("/help/"+app+"/"+topic+"/"+reseller+"/"+language+"");
+=======
+		    //Node target = session.getNode("/help[3]/"+app+"/"+topic+"/"+reseller+"/"+language+"");
+>>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
 			Node target = session.getNodeByIdentifier(en.getIdentifier());
 			
 			logger.info("name: {}", session.getNode("/help/pp/service/1/en"));
