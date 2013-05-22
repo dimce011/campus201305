@@ -17,6 +17,7 @@ import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,7 +32,7 @@ public class RestAPIService implements RestAPI {
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 
 	@Override
-	public String getParagraph(@PathParam("app") String app, @PathParam("topic") String topic,
+	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic,
 			@PathParam("parID") String parID, @QueryParam("reseller") String reseller,
 			@QueryParam("language") String language) {
 		Session session = null;
@@ -40,6 +41,7 @@ public class RestAPIService implements RestAPI {
 		File file = null;
 		OutputStream output = null;
 		InputStream input = null;
+		String noSuchID = "No such ID!";
 		StringBuffer result = new StringBuffer();
 		try {
 			InitialContext initialContext = new InitialContext();
@@ -82,19 +84,22 @@ public class RestAPIService implements RestAPI {
 			Elements divs = doc.getElementsByTag("div");
 			for (Element elem : divs) {
 				if (elem.id().equals(parID)) {
-					// if (elem.className().equals(parID)) {
+//					 if (elem.className().equals(parID)) {
 					result.append(elem.toString());
 				}
 			}
-			return result.toString();
+			if ("".equals(result.toString())) {
+				return Response.status(Response.Status.OK).entity(noSuchID).build();
+			} else {
+				return Response.status(Response.Status.OK).entity(result.toString()).build();
+			}
 		} else {
-			return "error";
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
-
 	}
-
+	
 	@Override
-	public String getPage(@QueryParam("app") String app, @QueryParam("topic") String topic,
+	public Response getPage(@QueryParam("app") String app, @QueryParam("topic") String topic,
 			@QueryParam("reseller") String reseller, @QueryParam("language") String language) {
 		Session session = null;
 		Repository repository = null;
@@ -135,18 +140,17 @@ public class RestAPIService implements RestAPI {
 
 		if (!error) {
 			try {
-				return readFile(file);
+				return Response.status(Response.Status.OK).entity(readFile(file)).build();
 			} catch (IOException e) {
-				e.printStackTrace();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 			}
 		} else {
-			return "error";
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
-		return "error";
 	}
 
 	@Override
-	public String getPageById(@PathParam("id") String id) {
+	public Response getPageById(@PathParam("id") String id) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
@@ -187,18 +191,17 @@ public class RestAPIService implements RestAPI {
 
 		if (!error) {
 			try {
-				return readFile(file);
+				return Response.status(Response.Status.OK).entity(readFile(file)).build();
 			} catch (IOException e) {
-				e.printStackTrace();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 			}
 		} else {
-			return "error";
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
-		return "error";
 	}
 
 	@Override
-	public String getDoc(@PathParam("app") String app, @PathParam("topic") String topic,
+	public Response getDoc(@PathParam("app") String app, @PathParam("topic") String topic,
 			@PathParam("reseller") String reseller, @PathParam("language") String language) {
 		Session session = null;
 		Repository repository = null;
@@ -234,17 +237,16 @@ public class RestAPIService implements RestAPI {
 				session.logout();
 			closeStreams(input, output);
 		}
-
+		
 		if (!error) {
 			try {
-				return readFile(file);
+				return Response.status(Response.Status.OK).entity(readFile(file)).build();
 			} catch (IOException e) {
-				e.printStackTrace();
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 			}
 		} else {
-			return "error";
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
-		return "error";
 	}
 	
 	private void closeStreams(InputStream input, OutputStream output) {
