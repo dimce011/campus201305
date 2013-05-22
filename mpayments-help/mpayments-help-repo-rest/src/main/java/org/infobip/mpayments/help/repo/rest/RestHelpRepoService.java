@@ -135,7 +135,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 		FreeMarker fm = new FreeMarker();
 		String s = fm.process(inputMap);
-
 		return s;
 	}
 
