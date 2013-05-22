@@ -16,6 +16,10 @@ import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -32,6 +36,10 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 	private static ObjectMapper jsonMapper = new ObjectMapper();
+
+	Session session = null;
+	Repository repository = null;
+	InitialContext initialContext;
 
 	@Override
 	public Response test(HttpServletRequest request) {
@@ -69,19 +77,19 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// Node three = service.addNode("3", NodeType.NT_FOLDER);
 			// Node seven = service.addNode("4", NodeType.NT_FOLDER);
 
-			//			Node one =session.getNode("/help/pp/service/1");
-			//			Node en = one.addNode("en", NodeType.NT_FILE);
-			//			//Node cro = one.addNode("cro", NodeType.NT_FILE);
+			// Node one =session.getNode("/help/pp/service/1");
+			// Node en = one.addNode("en", NodeType.NT_FILE);
+			// //Node cro = one.addNode("cro", NodeType.NT_FILE);
 			//
-			//			Node content = en.addNode("jcr:content", "nt:resource");
+			// Node content = en.addNode("jcr:content", "nt:resource");
 			//
-			//			File f = new File("template.ftl");
-			//			InputStream stream = new BufferedInputStream(new
-			//					FileInputStream(f));
-			//			Binary binary = session.getValueFactory().createBinary(stream);
-			//			content.setProperty("jcr:data", binary);
+			// File f = new File("template.ftl");
+			// InputStream stream = new BufferedInputStream(new
+			// FileInputStream(f));
+			// Binary binary = session.getValueFactory().createBinary(stream);
+			// content.setProperty("jcr:data", binary);
 			//
-			//			session.save();
+			// session.save();
 			ispisiSvuDecu(session.getNode("/help"));
 
 			// Do something interesting with the Session ...
@@ -277,6 +285,76 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 
 		return Response.status(Response.Status.OK).entity(response).build();
+	}
+
+	@Override
+	public Response getOneLevelJSON(@PathParam("nodePath") String nodePath) {
+		logger.info("NODE PATH - {}",nodePath);
+		openSession();
+
+		logger.info("NODE PATH - {}",nodePath);
+		String response = null;
+		Node node= null;
+		try {
+			node = session.getNode(nodePath);
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		DocumentNode dn = new DocumentNode();
+		try {
+			dn.setTitle(node.getName());
+			dn.setKey(node.getIdentifier());
+			String[] niz = node.getPath().split("/");
+			dn.setCategory(niz[1].toUpperCase());
+			dn.setParent(node.getParent().getPath());
+			dn.setSelfPath(node.getPath());
+			dn.setType(node.getPrimaryNodeType().getName());
+
+			if (node.hasNodes()) {
+				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+					Node subNode = nodeIterator.nextNode();
+					DocumentNode dnc = new DocumentNode();
+					dnc.setSelfPath(subNode.getPath());
+					dn.addChild(dnc);
+				}
+			}
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(node);
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Response.status(Response.Status.OK).entity(response).build();
+	}
+
+	public void openSession() {
+		try {
+			initialContext = new InitialContext();
+			repository = (Repository) initialContext.lookup("java:jcr/local");
+			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			logger.info("SESSION OPENED");
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (LoginException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
