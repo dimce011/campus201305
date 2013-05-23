@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+	<title>Custom3 PrimeFaces Tree</title>
+	<h:outputStylesheet name="custom-tree.css" library="css" />
+</h:head>
+<h:body>
+	<h:form id="form1">
+		<p:panel id="panel1" header="Custom PrimeFaces Tree">
+			<p:growl id="growl1" showSummary="true" showDetail="true"
+				autoUpdate="true" />
+
+			<p:tree id="drvce" value="#{drvoBean.root}" var="cvor">
+				<p:treeNode id="drvceNode">
+					<h:outputText value="#{cvor.ime} (#{cvor.link})" id="lblNode" />
+				</p:treeNode>
+			</p:tree>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>
+
