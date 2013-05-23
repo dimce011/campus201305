@@ -337,6 +337,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	public DocumentCvor getDocumentCvor(String parent) {
 		openSession();
+		logger.info("PARENT: {}", parent);
 		Node node = null;
 		DocumentCvor dnl = null;
 		try {
