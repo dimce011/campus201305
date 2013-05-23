@@ -363,11 +363,12 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getLinksJSON(@PathParam("parent") String parent) {
+	public Response getLinksJSON(@PathParam("path") String path) {
 		String response = null;
 		try {
-
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor("/" + parent));
+			String pom = "/"+path;
+			if(pom.equals("/")) pom = "/help";
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor(pom));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
