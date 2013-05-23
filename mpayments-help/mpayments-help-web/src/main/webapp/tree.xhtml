@@ -14,6 +14,7 @@
 				<p:growl id="growl1" showSummary="true" showDetail="true"
 					autoUpdate="true" />
 
+<<<<<<< HEAD
 				<p:tree id="tree1" value="#{treeBean.model}" var="node"
 					selectionMode="single" selection="#{treeBean.selectedNode}">
 					<p:ajax event="select" listener="#{treeBean.onNodeSelect}" />
@@ -35,5 +36,28 @@
 		</h:form>
 	</h:panelGrid>
 </h:body>
+=======
+                <p:tree id="tree1" value="#{treeBean.model}"
+                        var="node"
+                        selectionMode="single"
+                        selection="#{treeBean.selectedNode}"
+                        >
+                    <p:ajax event="select"  listener="#{treeBean.onNodeSelect}" />
+                    <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />
+                    <p:ajax event="collapse" listener="#{treeBean.onNodeCollapse}" />
+                    <p:treeNode type="node"
+                                expandedIcon="folder-open"
+                                collapsedIcon="folder-collapsed">
+                        
+                        <h:outputText value="#{node.title}" />
+                    </p:treeNode>
+                    <p:treeNode type="leaf" icon="document-node">
+                        <h:outputText value="#{node.title}" />
+                    </p:treeNode>
+                </p:tree>
+            </p:panel>
+        </h:form>
+    </h:body>
+>>>>>>> branch 'master' of https://github.com/dimce011/campus201305.git
 </html>
 

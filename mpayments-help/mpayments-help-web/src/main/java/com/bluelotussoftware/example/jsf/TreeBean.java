@@ -77,7 +77,7 @@ public class TreeBean implements Serializable {
 	private TreeNode root;
 	private TreeNode selectedNode;
 	private DocumentNode object;
-	private String path;
+	
 
 	/**
 	 * Default constructor
@@ -204,8 +204,7 @@ public class TreeBean implements Serializable {
 	public void onNodeSelect(NodeSelectEvent event) {
 		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
 			System.out.println("NodeExpandEvent Fired");
-			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", event.getTreeNode().getData()
-					.toString());
+			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode)event.getTreeNode().getData()).getTitle());
 			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 		} else {
 			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
@@ -231,8 +230,7 @@ public class TreeBean implements Serializable {
 	public void onNodeExpand(NodeExpandEvent event) {
 
 		System.out.println("NodeExpandEvent Fired");
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", event.getTreeNode().getData()
-				.toString());
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode)event.getTreeNode().getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 
 	}
@@ -246,8 +244,7 @@ public class TreeBean implements Serializable {
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
 
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", event.getTreeNode().getData()
-				.toString());
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed",((DocumentNode)event.getTreeNode().getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 	}
 
