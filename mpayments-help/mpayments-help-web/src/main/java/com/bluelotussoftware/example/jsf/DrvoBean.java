@@ -18,7 +18,7 @@ public class DrvoBean implements Serializable {
 		root = new DefaultTreeNode("Root", null);
 
 		TreeNode node0 = new DefaultTreeNode(new Podatak("Milan", "neki link"), root);
-		TreeNode node1 = new DefaultTreeNode("Miodrag", root);
+		TreeNode node1 = new DefaultTreeNode(new Podatak("Miodrag", "neki link"), root);
 		TreeNode node2 = new DefaultTreeNode(new Podatak("Petar", "neki link"), root);
 
 		TreeNode node00 = new DefaultTreeNode(new Podatak("Mila", "neki link"), node0);
