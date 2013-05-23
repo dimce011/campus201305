@@ -1,6 +1,7 @@
 package org.infobip.mpayments.help.repo.rest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,12 +17,16 @@ import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.infobip.mpayments.help.dto.DocumentCvor;
 import org.infobip.mpayments.help.dto.DocumentNode;
 import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.infobip.mpayments.help.repo.rest.vo.TestResponseVO;
@@ -328,5 +333,94 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	public void closeSession() {
 		session.logout();
+	}
+
+	public DocumentCvor getDocumentCvor(String parent) {
+		openSession();
+		Node node = null;
+		DocumentCvor dnl = null;
+		try {
+			node = session.getNode(parent);
+			String[] niz = node.getPath().split("/");
+			dnl = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
+					.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
+			String children_href = node.getPath() + "/children";
+			dnl.setChildren_href(children_href);
+
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
+		}
+		return dnl;
+
+	}
+
+	@Override
+	public Response getLinksJSON(@PathParam("parent") String parent) {
+		String response = null;
+		try {
+
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor("/" + parent));
+
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
+		}
+		return Response.status(Response.Status.OK).entity(response).build();
+	}
+
+	@Override
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent) {
+
+		openSession();
+		String response = null;
+		Node node = null;
+		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
+		try {
+			node = session.getNode("/" + parent);
+			if (node.hasNodes()) {
+				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+					Node subNode = nodeIterator.nextNode();
+					children_list.add(getDocumentCvor(subNode.getPath()));
+
+				}
+			}
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(children_list);
+
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
+		}
+		return Response.status(Response.Status.OK).entity(response).build();
 	}
 }
