@@ -28,7 +28,6 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.infobip.mpayments.help.dto.DocumentCvor;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -68,7 +67,7 @@ public class TreeBeanCvor implements Serializable {
 		makeTreeFromJSON();
 		root = new TreeNodeImpl("Root", null);
 		TreeNode treeNode = new TreeNodeImpl(object, root);
-		createNodes(object, treeNode);
+		// createNodes(object, treeNode);
 		System.out.println("Izasao");
 	}
 
@@ -78,21 +77,20 @@ public class TreeBeanCvor implements Serializable {
 		System.out.println("Ispis objekta " + getObject());
 	}
 
-	public void createNodes(DocumentCvor object, TreeNode root) {
-		if (object.getChildren_href() != "") {
-
-			TreeNode node1 = new TreeNodeImpl(list, root);
-			System.out.println("Ispis " + list.getSelfPath());
-			createNodes(list, node1);
-		}
-	}
+	// public void createNodes(DocumentCvor object, TreeNode root) {
+	//
+	// TreeNode node1 = new TreeNodeImpl(list, root);
+	// System.out.println("Ispis " + list.getSelfPath());
+	// createNodes(list, node1);
+	//
+	// }
 
 	public String getString() throws JSONException {
 		HttpClient httpClient = new DefaultHttpClient();
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
-		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/", map));
+		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo", map));
 		try {
 
 			response = httpClient.execute(httpGet);
@@ -177,24 +175,27 @@ public class TreeBeanCvor implements Serializable {
 	 */
 
 	public void onNodeSelect(NodeSelectEvent event) {
-		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
-			System.out.println("NodeSelectEvent Fired NODE");
-			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", ((DocumentCvor) event
-					.getTreeNode().getData()).getTitle());
-			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
-		} else {
-			DocumentCvor dcNode = (DocumentCvor) event.getTreeNode().getData();
-			System.out.println("NodeSelectEvent Fired LEAF" + dcNode.getSelf_href());
-			String uri = "";
-			StringTokenizer st = new StringTokenizer(dcNode.getSelf_href(), "/");
-			while (st.hasMoreTokens()) {
-				if (st.nextToken().equals("help")) {
-					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
-					break;
-				}
-			}
-			getPage(uri);
-		}
+		// DocumentCvor dcNode = (DocumentCvor) event.getTreeNode().getData();
+		// String uri = dcNode.getChildren_href();
+		// getPage(uri);
+		// try {
+		// makeTreeFromJSON();
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Manamana", ((DocumentCvor) event.getTreeNode()
+				.getData()).getTitle());
+		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+		// } catch (JsonParseException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (JsonMappingException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } catch (JSONException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 	}
 
 	/**
@@ -245,8 +246,8 @@ public class TreeBeanCvor implements Serializable {
 		HttpClient httpClient = new DefaultHttpClient();
 
 		HttpResponse response = null;
-		System.out.println("http://localhost:8080/helprepo/" + uri);
-		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getPage/" + uri, null));
+		System.out.println("http://localhost:8080/helprepo" + uri);
+		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getPage" + uri, null));
 		try {
 			response = httpClient.execute(httpGet);
 			InputStream input = response.getEntity().getContent();
