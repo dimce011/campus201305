@@ -15,7 +15,9 @@
 
 			<p:tree id="drvce" value="#{drvoBean.root}" var="cvor">
 				<p:treeNode id="drvceNode">
+					<a href="#{cvor.link}" target="blah">
 					<h:outputText value="#{cvor.ime} (#{cvor.link})" id="lblNode" />
+					</a>
 				</p:treeNode>
 			</p:tree>
 		</p:panel>
