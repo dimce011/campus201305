@@ -20,24 +20,28 @@ public interface RestAPI {
 	public String getPage(@QueryParam("app") String app, @QueryParam("topic") String topic,
 						 @QueryParam("reseller") String reseller,  @QueryParam("language") String language);*/
 	
+	/*
+	 * @GET
+	@Path("/getPage")
+	@Produces(MediaType.TEXT_HTML)
+	public Response getPage(@QueryParam("app") String app, @QueryParam("topic") String topic, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
+	*/
+	
 	@GET
 	@Path("/getPageById/{id}/content")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getPageById(@PathParam("id") String id);
 	
-	@GET
-	@Path("/getPage")
-	@Produces(MediaType.TEXT_HTML)
-	public Response getPage(@QueryParam("app") String app, @QueryParam("topic") String topic, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
-	
+
 	@GET
 	@Path("/getParagraph/{app}/{topic}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
 	
 	@GET
-	@Path("/getPage/{app}/{topic}/content/{reseller}/{language}")
+	//@Path("/{apppath}/content")
+	@Path("/{rPath:.*}/content")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDoc(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("reseller") String reseller, @PathParam("language") String language);
+	public Response getDoc(@PathParam("rPath") String rPath);
 
 }
