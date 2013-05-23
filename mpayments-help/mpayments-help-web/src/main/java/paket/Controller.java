@@ -2,11 +2,9 @@ package paket;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.primefaces.model.TreeNode;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-
-import com.bluelotussoftware.example.jsf.DocumentNode;
 
 @ManagedBean(name = "controller")
 @SessionScoped
