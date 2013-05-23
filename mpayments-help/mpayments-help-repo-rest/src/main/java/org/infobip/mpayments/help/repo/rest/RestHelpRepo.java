@@ -41,4 +41,14 @@ public interface RestHelpRepo {
 	@Path("/getOneLevelJSON/{nodePath:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOneLevelJSON(@PathParam("nodePath") String nodePath);
+
+	@GET
+	@Path("/{path:.*}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLinksJSON(@PathParam("path") String path);
+
+	@GET
+	@Path("/{parent:.*}/children")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent);
 }
