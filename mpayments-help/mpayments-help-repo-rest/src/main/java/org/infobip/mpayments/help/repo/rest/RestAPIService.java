@@ -205,13 +205,7 @@ public class RestAPIService implements RestAPI {
 	}
 
 	@Override
-	public Response getDoc(@PathParam("rPath") String rPath){
-
-	   /* StringTokenizer st = new StringTokenizer(rPath,"/");
-	    StringBuffer sb = new StringBuffer();
-	    while(st.hasMoreTokens()){
-	    	sb.append(b)
-	    }*/
+	public Response getDoc(@PathParam("rPath") String rPath) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
@@ -223,10 +217,8 @@ public class RestAPIService implements RestAPI {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 
-			System.out.println("rpath "+rPath);
-			Node target = session.getNode("/"+rPath);
-
-			//Node content = target.getNode("jcr:content");
+			System.out.println("rpath " + rPath);
+			Node target = session.getNode("/" + rPath);
 			input = target.getProperty("jcr:data").getBinary().getStream();
 
 			file = new File("template.html");
@@ -247,7 +239,7 @@ public class RestAPIService implements RestAPI {
 				session.logout();
 			closeStreams(input, output);
 		}
-		
+
 		if (!error) {
 			try {
 				return Response.status(Response.Status.OK).entity(readFile(file)).build();
