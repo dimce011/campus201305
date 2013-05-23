@@ -20,11 +20,11 @@
  */
 package com.bluelotussoftware.example.jsf;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +35,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -43,16 +44,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.codehaus.jackson.JsonFactory;
+import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.json.JSONException;
 import org.primefaces.model.TreeNode;
+//github.com/dimce011/campus201305.git
+//github.com/dimce011/campus201305.git
 
 /**
  * Page backing bean which manages page data and events.
@@ -65,6 +67,7 @@ import org.primefaces.model.TreeNode;
 public class TreeBean implements Serializable {
 
 	private String page = "aaaaaaaaaaaaa";
+
 	public String getPage() {
 		return page;
 	}
@@ -77,7 +80,6 @@ public class TreeBean implements Serializable {
 	private TreeNode root;
 	private TreeNode selectedNode;
 	private DocumentNode object;
-	
 
 	/**
 	 * Default constructor
@@ -86,8 +88,9 @@ public class TreeBean implements Serializable {
 	 * @throws JsonParseException
 	 * 
 	 * @throws IOException
+	 * @throws JSONException
 	 */
-	public TreeBean() throws JsonParseException, JsonMappingException, IOException {
+	public TreeBean() throws JsonParseException, JsonMappingException, IOException, JSONException {
 
 		makeFromJsonTree();
 		root = new TreeNodeImpl("Root", null);
@@ -96,11 +99,13 @@ public class TreeBean implements Serializable {
 		System.out.println("Izasao");
 	}
 
-	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException {
+	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException, JSONException {
 		// TODO Auto-generated method stub
 		ObjectMapper mapper = new ObjectMapper();
-		setObject(mapper.readValue(new File("C:\\Users\\larsic\\Desktop\\jsonTwoTest.json"), DocumentNode.class));
-		System.out.println(getObject());
+		// setObject(mapper.readValue(new File("C:\\user.json"),
+		// DocumentNode.class));
+		setObject(mapper.readValue(getString(), DocumentNode.class));
+		System.out.println("Ispis objekta " + getObject());
 	}
 
 	public void createNodes(DocumentNode object, TreeNode root) {
@@ -114,55 +119,57 @@ public class TreeBean implements Serializable {
 
 	}
 
-	public void jsonParse(File file) throws IOException {
+	public String getString() throws JSONException {
+		HttpClient httpClient = new DefaultHttpClient();
+		Map<String, String> map = new HashMap<String, String>();
+		String responseString = null;
+		HttpResponse response = null;
+		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/testJSON", map));
+		try {
 
-		JsonFactory jfactory = new JsonFactory();
-
-		/*** read from file ***/
-		JsonParser jParser = jfactory.createJsonParser(file);
-
-		// loop until token equal to "}"
-		while (jParser.nextToken() != JsonToken.END_OBJECT) {
-
-			// Get field name
-			String fieldname = jParser.getCurrentName();
-			System.out.println("File name: " + fieldname);
-
-			if ("documents".equals(fieldname)) {
-				// move to next, which is "name"'s value
-				jParser.nextToken();
-				System.out.println("This is documents: " + jParser.getText()); // display
-																				// mkyong
-
-			} else
-				System.out.println("There is no documents");
-
-			if ("key".equals(fieldname)) {
-
-				// current token is "age",
-				// move to next, which is "name"'s value
-				jParser.nextToken();
-				System.out.println("This is key: " + jParser.getIntValue()); // display
-																				// 29
+			response = httpClient.execute(httpGet);
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				responseString = EntityUtils.toString(entity, "UTF-8");
+				System.out.println("Ispis responsaaaaa!!!!! " + responseString);
 
 			}
 
-			if ("type".equals(fieldname)) {
-
-				jParser.nextToken(); // current token is "[", move next
-
-				// messages is array, loop until token equal to "]"
-				while (jParser.nextToken() != JsonToken.END_ARRAY) {
-
-					// display msg1, msg2, msg3
-					System.out.println("This is type:" + jParser.getText());
-
-				}
-
-			}
-
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		jParser.close();
+
+		System.out.println("proso2");
+		/*
+		 * if(webServiceRestString.equals("Restful")) return "strana3";
+		 */
+		return responseString;
+	}
+
+	private String prepareGetRequest(String url, Map<String, String> params) {
+
+		String fullUrl = url;
+
+		if (params != null && !params.isEmpty()) {
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			for (Entry<String, String> entry : params.entrySet()) {
+				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
+
+			String queryString = URLEncodedUtils.format(nameValuePairs, "UTF-8");
+
+			if (url.indexOf("?") == -1) {
+				fullUrl = url + "?" + queryString;
+			} else {
+				fullUrl = url + "&" + queryString;
+			}
+		}
+
+		return fullUrl;
 
 	}
 
@@ -204,7 +211,8 @@ public class TreeBean implements Serializable {
 	public void onNodeSelect(NodeSelectEvent event) {
 		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
 			System.out.println("NodeExpandEvent Fired");
-			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode)event.getTreeNode().getData()).getTitle());
+			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode) event
+					.getTreeNode().getData()).getTitle());
 			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 		} else {
 			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
@@ -230,7 +238,8 @@ public class TreeBean implements Serializable {
 	public void onNodeExpand(NodeExpandEvent event) {
 
 		System.out.println("NodeExpandEvent Fired");
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode)event.getTreeNode().getData()).getTitle());
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode) event.getTreeNode()
+				.getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 
 	}
@@ -244,7 +253,8 @@ public class TreeBean implements Serializable {
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
 
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed",((DocumentNode)event.getTreeNode().getData()).getTitle());
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentNode) event
+				.getTreeNode().getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 	}
 
@@ -254,28 +264,6 @@ public class TreeBean implements Serializable {
 
 	private void setObject(DocumentNode object) {
 		this.object = object;
-	}
-
-	private String prepareGetRequest(String url, Map<String, String> params) {
-
-		String fullUrl = url;
-
-		if (params != null && !params.isEmpty()) {
-			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-			for (Entry<String, String> entry : params.entrySet()) {
-				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-			}
-
-			String queryString = URLEncodedUtils.format(nameValuePairs, "UTF-8");
-
-			if (url.indexOf("?") == -1) {
-				fullUrl = url + "?" + queryString;
-			} else {
-				fullUrl = url + "&" + queryString;
-			}
-		}
-
-		return fullUrl;
 	}
 
 	String webServiceRestString;
