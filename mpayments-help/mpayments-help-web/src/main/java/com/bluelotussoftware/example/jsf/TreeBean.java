@@ -22,13 +22,27 @@ package com.bluelotussoftware.example.jsf;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.StringTokenizer;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
@@ -50,6 +64,15 @@ import org.primefaces.model.TreeNode;
 @ViewScoped
 public class TreeBean implements Serializable {
 
+	private String page = "aaaaaaaaaaaaa";
+	public String getPage() {
+		return page;
+	}
+
+	public void setPage(String page) {
+		this.page = page;
+	}
+
 	private static final long serialVersionUID = 2417620239014385855L;
 	private TreeNode root;
 	private TreeNode selectedNode;
@@ -68,7 +91,7 @@ public class TreeBean implements Serializable {
 
 		makeFromJsonTree();
 		root = new TreeNodeImpl("Root", null);
-		TreeNode node0 = new TreeNodeImpl(object.getTitle(), root);
+		TreeNode node0 = new TreeNodeImpl(object, root);
 		createNodes(object, node0);
 		System.out.println("Izasao");
 	}
@@ -76,7 +99,7 @@ public class TreeBean implements Serializable {
 	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException {
 		// TODO Auto-generated method stub
 		ObjectMapper mapper = new ObjectMapper();
-		setObject(mapper.readValue(new File("C:\\Users\\mratkovic\\Desktop\\jsonTwoTest.json"), DocumentNode.class));
+		setObject(mapper.readValue(new File("C:\\Users\\larsic\\Desktop\\jsonTwoTest.json"), DocumentNode.class));
 		System.out.println(getObject());
 	}
 
@@ -187,7 +210,15 @@ public class TreeBean implements Serializable {
 		} else {
 			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
 			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelfPath());
-
+			String uri = "";
+			StringTokenizer st = new StringTokenizer(dNode.getSelfPath(), "/");
+			while (st.hasMoreTokens()) {
+				if (st.nextToken().equals("help")) {
+					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
+					break;
+				}
+			}
+			getPage(uri);
 		}
 	}
 
@@ -226,5 +257,57 @@ public class TreeBean implements Serializable {
 
 	private void setObject(DocumentNode object) {
 		this.object = object;
+	}
+
+	private String prepareGetRequest(String url, Map<String, String> params) {
+
+		String fullUrl = url;
+
+		if (params != null && !params.isEmpty()) {
+			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+			for (Entry<String, String> entry : params.entrySet()) {
+				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+			}
+
+			String queryString = URLEncodedUtils.format(nameValuePairs, "UTF-8");
+
+			if (url.indexOf("?") == -1) {
+				fullUrl = url + "?" + queryString;
+			} else {
+				fullUrl = url + "&" + queryString;
+			}
+		}
+
+		return fullUrl;
+	}
+
+	String webServiceRestString;
+
+	public static String convertStreamToString(java.io.InputStream is) {
+		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
+	}
+
+	private void getPage(String uri) {
+		HttpClient httpClient = new DefaultHttpClient();
+
+		HttpResponse response = null;
+		System.out.println("http://localhost:8080/helprepo/" + uri);
+		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getPage/" + uri, null));
+		try {
+			response = httpClient.execute(httpGet);
+			InputStream input = response.getEntity().getContent();
+
+			String s = convertStreamToString(input);
+			page = s;
+			System.out.println("response !" + s);
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

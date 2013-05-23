@@ -21,7 +21,7 @@ public interface RestAPI {
 						 @QueryParam("reseller") String reseller,  @QueryParam("language") String language);*/
 	
 	@GET
-	@Path("/getPageById/document/{id}/content")
+	@Path("/getPageById/{id}/content")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getPageById(@PathParam("id") String id);
 	
@@ -31,12 +31,12 @@ public interface RestAPI {
 	public Response getPage(@QueryParam("app") String app, @QueryParam("topic") String topic, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
 	
 	@GET
-	@Path("/getParagraph/document/{app}/{topic}/content/{parID}")
+	@Path("/getParagraph/{app}/{topic}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
 	
 	@GET
-	@Path("/getPage/document/{app}/{topic}/content/{reseller}/{language}")
+	@Path("/getPage/{app}/{topic}/content/{reseller}/{language}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDoc(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("reseller") String reseller, @PathParam("language") String language);
 

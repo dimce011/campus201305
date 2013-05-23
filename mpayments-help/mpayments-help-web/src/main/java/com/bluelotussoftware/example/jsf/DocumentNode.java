@@ -94,7 +94,8 @@ public class DocumentNode {
 	}
 	@Override
 	public String toString() {
-		return "DocumentNode " + "[ key: " + key + ", title: " + title + ", category: " + category + ", type: " + type + ", parent: " + parent + ", selfPath: " + selfPath + "children: " + children;
+		 return title;
+		//return "DocumentNode " + "[ key: " + key + ", title: " + title + ", category: " + category + ", type: " + type + ", parent: " + parent + ", selfPath: " + selfPath + "children: " + children;
 	}
 
 }

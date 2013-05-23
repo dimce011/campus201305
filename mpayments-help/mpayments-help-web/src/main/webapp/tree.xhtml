@@ -8,30 +8,32 @@
         <h:outputStylesheet name="custom-tree.css" library="css"/>
     </h:head>
     <h:body>
-        <h:form id="form1">
-            <p:panel id="panel1" header="Custom PrimeFaces Tree">
-                <p:growl id="growl1" showSummary="true" showDetail="true" autoUpdate="true"/>
+	<h:panelGrid columns="3">
+		<h:form id="form1">
+			<p:panel id="panel1" header="Custom PrimeFaces Tree">
+				<p:growl id="growl1" showSummary="true" showDetail="true"
+					autoUpdate="true" />
 
-                <p:tree id="tree1" value="#{treeBean.model}"
-                        var="node"
-                        selectionMode="single"
-                        selection="#{treeBean.selectedNode}"
-                        >
-                    <p:ajax event="select"  listener="#{treeBean.onNodeSelect}" />
-                    <p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />
-                    <p:ajax event="collapse" listener="#{treeBean.onNodeCollapse}" />
-                    <p:treeNode type="node"
-                                expandedIcon="folder-open"
-                                collapsedIcon="folder-collapsed">
-                        
-                        <h:outputText value="#{treeBean.model.data.title}" />
-                    </p:treeNode>
-                    <p:treeNode type="leaf" icon="document-node">
-                        <h:outputText value="#{treeBean.model.data.title}" />
-                    </p:treeNode>
-                </p:tree>
-            </p:panel>
-        </h:form>
-    </h:body>
+				<p:tree id="tree1" value="#{treeBean.model}" var="node"
+					selectionMode="single" selection="#{treeBean.selectedNode}">
+					<p:ajax event="select" listener="#{treeBean.onNodeSelect}" />
+					<p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />
+					<p:ajax event="collapse" listener="#{treeBean.onNodeCollapse}" />
+					<p:treeNode type="node" expandedIcon="folder-open"
+						collapsedIcon="folder-collapsed">
+
+						<h:outputText value="#{node.title}" />
+					</p:treeNode>
+					<p:treeNode type="leaf" icon="document-node">
+						<h:outputText value="#{node.title}" />
+					</p:treeNode>
+				</p:tree>
+			</p:panel>
+		</h:form>
+		<h:form>
+				<h:outputText value="#{treeBean.page}" />
+		</h:form>
+	</h:panelGrid>
+</h:body>
 </html>
 
