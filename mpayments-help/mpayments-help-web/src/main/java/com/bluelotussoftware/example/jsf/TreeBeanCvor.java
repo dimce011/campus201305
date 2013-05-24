@@ -82,6 +82,7 @@ public class TreeBeanCvor implements Serializable {
 	private TreeNode pointer;
 	private TreeNode selectedNode;
 	private DocumentCvor object;
+	private TreeNode fakeChild;
 
 	/**
 	 * Default constructor
@@ -97,7 +98,8 @@ public class TreeBeanCvor implements Serializable {
 		makeFromJsonTree();
 		System.out.println("OBJECT: "+object);
 		root = new TreeNodeImpl("Root", null);
-		pointer = new TreeNodeImpl(TreeNodeType.NODE,object, root);
+		pointer = new TreeNodeImpl(TreeNodeType.NODE, object, root);
+		fakeChild = new TreeNodeImpl("fake", pointer);
 		//createNodes(object, node0);
 		System.out.println("Izasao");
 	}
@@ -254,8 +256,8 @@ public class TreeBeanCvor implements Serializable {
 //			}
 //			getPage(uri);
 //		}
-		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
-		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
+//		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
+//		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
 	}
 
 	/**
@@ -265,10 +267,16 @@ public class TreeBeanCvor implements Serializable {
 	 * the {@link javax.faces.context.FacesContext}.
 	 */
 	public void onNodeExpand(NodeExpandEvent event) {
-
+		selectedNode = event.getTreeNode();
 		System.out.println("NodeExpandEvent Fired");
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode) event.getTreeNode()
-				.getData()).getTitle());
+		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
+		if(event.getTreeNode().getChildCount()==1){
+            event.getTreeNode().getChildren().remove(0);
+        }
+		
+		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
+		
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 
 	}

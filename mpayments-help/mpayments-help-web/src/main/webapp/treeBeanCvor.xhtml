@@ -17,7 +17,7 @@
 				<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node" dynamic="true"
 					selectionMode="single" selection="#{treeBeanCvor.selectedNode}">
 					<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}" />
-					<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}" />
+					<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}" update="tree1"/>
 					<p:ajax event="collapse" listener="#{treeBeanCvor.onNodeCollapse}" />
 					<p:treeNode type="node" expandedIcon="folder-open"
 						collapsedIcon="folder-collapsed">
