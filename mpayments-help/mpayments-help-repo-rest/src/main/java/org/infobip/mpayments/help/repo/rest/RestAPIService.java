@@ -1,12 +1,13 @@
 package org.infobip.mpayments.help.repo.rest;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 import javax.ejb.Stateless;
 import javax.jcr.Node;
@@ -16,10 +17,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.naming.InitialContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -88,7 +86,7 @@ public class RestAPIService implements RestAPI {
 			Elements divs = doc.getElementsByTag("div");
 			for (Element elem : divs) {
 				if (elem.id().equals(parID)) {
-//					 if (elem.className().equals(parID)) {
+					// if (elem.className().equals(parID)) {
 					result.append(elem.toString());
 				}
 			}
@@ -101,57 +99,64 @@ public class RestAPIService implements RestAPI {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
 	}
-	
-//	@Override
-//	public Response getPage(@QueryParam("app") String app, @QueryParam("topic") String topic,
-//			@QueryParam("reseller") String reseller, @QueryParam("language") String language) {
-//		Session session = null;
-//		Repository repository = null;
-//		boolean error = false;
-//		File file = null;
-//		InputStream input = null;
-//		OutputStream output = null;
-//		try {
-//			InitialContext initialContext = new InitialContext();
-//			repository = (Repository) initialContext.lookup("java:jcr/local");
-//			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-//
-//			System.out.println("ovde");
-//
-//			Node target = session.getNode("/help/" + app + "/" + topic + "/" + reseller + "/" + language + "");
-//
-//			Node content = target.getNode("jcr:content");
-//			input = content.getProperty("jcr:data").getBinary().getStream();
-//
-//			file = new File("template.html");
-//			output = new FileOutputStream(file);
-//
-//			byte[] buffer = new byte[input.available()];
-//			while (input.read(buffer) != -1) {
-//				output.write(buffer);
-//				buffer = new byte[input.available() + 1];
-//			}
-//			output.write('\n');
-//			output.flush();
-//		} catch (Exception ex) {
-//			error = true;
-//			ex.printStackTrace();
-//		} finally {
-//			if (session != null)
-//				session.logout();
-//			closeStreams(input, output);
-//		}
-//
-//		if (!error) {
-//			try {
-//				return Response.status(Response.Status.OK).entity(readFile(file)).build();
-//			} catch (IOException e) {
-//				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-//			}
-//		} else {
-//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-//		}
-//	}
+
+	// @Override
+	// public Response getPage(@QueryParam("app") String app,
+	// @QueryParam("topic") String topic,
+	// @QueryParam("reseller") String reseller, @QueryParam("language") String
+	// language) {
+	// Session session = null;
+	// Repository repository = null;
+	// boolean error = false;
+	// File file = null;
+	// InputStream input = null;
+	// OutputStream output = null;
+	// try {
+	// InitialContext initialContext = new InitialContext();
+	// repository = (Repository) initialContext.lookup("java:jcr/local");
+	// session = repository.login(new SimpleCredentials("admin",
+	// "admin".toCharArray()));
+	//
+	// System.out.println("ovde");
+	//
+	// Node target = session.getNode("/help/" + app + "/" + topic + "/" +
+	// reseller + "/" + language + "");
+	//
+	// Node content = target.getNode("jcr:content");
+	// input = content.getProperty("jcr:data").getBinary().getStream();
+	//
+	// file = new File("template.html");
+	// output = new FileOutputStream(file);
+	//
+	// byte[] buffer = new byte[input.available()];
+	// while (input.read(buffer) != -1) {
+	// output.write(buffer);
+	// buffer = new byte[input.available() + 1];
+	// }
+	// output.write('\n');
+	// output.flush();
+	// } catch (Exception ex) {
+	// error = true;
+	// ex.printStackTrace();
+	// } finally {
+	// if (session != null)
+	// session.logout();
+	// closeStreams(input, output);
+	// }
+	//
+	// if (!error) {
+	// try {
+	// return
+	// Response.status(Response.Status.OK).entity(readFile(file)).build();
+	// } catch (IOException e) {
+	// return
+	// Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
+	// }
+	// } else {
+	// return
+	// Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
+	// }
+	// }
 
 	@Override
 	public Response getPageById(@PathParam("id") String id) {
@@ -181,7 +186,7 @@ public class RestAPIService implements RestAPI {
 				output.write(buffer);
 				buffer = new byte[input.available() + 1];
 			}
-			
+
 			output.write('\n');
 			output.flush();
 		} catch (Exception ex) {
@@ -204,14 +209,39 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
+	private static String getStringFromInputStream(InputStream is) {
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+		String line;
+		try {
+
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return sb.toString();
+	}
+
 	@Override
 	public Response getDoc(@PathParam("rPath") String rPath) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
-		File file = null;
 		InputStream input = null;
 		OutputStream output = null;
+		String result = null;
 		try {
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
@@ -220,17 +250,8 @@ public class RestAPIService implements RestAPI {
 			System.out.println("rpath " + rPath);
 			Node target = session.getNode("/" + rPath);
 			input = target.getProperty("jcr:data").getBinary().getStream();
+			result = getStringFromInputStream(input);
 
-			file = new File("template.html");
-			output = new FileOutputStream(file);
-
-			byte[] buffer = new byte[input.available()];
-			while (input.read(buffer) != -1) {
-				output.write(buffer);
-				buffer = new byte[input.available() + 1];
-			}
-			output.write('\n');
-			output.flush();
 		} catch (Exception ex) {
 			error = true;
 			ex.printStackTrace();
@@ -241,16 +262,12 @@ public class RestAPIService implements RestAPI {
 		}
 
 		if (!error) {
-			try {
-				return Response.status(Response.Status.OK).entity(readFile(file)).build();
-			} catch (IOException e) {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-			}
+			return Response.status(Response.Status.OK).entity(result).build();
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
 	}
-	
+
 	private void closeStreams(InputStream input, OutputStream output) {
 		if (input != null)
 			try {
@@ -265,7 +282,7 @@ public class RestAPIService implements RestAPI {
 				e.printStackTrace();
 			}
 	}
-	
+
 	private String readFile(File file) throws IOException {
 		StringBuilder fileContents = new StringBuilder((int) file.length());
 		Scanner scanner = new Scanner(file);
@@ -289,7 +306,5 @@ public class RestAPIService implements RestAPI {
 			}
 		}
 	}
-
-
 
 }
