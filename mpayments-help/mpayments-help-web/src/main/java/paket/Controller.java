@@ -72,6 +72,10 @@ public class Controller {
 		return "tree"; 
 	}
 	
+	public String obradaOpcijeMPM(){
+		return "treeBeanCvor";
+	}
+	
 
 
 }

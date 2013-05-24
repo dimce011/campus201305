@@ -27,6 +27,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.infobip.mpayments.help.dto.DocumentCvor;
+import org.infobip.mpayments.help.dto.DocumentCvorWrapper;
 import org.infobip.mpayments.help.dto.DocumentNode;
 import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.infobip.mpayments.help.repo.rest.vo.TestResponseVO;
@@ -402,7 +403,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 				}
 			}
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(children_list);
+			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
+			dcw.data = children_list;
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dcw);
 
 		} catch (PathNotFoundException e1) {
 			// TODO Auto-generated catch block

@@ -14,7 +14,7 @@
 				<p:growl id="growl1" showSummary="true" showDetail="true"
 					autoUpdate="true" />
 
-				<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node"
+				<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node" dynamic="true"
 					selectionMode="single" selection="#{treeBeanCvor.selectedNode}">
 					<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}" />
 					<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}" />

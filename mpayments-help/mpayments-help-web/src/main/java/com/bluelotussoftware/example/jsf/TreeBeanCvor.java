@@ -1,3 +1,23 @@
+/*
+ *  Copyright 2012 Blue Lotus Software, LLC..
+ *  Copyright 2012 John Yeary <jyeary@bluelotussoftware.com>.
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
+ * $Id: TreeBean.java,v fd1f822937df 2012/07/03 13:22:29 jyeary $
+ */
 package com.bluelotussoftware.example.jsf;
 
 import java.io.IOException;
@@ -5,6 +25,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,12 +54,20 @@ import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.json.JSONException;
 import org.primefaces.model.TreeNode;
+//github.com/dimce011/campus201305.git
+//github.com/dimce011/campus201305.git
 
+/**
+ * Page backing bean which manages page data and events.
+ * 
+ * @author John Yeary <jyeary@bluelotussoftware.com>
+ * @version 1.0
+ */
 @ManagedBean
 @ViewScoped
 public class TreeBeanCvor implements Serializable {
 
-	private String page = "MPM";
+	private String page = "MMMMMPPPPPPMMMMMM";
 
 	public String getPage() {
 		return page;
@@ -50,6 +79,7 @@ public class TreeBeanCvor implements Serializable {
 
 	private static final long serialVersionUID = 2417620239014385855L;
 	private TreeNode root;
+	private TreeNode pointer;
 	private TreeNode selectedNode;
 	private DocumentCvor object;
 
@@ -64,33 +94,64 @@ public class TreeBeanCvor implements Serializable {
 	 */
 	public TreeBeanCvor() throws JsonParseException, JsonMappingException, IOException, JSONException {
 
-		makeTreeFromJSON();
+		makeFromJsonTree();
+		System.out.println("OBJECT: "+object);
 		root = new TreeNodeImpl("Root", null);
-		TreeNode treeNode = new TreeNodeImpl(object, root);
-		// createNodes(object, treeNode);
+		pointer = new TreeNodeImpl(TreeNodeType.NODE,object, root);
+		//createNodes(object, node0);
 		System.out.println("Izasao");
 	}
 
-	private void makeTreeFromJSON() throws JsonParseException, JsonMappingException, IOException, JSONException {
+	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException, JSONException {
+		// TODO Auto-generated method stub
 		ObjectMapper mapper = new ObjectMapper();
-		setObject(mapper.readValue(getString(), DocumentCvor.class));
-		System.out.println("Ispis objekta " + getObject());
+		// setObject(mapper.readValue(new File("C:\\user.json"),
+		// DocumentNode.class));
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/"), DocumentCvor.class));
+		System.out.println("Ispis objekta " + object.getSelf_href());
+	}
+	
+	public void addChildren(String uri){
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			DocumentCvorWrapper dcw  = mapper.readValue(getString(uri), DocumentCvorWrapper.class);
+			// List<DocumentCvor> documentCvors = mapper.readValue(getString(uri), new List<DocumentCvor>().getClass());
+			for (int i = 0; i < dcw.data.size(); i++) {
+				System.out.println("TITLE - " + dcw.data.get(i).getTitle());
+				TreeNode node = new TreeNodeImpl(dcw.data.get(i), selectedNode);
+			}
+		} catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	// public void createNodes(DocumentCvor object, TreeNode root) {
-	//
-	// TreeNode node1 = new TreeNodeImpl(list, root);
-	// System.out.println("Ispis " + list.getSelfPath());
-	// createNodes(list, node1);
-	//
-	// }
+	public void createNodes(DocumentCvor object, TreeNode root) {
+//		if (object.getChildren() != null) {
+//			for (DocumentCvor list : object.getChildren()) {
+				TreeNode node1 = new TreeNodeImpl(object, root);
+//				System.out.println("Ispis " + list.getSelfPath());
+//				createNodes(list, node1);
+//			}
+//		}
 
-	public String getString() throws JSONException {
+	}
+
+	public String getString(String uri) throws JSONException {
 		HttpClient httpClient = new DefaultHttpClient();
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
-		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo", map));
+		HttpGet httpGet = new HttpGet(prepareGetRequest(uri , map));
 		try {
 
 			response = httpClient.execute(httpGet);
@@ -109,7 +170,7 @@ public class TreeBeanCvor implements Serializable {
 			e.printStackTrace();
 		}
 
-		System.out.println("Prosao");
+		System.out.println("proso2");
 		/*
 		 * if(webServiceRestString.equals("Restful")) return "strana3";
 		 */
@@ -175,27 +236,26 @@ public class TreeBeanCvor implements Serializable {
 	 */
 
 	public void onNodeSelect(NodeSelectEvent event) {
-		// DocumentCvor dcNode = (DocumentCvor) event.getTreeNode().getData();
-		// String uri = dcNode.getChildren_href();
-		// getPage(uri);
-		// try {
-		// makeTreeFromJSON();
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Manamana", ((DocumentCvor) event.getTreeNode()
-				.getData()).getTitle());
-		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
-		// } catch (JsonParseException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (JsonMappingException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (JSONException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
+//		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
+//			System.out.println("NodeExpandEvent Fired");
+//			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode) event
+//					.getTreeNode().getData()).getTitle());
+//			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+//		} else {
+//			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
+//			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelfPath());
+//			String uri = "";
+//			StringTokenizer st = new StringTokenizer(dNode.getSelfPath(), "/");
+//			while (st.hasMoreTokens()) {
+//				if (st.nextToken().equals("help")) {
+//					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
+//					break;
+//				}
+//			}
+//			getPage(uri);
+//		}
+		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
+		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
 	}
 
 	/**
@@ -207,7 +267,7 @@ public class TreeBeanCvor implements Serializable {
 	public void onNodeExpand(NodeExpandEvent event) {
 
 		System.out.println("NodeExpandEvent Fired");
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentCvor) event.getTreeNode()
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode) event.getTreeNode()
 				.getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 
@@ -222,7 +282,7 @@ public class TreeBeanCvor implements Serializable {
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
 
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentCvor) event
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentNode) event
 				.getTreeNode().getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 	}
@@ -237,7 +297,7 @@ public class TreeBeanCvor implements Serializable {
 
 	String webServiceRestString;
 
-	public String convertStreamToString(java.io.InputStream is) {
+	public static String convertStreamToString(java.io.InputStream is) {
 		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
 		return s.hasNext() ? s.next() : "";
 	}
@@ -246,8 +306,8 @@ public class TreeBeanCvor implements Serializable {
 		HttpClient httpClient = new DefaultHttpClient();
 
 		HttpResponse response = null;
-		System.out.println("http://localhost:8080/helprepo" + uri);
-		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getPage" + uri, null));
+		System.out.println("http://localhost:8080/helprepo/" + uri);
+		HttpGet httpGet = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getPage/" + uri, null));
 		try {
 			response = httpClient.execute(httpGet);
 			InputStream input = response.getEntity().getContent();
