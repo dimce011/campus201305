@@ -19,7 +19,7 @@ public class DocumentCvor {
 		this.title = title;
 		this.category = category;
 		this.type = type;
-		this.self_href = self_href;
+		this.self_href = "http://localhost:8080/helprepo" + self_href + "/content";
 		this.parent_href = parent_href;
 		// this.children_href = children_href;
 	}
@@ -61,7 +61,7 @@ public class DocumentCvor {
 	}
 
 	public void setSelf_href(String self_href) {
-		this.self_href = self_href;
+		this.self_href = "http://localhost:8080/helprepo" + self_href + "/content";
 	}
 
 	public String getParent_href() {

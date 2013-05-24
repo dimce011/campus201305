@@ -250,15 +250,7 @@ public class TreeBeanCvor implements Serializable {
 		} else {
 			DocumentCvor dNode = (DocumentCvor) event.getTreeNode().getData();
 			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelf_href());
-			String uri = "";
-			StringTokenizer st = new StringTokenizer(dNode.getSelf_href(), "/");
-			while (st.hasMoreTokens()) {
-				if (st.nextToken().equals("help")) {
-					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
-					break;
-				}
-			}
-			getPage(uri);
+			
 		}
 //		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
 //		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());

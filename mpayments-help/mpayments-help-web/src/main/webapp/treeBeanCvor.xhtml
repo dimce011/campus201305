@@ -25,14 +25,13 @@
 						<h:outputText value="#{node.title}" />
 					</p:treeNode>
 					<p:treeNode type="leaf" icon="document-node">
-						<h:outputText value="#{node.title}" />
+					<a href="#{node.self_href}" target="myFrame" >
+						<h:outputText value="#{node.title}" /></a>
 					</p:treeNode>
 				</p:tree>
 			</p:panel>
 		</h:form>
-		<h:form>
-				<h:outputText value="#{treeBeanCvor.page}" />
-		</h:form>
+		<iframe name="myFrame" width="680" height="680"/>
 	</h:panelGrid>
 </h:body>
 
