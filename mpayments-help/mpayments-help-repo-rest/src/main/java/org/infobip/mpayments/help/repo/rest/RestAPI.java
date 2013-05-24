@@ -14,15 +14,16 @@ import javax.ws.rs.core.Response;
 public interface RestAPI {
 	
 	@GET
-	@Path("/getPageById/{id}/content")
+	@Path("/documents/{id}/content")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getPageById(@PathParam("id") String id);
+	public Response getDocuments(@PathParam("id") String id);
 	
 
 	@GET
 	@Path("/getParagraph/{app}/{topic}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
+	
 	
 	@GET
 	//@Path("/{apppath}/content")

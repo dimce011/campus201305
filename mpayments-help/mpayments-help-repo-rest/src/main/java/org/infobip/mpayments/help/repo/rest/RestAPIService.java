@@ -86,7 +86,7 @@ public class RestAPIService implements RestAPI {
 
 
 	@Override
-	public Response getPageById(@PathParam("id") String id) {
+	public Response getDocuments(@PathParam("id") String id) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
