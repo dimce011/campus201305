@@ -395,6 +395,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 	@Override
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent) {
 
+		logger.info("POZVANA METODA GETCHILDRENLINKSJSON");
 		openSession();
 		String response = null;
 		Node node = null;
