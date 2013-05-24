@@ -217,16 +217,8 @@ public class TreeBean implements Serializable {
 		} else {
 			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
 			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelfPath());
-			String uri = "";
-			StringTokenizer st = new StringTokenizer(dNode.getSelfPath(), "/");
-			while (st.hasMoreTokens()) {
-				if (st.nextToken().equals("help")) {
-					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
-					break;
-				}
+			//dNode.link = "http://www.etf.rs";		
 			}
-			getPage(uri);
-		}
 	}
 
 	/**

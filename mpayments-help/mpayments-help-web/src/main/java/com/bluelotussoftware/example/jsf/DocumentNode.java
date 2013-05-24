@@ -14,7 +14,15 @@ public class DocumentNode {
 	String category;
 	String type;
 	String selfPath;
+	String link;
 	
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
+	}
 	ArrayList<DocumentNode> children = null;
 	String parent = null;
 
@@ -31,6 +39,8 @@ public class DocumentNode {
 		this.parent = parent;
 		this.selfPath = selfPath;
 		children = new ArrayList<DocumentNode>();
+		this.link = "http://localhost:8080/helprepo" + selfPath + "/content";
+		
 	}
 
 	public String getKey() {
@@ -90,6 +100,7 @@ public class DocumentNode {
 	}
 
 	public void setSelfPath(String selfPath) {
+		this.link = "http://localhost:8080/helprepo" + selfPath + "/content";
 		this.selfPath = selfPath;
 	}
 	@Override

@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:h="http://java.sun.com/jsf/html">
-    <h:head>
-        <title>Custom PrimeFaces Tree</title>
-        <h:outputStylesheet name="custom-tree.css" library="css"/>
-    </h:head>
-    <h:body>
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+	<title>Custom PrimeFaces Tree</title>
+	<h:outputStylesheet name="custom-tree.css" library="css" />
+</h:head>
+<h:body>
 	<h:panelGrid columns="3">
 		<h:form id="form1">
 			<p:panel id="panel1" header="Custom PrimeFaces Tree">
@@ -16,7 +16,7 @@
 
 				<p:tree id="tree1" value="#{treeBean.model}" var="node"
 					selectionMode="single" selection="#{treeBean.selectedNode}">
-					<p:ajax event="select" listener="#{treeBean.onNodeSelect}" />
+					<p:ajax event="select" listener="#{treeBean.onNodeSelect}"/>
 					<p:ajax event="expand" listener="#{treeBean.onNodeExpand}" />
 					<p:ajax event="collapse" listener="#{treeBean.onNodeCollapse}" />
 					<p:treeNode type="node" expandedIcon="folder-open"
@@ -24,15 +24,19 @@
 
 						<h:outputText value="#{node.title}" />
 					</p:treeNode>
-					<p:treeNode type="leaf" icon="document-node">
-						<h:outputText value="#{node.title}" />
+
+					<p:treeNode id="drvceNode" type="leaf" icon="document-node">
+						<a href="#{node.link}" target="myFrame">
+							<h:outputText value="#{node.title} (#{node.link})" id="lblNode" />
+						</a>
 					</p:treeNode>
 				</p:tree>
 			</p:panel>
 		</h:form>
-		<h:form>
-				<h:outputText value="#{treeBean.page}" />
-		</h:form>
+		
+			<iframe name="myFrame" width="680" height="680"/>
+		
+
 	</h:panelGrid>
 </h:body>
 
