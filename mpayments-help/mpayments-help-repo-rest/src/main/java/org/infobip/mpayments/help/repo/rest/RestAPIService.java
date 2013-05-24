@@ -84,63 +84,6 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
-	// @Override
-	// public Response getPage(@QueryParam("app") String app,
-	// @QueryParam("topic") String topic,
-	// @QueryParam("reseller") String reseller, @QueryParam("language") String
-	// language) {
-	// Session session = null;
-	// Repository repository = null;
-	// boolean error = false;
-	// File file = null;
-	// InputStream input = null;
-	// OutputStream output = null;
-	// try {
-	// InitialContext initialContext = new InitialContext();
-	// repository = (Repository) initialContext.lookup("java:jcr/local");
-	// session = repository.login(new SimpleCredentials("admin",
-	// "admin".toCharArray()));
-	//
-	// System.out.println("ovde");
-	//
-	// Node target = session.getNode("/help/" + app + "/" + topic + "/" +
-	// reseller + "/" + language + "");
-	//
-	// Node content = target.getNode("jcr:content");
-	// input = content.getProperty("jcr:data").getBinary().getStream();
-	//
-	// file = new File("template.html");
-	// output = new FileOutputStream(file);
-	//
-	// byte[] buffer = new byte[input.available()];
-	// while (input.read(buffer) != -1) {
-	// output.write(buffer);
-	// buffer = new byte[input.available() + 1];
-	// }
-	// output.write('\n');
-	// output.flush();
-	// } catch (Exception ex) {
-	// error = true;
-	// ex.printStackTrace();
-	// } finally {
-	// if (session != null)
-	// session.logout();
-	// closeStreams(input, output);
-	// }
-	//
-	// if (!error) {
-	// try {
-	// return
-	// Response.status(Response.Status.OK).entity(readFile(file)).build();
-	// } catch (IOException e) {
-	// return
-	// Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-	// }
-	// } else {
-	// return
-	// Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-	// }
-	// }
 
 	@Override
 	public Response getPageById(@PathParam("id") String id) {
@@ -171,7 +114,7 @@ public class RestAPIService implements RestAPI {
 				session.logout();
 			closeStreams(input, output);
 		}
-
+		
 		if (!error) {
 			return Response.status(Response.Status.OK).entity(result).build();
 		} else {
@@ -213,17 +156,16 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 	
+	
 	private static StringBuilder getStringFromInputStream(InputStream is) {
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
 		String line;
 		try {
-
 			br = new BufferedReader(new InputStreamReader(is));
 			while ((line = br.readLine()) != null) {
 				sb.append(line);
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -238,6 +180,7 @@ public class RestAPIService implements RestAPI {
 		return sb;
 	}
 
+	
 	private void closeStreams(InputStream input, OutputStream output) {
 		if (input != null)
 			try {
@@ -253,6 +196,8 @@ public class RestAPIService implements RestAPI {
 			}
 	}
 
+	
+	@SuppressWarnings("unused")
 	private String readFile(File file) throws IOException {
 		StringBuilder fileContents = new StringBuilder((int) file.length());
 		Scanner scanner = new Scanner(file);
@@ -267,6 +212,7 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
+	
 	private void printChildren(Node node) throws RepositoryException {
 		if (node.hasNodes()) {
 			NodeIterator it = node.getNodes();

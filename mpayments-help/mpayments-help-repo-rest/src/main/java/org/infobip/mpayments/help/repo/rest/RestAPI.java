@@ -12,20 +12,6 @@ import javax.ws.rs.core.Response;
 @Local
 @Path("/")
 public interface RestAPI {
-
-	
-	/*@GET
-	@Path("/getPage")
-	@Produces(MediaType.TEXT_HTML)
-	public String getPage(@QueryParam("app") String app, @QueryParam("topic") String topic,
-						 @QueryParam("reseller") String reseller,  @QueryParam("language") String language);*/
-	
-	/*
-	 * @GET
-	@Path("/getPage")
-	@Produces(MediaType.TEXT_HTML)
-	public Response getPage(@QueryParam("app") String app, @QueryParam("topic") String topic, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
-	*/
 	
 	@GET
 	@Path("/getPageById/{id}/content")
