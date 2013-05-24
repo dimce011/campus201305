@@ -96,11 +96,11 @@ public class TreeBeanCvor implements Serializable {
 	public TreeBeanCvor() throws JsonParseException, JsonMappingException, IOException, JSONException {
 
 		makeFromJsonTree();
-		System.out.println("OBJECT: "+object);
+		System.out.println("OBJECT: " + object);
 		root = new TreeNodeImpl("Root", null);
 		pointer = new TreeNodeImpl(TreeNodeType.NODE, object, root);
 		fakeChild = new TreeNodeImpl("fake", pointer);
-		//createNodes(object, node0);
+		// createNodes(object, node0);
 		System.out.println("Izasao");
 	}
 
@@ -112,19 +112,33 @@ public class TreeBeanCvor implements Serializable {
 		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/"), DocumentCvor.class));
 		System.out.println("Ispis objekta " + object.getSelf_href());
 	}
-	
-	public void addChildren(String uri){
+
+	public void addChildren(String uri) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			DocumentCvorWrapper dcw  = mapper.readValue(getString(uri), DocumentCvorWrapper.class);
-			// List<DocumentCvor> documentCvors = mapper.readValue(getString(uri), new List<DocumentCvor>().getClass());
+			DocumentCvorWrapper dcw = mapper.readValue(getString(uri), DocumentCvorWrapper.class);
+			// List<DocumentCvor> documentCvors =
+			// mapper.readValue(getString(uri), new
+			// List<DocumentCvor>().getClass());
 			for (int i = 0; i < dcw.data.size(); i++) {
 				System.out.println("TITLE - " + dcw.data.get(i).getTitle());
-				TreeNode node = new TreeNodeImpl(dcw.data.get(i), selectedNode);
-				if(!dcw.data.get(i).getChildren_href().equals("")){
+				TreeNode node = null;
+				if (dcw.data.get(i).getType().equals("nt:folder")) {
+					if (dcw.data.get(i).getChildren_href().equals("")) {
+						node = new TreeNodeImpl(TreeNodeType.EMPTY, dcw.data.get(i), selectedNode);
+						System.out.println("TIP CVORA praznog>>> " + node.getType());
+					} else {
+						node = new TreeNodeImpl(TreeNodeType.NODE, dcw.data.get(i), selectedNode);
+						System.out.println("TIP CVORA>>> " + node.getType());
+					}
+				} else {
+					node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.data.get(i), selectedNode);
+					System.out.println("TIP CVORA>>> " + node.getType());
+				}
+				if (!dcw.data.get(i).getChildren_href().equals("")) {
 					TreeNode fake = new TreeNodeImpl("fake", node);
 				}
-				
+
 			}
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
@@ -142,13 +156,13 @@ public class TreeBeanCvor implements Serializable {
 	}
 
 	public void createNodes(DocumentCvor object, TreeNode root) {
-//		if (object.getChildren() != null) {
-//			for (DocumentCvor list : object.getChildren()) {
-				TreeNode node1 = new TreeNodeImpl(object, root);
-//				System.out.println("Ispis " + list.getSelfPath());
-//				createNodes(list, node1);
-//			}
-//		}
+		// if (object.getChildren() != null) {
+		// for (DocumentCvor list : object.getChildren()) {
+		TreeNode node1 = new TreeNodeImpl(object, root);
+		// System.out.println("Ispis " + list.getSelfPath());
+		// createNodes(list, node1);
+		// }
+		// }
 
 	}
 
@@ -157,7 +171,7 @@ public class TreeBeanCvor implements Serializable {
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
-		HttpGet httpGet = new HttpGet(prepareGetRequest(uri , map));
+		HttpGet httpGet = new HttpGet(prepareGetRequest(uri, map));
 		try {
 
 			response = httpClient.execute(httpGet);
@@ -250,10 +264,10 @@ public class TreeBeanCvor implements Serializable {
 		} else {
 			DocumentCvor dNode = (DocumentCvor) event.getTreeNode().getData();
 			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelf_href());
-			
+
 		}
-//		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
-//		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
+		// DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
+		// addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
 	}
 
 	/**
@@ -266,12 +280,12 @@ public class TreeBeanCvor implements Serializable {
 		selectedNode = event.getTreeNode();
 		System.out.println("NodeExpandEvent Fired");
 		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
-		if(event.getTreeNode().getChildCount()==1){
-            event.getTreeNode().getChildren().remove(0);
-        }
-		
-		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
-		
+		if (event.getTreeNode().getChildCount() == 1) {
+			event.getTreeNode().getChildren().remove(0);
+		}
+
+		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href());
+
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 

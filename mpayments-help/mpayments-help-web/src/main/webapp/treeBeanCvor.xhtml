@@ -19,15 +19,21 @@
 					<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}" />
 					<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}" update="tree1"/>
 					<p:ajax event="collapse" listener="#{treeBeanCvor.onNodeCollapse}" />
+					
 					<p:treeNode type="node" expandedIcon="folder-open"
 						collapsedIcon="folder-collapsed">
-
 						<h:outputText value="#{node.title}" />
 					</p:treeNode>
+					
 					<p:treeNode type="leaf" icon="document-node">
 					<a href="#{node.self_href}" target="myFrame" >
 						<h:outputText value="#{node.title}" /></a>
 					</p:treeNode>
+					
+					<p:treeNode type="empty" icon="folder-collapsed">
+						<h:outputText value="#{node.title}" />
+					</p:treeNode>
+					
 				</p:tree>
 			</p:panel>
 		</h:form>
