@@ -121,6 +121,10 @@ public class TreeBeanCvor implements Serializable {
 			for (int i = 0; i < dcw.data.size(); i++) {
 				System.out.println("TITLE - " + dcw.data.get(i).getTitle());
 				TreeNode node = new TreeNodeImpl(dcw.data.get(i), selectedNode);
+				if(!dcw.data.get(i).getType().equals("nt:resource")){
+					TreeNode fake = new TreeNodeImpl("fake", node);
+				}
+				
 			}
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block
@@ -238,24 +242,24 @@ public class TreeBeanCvor implements Serializable {
 	 */
 
 	public void onNodeSelect(NodeSelectEvent event) {
-//		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
-//			System.out.println("NodeExpandEvent Fired");
-//			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentNode) event
-//					.getTreeNode().getData()).getTitle());
-//			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
-//		} else {
-//			DocumentNode dNode = (DocumentNode) event.getTreeNode().getData();
-//			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelfPath());
-//			String uri = "";
-//			StringTokenizer st = new StringTokenizer(dNode.getSelfPath(), "/");
-//			while (st.hasMoreTokens()) {
-//				if (st.nextToken().equals("help")) {
-//					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
-//					break;
-//				}
-//			}
-//			getPage(uri);
-//		}
+		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
+			System.out.println("NodeExpandEvent Fired");
+			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentCvor) event
+					.getTreeNode().getData()).getTitle());
+			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+		} else {
+			DocumentCvor dNode = (DocumentCvor) event.getTreeNode().getData();
+			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelf_href());
+			String uri = "";
+			StringTokenizer st = new StringTokenizer(dNode.getSelf_href(), "/");
+			while (st.hasMoreTokens()) {
+				if (st.nextToken().equals("help")) {
+					uri += st.nextToken() + "/" + st.nextToken() + "/content/" + st.nextToken() + "/" + st.nextToken();
+					break;
+				}
+			}
+			getPage(uri);
+		}
 //		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
 //		addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
 	}
