@@ -121,7 +121,7 @@ public class TreeBeanCvor implements Serializable {
 			for (int i = 0; i < dcw.data.size(); i++) {
 				System.out.println("TITLE - " + dcw.data.get(i).getTitle());
 				TreeNode node = new TreeNodeImpl(dcw.data.get(i), selectedNode);
-				if(!dcw.data.get(i).getType().equals("nt:resource")){
+				if(!dcw.data.get(i).getChildren_href().equals("")){
 					TreeNode fake = new TreeNodeImpl("fake", node);
 				}
 				
