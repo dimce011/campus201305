@@ -8,7 +8,9 @@ public class DocumentCvor {
 	String self_href;
 	String parent_href;
 	String children_href;
+	String content_href;
 
+	
 	public DocumentCvor() {
 
 	}
@@ -21,6 +23,7 @@ public class DocumentCvor {
 		this.type = type;
 		this.self_href = self_href;
 		this.parent_href = parent_href;
+		//this.content_href = content_href;
 		// this.children_href = children_href;
 	}
 
@@ -80,4 +83,13 @@ public class DocumentCvor {
 		this.children_href = children_href;
 	}
 
+	public String getContent_href() {
+		return content_href;
+	}
+
+	public void setContent_href(String content_href) {
+		this.content_href = content_href;
+	}
+
+	
 }
