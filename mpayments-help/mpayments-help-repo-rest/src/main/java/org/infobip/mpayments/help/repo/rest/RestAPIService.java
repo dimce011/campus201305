@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import javax.ejb.Stateless;
 import javax.jcr.Node;
@@ -43,6 +46,7 @@ public class RestAPIService implements RestAPI {
 	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic,
 			@PathParam("parID") String parID, @QueryParam("reseller") String reseller,
 			@QueryParam("language") String language) {
+		System.out.println("POZVANA METODA getParagraph");
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
@@ -100,6 +104,7 @@ public class RestAPIService implements RestAPI {
 		InputStream input = null;
 		OutputStream output = null;
 		String result = null;
+		System.out.println("POZVANA METODA getDocuments");
 		try {
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
@@ -138,6 +143,7 @@ public class RestAPIService implements RestAPI {
 		InputStream input = null;
 		OutputStream output = null;
 		String result = null;
+		System.out.println("POZVANA METODA getDoc");
 		try {
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
@@ -233,19 +239,50 @@ public class RestAPIService implements RestAPI {
 
 
 	@Override
-	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic,
-			@QueryParam("language") String language, @QueryParam("reseller") String reseller){
+	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars){
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
 		InputStream input = null;
 		OutputStream output = null;
 		String result = null;
+		StringTokenizer stringTokenizer = null;
+		Map<String, String> mapParameters = new HashMap<String, String>();
+		String reseller = null;
+		String language = null;
+		System.out.println("POZVANA METODA getDocument");
 		try {
 			//System.out.println("ovde1");
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			
+			stringTokenizer = new StringTokenizer(fieldPars, "&=");
+			System.out.println("FIELD PARAMS " + fieldPars);
+			while (stringTokenizer.hasMoreTokens()) {
+				String first = stringTokenizer.nextToken();
+				String second = stringTokenizer.nextToken();
+				if ("reseller".equalsIgnoreCase(first)) {
+					reseller = second;
+					continue;
+				}
+				if ("language".equalsIgnoreCase(first)) {
+					language = second;
+					continue;
+				}
+				mapParameters.put(first, second);
+			}
+			
+			if (language == null) {
+				language = "en";
+			}
+			if (reseller == null) {
+				reseller = "1";
+			}
+			
+			for (Map.Entry<String, String> entry : mapParameters.entrySet()) {
+				System.out.println(entry.getKey() + " = " + entry.getValue());
+			}
 		
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();

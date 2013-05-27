@@ -24,11 +24,11 @@ public interface RestAPI {
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
 	
-	
+	//@Path("/mypath{param1 : (/param1)?}")
 	@GET
-	@Path("/{app}/{topic}/content")
+	@Path("/{app}/{topic}/content{fieldPars : ((/fieldPars)|(*.))?}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @QueryParam("language") String language, @QueryParam("reseller") String reseller);
+	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars);
 	
 //  za staro drvo!
 //	@GET
