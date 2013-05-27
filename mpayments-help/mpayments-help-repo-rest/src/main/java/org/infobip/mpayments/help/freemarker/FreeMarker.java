@@ -1,5 +1,6 @@
 package org.infobip.mpayments.help.freemarker;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
@@ -31,13 +32,16 @@ public class FreeMarker {
 		cfg = new Configuration();
 	}
 
-	public String process(Map<String, Object> input) {
+	public String process(Map<String, Object> input, String templateStr ) {
 		String str = null;
 		try {
 
 			cfg.setClassForTemplateLoading(this.getClass(), "/");
-			template = cfg.getTemplate("templates/helloworld.ftl");
-
+			//template = cfg.getTemplate("templates/helloworld.ftl");
+			
+			
+			Template template = new Template("name", new StringReader(templateStr),new Configuration());
+			
 			StringWriter sv = new StringWriter();
 
 			template.process(input, sv);

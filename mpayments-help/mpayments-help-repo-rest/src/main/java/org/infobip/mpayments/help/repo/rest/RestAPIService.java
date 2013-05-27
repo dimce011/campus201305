@@ -30,6 +30,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -237,6 +238,10 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
+	@Override
+	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic){
+		return getDocument(app,topic,"");
+	}
 
 	@Override
 	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars){
@@ -247,30 +252,41 @@ public class RestAPIService implements RestAPI {
 		OutputStream output = null;
 		String result = null;
 		StringTokenizer stringTokenizer = null;
-		Map<String, String> mapParameters = new HashMap<String, String>();
+		Map<String, Object> mapParameters = new HashMap<String, Object>();
 		String reseller = null;
 		String language = null;
 		System.out.println("POZVANA METODA getDocument");
 		try {
-			//System.out.println("ovde1");
+			System.out.println("field par uri "+fieldPars);
+			
+			if(fieldPars == null ){
+				error = true;
+				fieldPars = "";
+			}
+			
+			if(fieldPars.startsWith("?"))
+				fieldPars = fieldPars.substring(1);
+			
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-			
-			stringTokenizer = new StringTokenizer(fieldPars, "&=");
-			System.out.println("FIELD PARAMS " + fieldPars);
-			while (stringTokenizer.hasMoreTokens()) {
-				String first = stringTokenizer.nextToken();
-				String second = stringTokenizer.nextToken();
-				if ("reseller".equalsIgnoreCase(first)) {
-					reseller = second;
-					continue;
+			if (!fieldPars.equals("")) {
+				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
+				System.out.println("FIELD PARAMS " + fieldPars);
+				while (stringTokenizer.hasMoreTokens()) {
+					String first = stringTokenizer.nextToken();
+					String second = stringTokenizer.nextToken();
+					if ("reseller".equalsIgnoreCase(first)) {
+						reseller = second;
+						continue;
+					}
+					if ("language".equalsIgnoreCase(first)) {
+						language = second;
+						continue;
+					}
+				
+					mapParameters.put(first, second);
 				}
-				if ("language".equalsIgnoreCase(first)) {
-					language = second;
-					continue;
-				}
-				mapParameters.put(first, second);
 			}
 			
 			if (language == null) {
@@ -280,25 +296,46 @@ public class RestAPIService implements RestAPI {
 				reseller = "1";
 			}
 			
-			for (Map.Entry<String, String> entry : mapParameters.entrySet()) {
+			System.out.println("ispis mape");
+			for (Map.Entry<String, Object> entry : mapParameters.entrySet()) {
 				System.out.println(entry.getKey() + " = " + entry.getValue());
 			}
-		
+			
+			String path = "/help/" + app + "/" + topic;
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
-
-			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+"' and [my:reseller] = '" +reseller+"'", Query.JCR_SQL2);
+//			System.out.println("query " + "SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+
+//					 "' and [my:reseller] = '" +reseller+"'");
+//			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+
+//										 "' and [my:reseller] = '" +reseller+"'", Query.JCR_SQL2);
+			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+"' and [my:reseller] = '" +reseller+"' and ISCHILDNODE(["+path+"])", Query.JCR_SQL2);
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
 			Node node = null;
-			if (it.hasNext()) {
+			boolean tPar = true;
+			while (it.hasNext()) {
 				node = it.nextNode();
+				if(node.getPath().startsWith("/help/"+app+"/"+topic))
+					break;
+				if(node.getPath().startsWith("/help[2]/"+app+"/"+topic))
+					break;
+				if(node.getPath().startsWith("/help[3]/"+app+"/"+topic))
+					break;
 			}
+			
+			
 
+			System.out.println("path " + node.getPath());
 			Node content = node.getNode("jcr:content");
 			input = content.getProperty("jcr:data").getBinary().getStream();
 			result = RestAPIService.getStringFromInputStream(input).toString();
+			
+			if(!mapParameters.isEmpty()){
+				FreeMarker fm = new FreeMarker();
+				result = fm.process(mapParameters,result);
+			}
+			
 			res = null;
 			it = null;
 
