@@ -6,12 +6,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.jcr.Binary;
 import javax.jcr.LoginException;
+import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
@@ -19,6 +22,7 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -59,145 +63,153 @@ public class RestHelpRepoService implements RestHelpRepo {
 		try {
 			openSession();
 
-			
-			
-			// pravljenje namespace-a			
-//            NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry(); 
-//
-//            List<String> list = Arrays.asList(registry.getPrefixes()); 
-//            if (!list.contains("my")) { 
-//                    registry.registerNamespace("my", "com.infobip.jcr.my"); 
-//            } 
-//
-            NodeTypeManager manager = session.getWorkspace().getNodeTypeManager(); 
-            
-    		ispisiSvuDecu(session.getNode("/"));
+			// pravljenje namespace-a
+			NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry();
 
-    		// pravljenje novog tipa cvora sa novim propertijima   		
-    		
-//            NamespaceRegistry nsReg = (NamespaceRegistry)session.getWorkspace().getNamespaceRegistry();
-//            nsReg.registerNamespace("my","com.infobip.jcr.my");
+			List<String> list = Arrays.asList(registry.getPrefixes());
+			if (!list.contains("my")) {
+				registry.registerNamespace("my", "com.infobip.jcr.my");
+			}
 
-//            NodeTypeTemplate nodeType = manager.createNodeTypeTemplate(); 
-//             nodeType.setMixin(true); 
-//            nodeType.setName("my:metaPageData"); 
-//            nodeType.setQueryable(true); 
-//          
-//             nodeType.setDeclaredSuperTypeNames(new String[]{"mix:title"});
-//             System.out.println("ovde1");
-//          
-//            PropertyDefinitionTemplate propertyDef = manager.createPropertyDefinitionTemplate(); 
-//            propertyDef.setName("my:lang"); 
-//            propertyDef.setMultiple(false); 
-//            propertyDef.setRequiredType(PropertyType.STRING); 
-//            propertyDef.setOnParentVersion(OnParentVersionAction.COPY); 
-//            propertyDef.setProtected(false); 
-//            System.out.println("ovde2");
-//            
-//            PropertyDefinitionTemplate propertyDef2 = manager.createPropertyDefinitionTemplate(); 
-//            propertyDef2.setName("my:reseller"); 
-//            propertyDef2.setMultiple(false); 
-//            propertyDef2.setRequiredType(PropertyType.STRING); 
-//            propertyDef2.setOnParentVersion(OnParentVersionAction.COPY); 
-//            propertyDef2.setProtected(false); 
-//            System.out.println("ovde2");
-//         
-//            nodeType.getPropertyDefinitionTemplates().add(propertyDef); 
-//            nodeType.getPropertyDefinitionTemplates().add(propertyDef2); 
-//            System.out.println("ovde3");
-//            manager.registerNodeType(nodeType, true); 
-//            
-//            ispisiSvuDecu(session.getNode("/"));
+			NodeTypeManager manager = session.getWorkspace().getNodeTypeManager();
 
-    		
-    		// promena fajla, po potrebi
-    		
-//    		Node root = session.getRootNode();
-//    		Node help = root.getNode("help[2]");
-//    		Node pp = help.getNode("pp");
-//    		Node service = pp.getNode("service");
-//    		Node one = service.getNode("one");
-//    		
-//    		Node content = one.getNode("jcr:content");
-//    		File f = new File("template.ftl");
-//			InputStream stream = new BufferedInputStream(new FileInputStream(f));
-//			Binary binary = session.getValueFactory().createBinary(stream);
-//			content.setProperty("jcr:data", binary);
-//			session.save();
-    		
-    		// kraj promene
-    		
-    		// kreiranje novog repozitorijuma
-    		
-//			Node root = session.getRootNode();
-//			
-//			Node help = root.addNode("help", NodeType.NT_FOLDER);
-//
-//			Node pp = help.addNode("pp", NodeType.NT_FOLDER);
-//			Node cs = help.addNode("cs", NodeType.NT_FOLDER);
-//			Node wd = help.addNode("wd", NodeType.NT_FOLDER);
-//			Node fi = help.addNode("fi", NodeType.NT_FOLDER);
-//			Node ami = help.addNode("ami", NodeType.NT_FOLDER);
-//
-//			Node service = pp.addNode("service", NodeType.NT_FOLDER);
-//			Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
-//			Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
-//			Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
-//
-//			Node one = service.addNode("one", NodeType.NT_FILE);
-//			Node content = one.addNode("jcr:content", "nt:resource");
-//			one.addMixin("my:metaPageData");
-//		              
-//			one.setProperty("my:lang", "en");
-//			one.setProperty("my:reseller", "1");
-//			
-//			System.out.println("ovde13 ");
-//			
-//			String enLang = one.getProperty("my:lang").getValue().getString();
-//			String reseller = one.getProperty("my:reseller").getValue().getString();
-//			
-//			System.out.println("ovde323232 "+enLang+" "+reseller);
-//
-    		
-    		// upit za trazenje cvora
-//            Workspace ws = session.getWorkspace();
-//            QueryManager qm = ws.getQueryManager();
-//         //  Query query = qm.createQuery(reseller,lang);
-//           // Query query = qm.createQuery("SELECT * FROM [my:metaPageData]", Query.XPATH);
-//			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = 'en'", Query.JCR_SQL2);
-//
-//			QueryResult res = query.execute();
-//
-//			NodeIterator it = res.getNodes();
-//
-//			System.out.println("ovde88 " + it.hasNext());
-//
-//			while (it.hasNext()) {
-//				Node n = it.nextNode();
-//
-//				System.out.println("query " + n.getPath()); // Check out the
-//															// current node
-//
-//			}
-    		
-    		
-    		// kraj
+			// ispisiSvuDecu(session.getNode("/"));
+			// session.getNode("/help").remove();
+			// ispisiSvuDecu(session.getNode("/"));
+			// session.save();
 
-//			ispisiSvuDecu(session.getNode("/"));
-//			File f = new File("template.ftl");
-//			InputStream stream = new BufferedInputStream(new FileInputStream(f));
-//			Binary binary = session.getValueFactory().createBinary(stream);
-//			content.setProperty("jcr:data", binary);
-			
-//			session.save();
-//			content.setProperty("my:language", "en");
-			
-			//content.setProperty("reseller", "centili");
-			 
-			 
-//			 Node two = service.addNode("2", NodeType.NT_FOLDER);
-//			 Node three = service.addNode("3", NodeType.NT_FOLDER);
-//			 Node seven = service.addNode("4", NodeType.NT_FOLDER);
+			// pravljenje novog tipa cvora sa novim propertijima
+
+			// NamespaceRegistry nsReg =
+			// (NamespaceRegistry)session.getWorkspace().getNamespaceRegistry();
+			// nsReg.registerNamespace("my","com.infobip.jcr.my");
+			//
+			// NodeTypeTemplate nodeType = manager.createNodeTypeTemplate();
+			// nodeType.setMixin(true);
+			// nodeType.setName("my:metaPageData");
+			// nodeType.setQueryable(true);
+			//
+			// nodeType.setDeclaredSuperTypeNames(new String[]{"mix:title"});
+			// System.out.println("ovde1");
+			//
+			// PropertyDefinitionTemplate propertyDef =
+			// manager.createPropertyDefinitionTemplate();
+			// propertyDef.setName("my:lang");
+			// propertyDef.setMultiple(false);
+			// propertyDef.setRequiredType(PropertyType.STRING);
+			// propertyDef.setOnParentVersion(OnParentVersionAction.COPY);
+			// propertyDef.setProtected(false);
+			// System.out.println("ovde2");
+			//
+			// PropertyDefinitionTemplate propertyDef2 =
+			// manager.createPropertyDefinitionTemplate();
+			// propertyDef2.setName("my:reseller");
+			// propertyDef2.setMultiple(false);
+			// propertyDef2.setRequiredType(PropertyType.STRING);
+			// propertyDef2.setOnParentVersion(OnParentVersionAction.COPY);
+			// propertyDef2.setProtected(false);
+			// System.out.println("ovde2");
+			//
+			// nodeType.getPropertyDefinitionTemplates().add(propertyDef);
+			// nodeType.getPropertyDefinitionTemplates().add(propertyDef2);
+			// System.out.println("ovde3");
+			// manager.registerNodeType(nodeType, true);
+			//
+			// ispisiSvuDecu(session.getNode("/"));
+
+			// promena fajla, po potrebi
+
+			// Node root = session.getRootNode();
+			// Node help = root.getNode("help[2]");
+			// Node pp = help.getNode("pp");
+			// Node service = pp.getNode("service");
+			// Node one = service.getNode("one");
+			//
+			// Node content = one.getNode("jcr:content");
+			// File f = new File("template.ftl");
+			// InputStream stream = new BufferedInputStream(new
+			// FileInputStream(f));
+			// Binary binary = session.getValueFactory().createBinary(stream);
+			// content.setProperty("jcr:data", binary);
+			// session.save();
+
+			// kraj promene
+
+			// kreiranje novog repozitorijuma
+
+			// Node root = session.getRootNode();
+			//
+			// Node help = root.addNode("help", NodeType.NT_FOLDER);
+			//
+			// Node pp = help.addNode("pp", NodeType.NT_FOLDER);
+			// Node cs = help.addNode("cs", NodeType.NT_FOLDER);
+			// Node wd = help.addNode("wd", NodeType.NT_FOLDER);
+			// Node fi = help.addNode("fi", NodeType.NT_FOLDER);
+			// Node ami = help.addNode("ami", NodeType.NT_FOLDER);
+			//
+			// Node service = pp.addNode("service", NodeType.NT_FOLDER);
+			// Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
+			// Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
+			// Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
+			//
+			// Node one = service.addNode("one", NodeType.NT_FILE);
+			// Node content = one.addNode("jcr:content", "nt:resource");
+			// one.addMixin("my:metaPageData");
+			//
+			// one.setProperty("my:lang", "en");
+			// one.setProperty("my:reseller", "1");
+			//
+			// System.out.println("ovde13 ");
+			//
+			// String enLang =
+			// one.getProperty("my:lang").getValue().getString();
+			// String reseller =
+			// one.getProperty("my:reseller").getValue().getString();
+			//
+			// System.out.println("ovde323232 "+enLang+" "+reseller);
+			//
+
+			// upit za trazenje cvora
+			// Workspace ws = session.getWorkspace();
+			// QueryManager qm = ws.getQueryManager();
+			// // Query query = qm.createQuery(reseller,lang);
+			// // Query query =
+			// qm.createQuery("SELECT * FROM [my:metaPageData]", Query.XPATH);
+			// Query query =
+			// qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = 'en'",
+			// Query.JCR_SQL2);
+			//
+			// QueryResult res = query.execute();
+			//
+			// NodeIterator it = res.getNodes();
+			//
+			// System.out.println("ovde88 " + it.hasNext());
+			//
+			// while (it.hasNext()) {
+			// Node n = it.nextNode();
+			//
+			// System.out.println("query " + n.getPath()); // Check out the
+			// // current node
+			//
+			// }
+
+			// kraj
+
+			ispisiSvuDecu(session.getNode("/"));
+			// File f = new File("template.ftl");
+			// InputStream stream = new BufferedInputStream(new
+			// FileInputStream(f));
+			// Binary binary = session.getValueFactory().createBinary(stream);
+			// content.setProperty("jcr:data", binary);
+
+			// // session.save();
+			// content.setProperty("my:language", "en");
+			//
+			// content.setProperty("reseller", "centili");
+
+			// Node two = service.addNode("2", NodeType.NT_FOLDER);
+			// Node three = service.addNode("3", NodeType.NT_FOLDER);
+			// Node seven = service.addNode("4", NodeType.NT_FOLDER);
 
 			// Node one =session.getNode("/help/pp/service/1");
 			// Node en = one.addNode("en", NodeType.NT_FILE);
@@ -211,8 +223,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// Binary binary = session.getValueFactory().createBinary(stream);
 			// content.setProperty("jcr:data", binary);
 			//
-			// session.save();
-	
+			session.save();
 
 			// Do something interesting with the Session ...
 			// logger.info("name: {}", sess.getRootNode().getName());
@@ -470,10 +481,14 @@ public class RestHelpRepoService implements RestHelpRepo {
 			String[] niz = node.getPath().split("/");
 			dnl = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
 					.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
-			
-			if(node.hasNodes()){
-				String children_href = node.getPath() + "/children";
-				dnl.setChildren_href(children_href);
+
+			if (node.hasNodes()) {
+				if (hasFolder(node)) {
+					String children_href = node.getPath() + "/children";
+					dnl.setChildren_href(children_href);
+				} else {
+					dnl.setChildren_href("");
+				}
 			} else {
 				dnl.setChildren_href("");
 			}
@@ -496,8 +511,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 	public Response getLinksJSON(@PathParam("path") String path) {
 		String response = null;
 		try {
-			String pom = "/"+path;
-			if(pom.equals("/")) pom = "/help";
+			String pom = "/" + path;
+			if (pom.equals("/"))
+				pom = "/help";
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor(pom));
 
 		} catch (JsonGenerationException e) {
@@ -557,5 +573,17 @@ public class RestHelpRepoService implements RestHelpRepo {
 				closeSession();
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
+	}
+
+	public boolean hasFolder(Node node) throws RepositoryException {
+		openSession();
+		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+			Node subNode = nodeIterator.nextNode();
+			logger.info("Node >>> " + subNode.getName() + " type >>> " + subNode.getPrimaryNodeType().getName());
+			if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

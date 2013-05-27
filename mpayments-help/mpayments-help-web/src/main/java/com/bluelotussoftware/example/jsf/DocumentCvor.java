@@ -5,22 +5,22 @@ public class DocumentCvor {
 	String title;
 	String category;
 	String type;
-	String self_href;
 	String parent_href;
+	String self_href;
 	String children_href;
 
 	public DocumentCvor() {
 
 	}
 
-	public DocumentCvor(String key, String title, String category, String type, String self_href, String parent_href) {
+	public DocumentCvor(String key, String title, String category, String type, String parent_href, String self_href) {
 		super();
 		this.key = key;
 		this.title = title;
 		this.category = category;
 		this.type = type;
-		this.self_href = "http://localhost:8080/helprepo" + self_href + "/content";
 		this.parent_href = parent_href;
+		this.self_href = self_href;
 		// this.children_href = children_href;
 	}
 
@@ -61,7 +61,7 @@ public class DocumentCvor {
 	}
 
 	public void setSelf_href(String self_href) {
-		this.self_href = "http://localhost:8080/helprepo" + self_href + "/content";
+		this.self_href = self_href;
 	}
 
 	public String getParent_href() {
@@ -79,5 +79,7 @@ public class DocumentCvor {
 	public void setChildren_href(String children_href) {
 		this.children_href = children_href;
 	}
+	
+	
 
 }
