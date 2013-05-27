@@ -277,9 +277,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 		inputMap.put("firma", language);
 		inputMap.put("test", test);
 
-		FreeMarker fm = new FreeMarker();
-		String s = fm.process(inputMap);
-		return s;
+	//	FreeMarker fm = new FreeMarker();
+	//	String s = fm.process(inputMap);
+		return "";
 	}
 
 	private void ispisiSvuDecu(Node node) throws RepositoryException {
