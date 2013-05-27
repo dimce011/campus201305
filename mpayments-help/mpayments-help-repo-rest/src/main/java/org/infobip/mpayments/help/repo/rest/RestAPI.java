@@ -26,7 +26,7 @@ public interface RestAPI {
 	
 	
 	@GET
-	@Path("/{app}/{topic}/content")
+	@Path("/help/{app}/{topic}/content")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @QueryParam("language") String language, @QueryParam("reseller") String reseller);
 	
