@@ -1,39 +1,48 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:h="http://java.sun.com/jsf/html">
-    <h:head>
-        <title>Custom PrimeFaces Tree</title>
-        <h:outputStylesheet name="custom-tree.css" library="css"/>
-    </h:head>
-    <h:body>
-	<h:panelGrid columns="3">
-		<h:form id="form1">
-			<p:panel id="panel1" header="Custom PrimeFaces Tree">
-				<p:growl id="growl1" showSummary="true" showDetail="true"
-					autoUpdate="true" />
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+	<title>Custom PrimeFaces Tree</title>
+	<h:outputStylesheet name="custom-tree.css" library="css" />
+</h:head>
+<h:body>
 
-				<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node" dynamic="true"
-					selectionMode="single" selection="#{treeBeanCvor.selectedNode}">
-					<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}" />
-					<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}" update="tree1"/>
-					<p:ajax event="collapse" listener="#{treeBeanCvor.onNodeCollapse}" />
-					<p:treeNode type="node" expandedIcon="folder-open"
-						collapsedIcon="folder-collapsed">
+	<h:form id="form1" styleClass="menux">
+		<p:panel id="panel1" header="Custom PrimeFaces Tree 3">
+			<p:growl id="growl1" showSummary="true" showDetail="true"
+				autoUpdate="true" />
 
-						<h:outputText value="#{node.title}" />
-					</p:treeNode>
-					<p:treeNode type="leaf" icon="document-node">
-						<h:outputText value="#{node.title}" />
-					</p:treeNode>
-				</p:tree>
-			</p:panel>
-		</h:form>
-		<h:form>
-				<h:outputText value="#{treeBeanCvor.page}" />
-		</h:form>
-	</h:panelGrid>
+			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node"
+				dynamic="true" selectionMode="single"
+				selection="#{treeBeanCvor.selectedNode}">
+				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}" />
+				<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}"
+					update="tree1" />
+				<p:ajax event="collapse" listener="#{treeBeanCvor.onNodeCollapse}" />
+
+				<p:treeNode type="node" expandedIcon="folder-open"
+					collapsedIcon="folder-collapsed">
+					<h:outputText value="#{node.title}" />
+				</p:treeNode>
+
+				<p:treeNode type="leaf" icon="document-node">
+					<a href="#{node.self_href}" target="myFrame"> <h:outputText
+							value="#{node.title}" /></a>
+				</p:treeNode>
+
+				<p:treeNode type="empty" icon="folder-collapsed">
+					<h:outputText value="#{node.title}" />
+				</p:treeNode>
+
+			</p:tree>
+		</p:panel>
+	</h:form>
+	<p:outputPanel styleClass="contentx">
+		<iframe name="myFrame" width="680" height="680" />
+	</p:outputPanel>
+
 </h:body>
 
 </html>

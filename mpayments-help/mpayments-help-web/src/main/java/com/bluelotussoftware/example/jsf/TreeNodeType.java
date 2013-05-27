@@ -29,7 +29,7 @@ package com.bluelotussoftware.example.jsf;
  */
 public enum TreeNodeType {
 
-    LEAF("leaf"), NODE("node");
+    LEAF("leaf"), NODE("node"), EMPTY("empty");
     private String type;
 
     private TreeNodeType(final String type) {

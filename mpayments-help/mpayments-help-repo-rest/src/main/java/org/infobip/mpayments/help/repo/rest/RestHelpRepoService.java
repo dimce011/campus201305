@@ -470,8 +470,13 @@ public class RestHelpRepoService implements RestHelpRepo {
 			String[] niz = node.getPath().split("/");
 			dnl = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
 					.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
-			String children_href = node.getPath() + "/children";
-			dnl.setChildren_href(children_href);
+			
+			if(node.hasNodes()){
+				String children_href = node.getPath() + "/children";
+				dnl.setChildren_href(children_href);
+			} else {
+				dnl.setChildren_href("");
+			}
 
 		} catch (PathNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -514,6 +519,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 	@Override
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent) {
 
+		logger.info("POZVANA METODA GETCHILDRENLINKSJSON");
 		openSession();
 		String response = null;
 		Node node = null;

@@ -22,3 +22,25 @@
     height: 16px;
     width: 16px;
 }
+
+.menux {
+	width: 30%;
+	height: 100%;
+	background: #eee;
+	position: fixed;
+	left: 0;
+}
+
+.contentx {
+	width: 70%;
+	height: 100%;
+	background: #ddd;
+	position: fixed;
+	float: left;
+	right: 0;
+}
+
+.contentx iframe {
+	width: 100%;
+	height: 100%;
+}
