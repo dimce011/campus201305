@@ -28,12 +28,18 @@
 				</p:treeNode>
 
 				<p:treeNode type="leaf" icon="document-node">
-					<a href="#{node.self_href}" target="myFrame"> <h:outputText
+					<a href="#{node.content_href}" target="myFrame"> <h:outputText
 							value="#{node.title}" /></a>
 				</p:treeNode>
 
 				<p:treeNode type="empty" icon="folder-collapsed">
 					<h:outputText value="#{node.title}" />
+				</p:treeNode>
+				
+				<p:treeNode type="contentFolder" expandedIcon="folder-open"
+					collapsedIcon="folder-collapsed">
+					<a href="#{node.content_href}" target="myFrame"> <h:outputText
+							value="#{node.title}" /></a>
 				</p:treeNode>
 
 			</p:tree>

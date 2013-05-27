@@ -277,8 +277,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 		inputMap.put("firma", language);
 		inputMap.put("test", test);
 
-	//	FreeMarker fm = new FreeMarker();
-	//	String s = fm.process(inputMap);
+		// FreeMarker fm = new FreeMarker();
+		// String s = fm.process(inputMap);
 		return "";
 	}
 
@@ -489,8 +489,16 @@ public class RestHelpRepoService implements RestHelpRepo {
 				} else {
 					dnl.setChildren_href("");
 				}
+				
+				if (hasFiles(node)) {
+					String content_href = node.getPath() + "/content";
+					dnl.setContent_href(content_href);
+				} else {
+					dnl.setContent_href("");
+				}
 			} else {
 				dnl.setChildren_href("");
+				dnl.setContent_href("");
 			}
 
 		} catch (PathNotFoundException e1) {
@@ -579,8 +587,18 @@ public class RestHelpRepoService implements RestHelpRepo {
 		openSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 			Node subNode = nodeIterator.nextNode();
-			logger.info("Node >>> " + subNode.getName() + " type >>> " + subNode.getPrimaryNodeType().getName());
 			if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean hasFiles(Node node) throws RepositoryException {
+		openSession();
+		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+			Node subNode = nodeIterator.nextNode();
+			if (subNode.getPrimaryNodeType().getName().equals("nt:file")) {
 				return true;
 			}
 		}

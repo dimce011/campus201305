@@ -112,10 +112,10 @@ public class TreeBeanCvor implements Serializable {
 		ObjectMapper mapper = new ObjectMapper();
 		// setObject(mapper.readValue(new File("C:\\user.json"),
 		// DocumentNode.class));
-		//String str = URLEncoder.encode("help[2]","UTF-8");
-		//String s = "http://localhost:8080/helprepo/" + str;
-		//System.out.println("Ispis stringa " + s);
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/help"), DocumentCvor.class));
+		// String str = URLEncoder.encode("help[2]","UTF-8");
+		// String s = "http://localhost:8080/helprepo/" + str;
+		// System.out.println("Ispis stringa " + s);
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help"), DocumentCvor.class));
 		System.out.println("Ispis objekta " + object.getSelf_href());
 	}
 
@@ -127,23 +127,44 @@ public class TreeBeanCvor implements Serializable {
 			// mapper.readValue(getString(uri), new
 			// List<DocumentCvor>().getClass());
 			for (int i = 0; i < dcw.data.size(); i++) {
-				System.out.println("TITLE - " + dcw.data.get(i).getTitle());
+				//System.out.println("TITLE - " + dcw.data.get(i).getTitle() + " content_href = " + dcw.data.get(i).getContent_href());
 				TreeNode node = null;
-				if (dcw.data.get(i).getType().equals("nt:folder")) {
-					if (dcw.data.get(i).getChildren_href().equals("")) {
+
+				if (dcw.data.get(i).getChildren_href().equals("")) {
+					if (dcw.data.get(i).getContent_href().equals("")) {
 						node = new TreeNodeImpl(TreeNodeType.EMPTY, dcw.data.get(i), selectedNode);
-						System.out.println("TIP CVORA praznog>>> " + node.getType());
+					//	System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE empty>>> " + node.getType());
 					} else {
-						node = new TreeNodeImpl(TreeNodeType.NODE, dcw.data.get(i), selectedNode);
-						System.out.println("TIP CVORA>>> " + node.getType());
+						node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.data.get(i), selectedNode);
+						//System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE leaf>>> " + node.getType());
 					}
 				} else {
-					node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.data.get(i), selectedNode);
-					System.out.println("TIP CVORA>>> " + node.getType());
+					if (dcw.data.get(i).getContent_href().equals("")) {
+						node = new TreeNodeImpl(TreeNodeType.NODE, dcw.data.get(i), selectedNode);
+						//System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE node>>> " + node.getType());
+						TreeNode fake = new TreeNodeImpl("fake", node);
+					} else {
+						node = new TreeNodeImpl(TreeNodeType.CONTENTFOLDER, dcw.data.get(i), selectedNode);
+						//System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE contentfolder>>> " + node.getType());
+						TreeNode fake = new TreeNodeImpl("fake", node);
+					}
 				}
-				if (!dcw.data.get(i).getChildren_href().equals("")) {
-					TreeNode fake = new TreeNodeImpl("fake", node);
-				}
+
+				// if (dcw.data.get(i).getType().equals("nt:folder")) {
+				// if (dcw.data.get(i).getChildren_href().equals("")) {
+				// node = new TreeNodeImpl(TreeNodeType.EMPTY, dcw.data.get(i),
+				// selectedNode);
+				// } else {
+				// node = new TreeNodeImpl(TreeNodeType.NODE, dcw.data.get(i),
+				// selectedNode);
+				// }
+				// } else {
+				// node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.data.get(i),
+				// selectedNode);
+				// }
+				// if (!dcw.data.get(i).getChildren_href().equals("")) {
+				// TreeNode fake = new TreeNodeImpl("fake", node);
+				// }
 
 			}
 		} catch (JsonParseException e) {
@@ -185,7 +206,8 @@ public class TreeBeanCvor implements Serializable {
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				responseString = EntityUtils.toString(entity, "UTF-8");
-				//responseString = URLEncoder.encode(entity.toString(),"UTF-8");
+				// responseString =
+				// URLEncoder.encode(entity.toString(),"UTF-8");
 				System.out.println("Ispis responsaaaaa!!!!! " + responseString);
 
 			}
@@ -214,8 +236,7 @@ public class TreeBeanCvor implements Serializable {
 			for (Entry<String, String> entry : params.entrySet()) {
 				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
-			
-			
+
 			String queryString = URLEncodedUtils.format(nameValuePairs, "UTF-8");
 
 			if (url.indexOf("?") == -1) {
@@ -265,7 +286,8 @@ public class TreeBeanCvor implements Serializable {
 	 */
 
 	public void onNodeSelect(NodeSelectEvent event) {
-		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()) {
+		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()
+				|| event.getTreeNode().getType() == TreeNodeType.CONTENTFOLDER.getType()) {
 			System.out.println("NodeExpandEvent Fired");
 			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentCvor) event
 					.getTreeNode().getData()).getTitle());
