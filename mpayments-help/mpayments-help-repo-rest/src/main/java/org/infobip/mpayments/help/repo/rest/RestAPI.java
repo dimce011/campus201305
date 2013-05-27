@@ -20,9 +20,14 @@ public interface RestAPI {
 	
 
 	@GET
-	@Path("/getParagraph/{app}/{topic}/content/{parID}")
+	@Path("/documents/getParagraph/{app}/{topic}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @QueryParam("reseller") String reseller, @QueryParam("language") String language);
+	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID);
+
+	@GET
+	@Path("/documents/getParagraph/{app}/{topic}/content/{parID}/{fieldPars}")
+	@Produces(MediaType.TEXT_HTML)
+	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars);
 	
 	//@Path("/mypath{param1 : (/param1)?}") {fuel : (/fuel/[^/]+)?}
 	@GET
