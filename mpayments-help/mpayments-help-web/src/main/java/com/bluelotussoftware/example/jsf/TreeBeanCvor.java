@@ -84,6 +84,8 @@ public class TreeBeanCvor implements Serializable {
 	private TreeNode selectedNode;
 	private DocumentCvor object;
 	private TreeNode fakeChild;
+	private String language;
+	private String reseller;
 
 	/**
 	 * Default constructor
@@ -270,6 +272,8 @@ public class TreeBeanCvor implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 		} else {
 			DocumentCvor dNode = (DocumentCvor) event.getTreeNode().getData();
+			System.out.println("SELF >>> " + dNode.getSelf_href());
+			System.out.println("PARENT >>> " + dNode.getParent_href());
 			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelf_href());
 
 		}

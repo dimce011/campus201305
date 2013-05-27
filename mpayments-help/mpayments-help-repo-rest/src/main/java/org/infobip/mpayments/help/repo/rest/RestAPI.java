@@ -28,6 +28,7 @@ public interface RestAPI {
 	@GET
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
 	@Path("help/{app}/{topic}/content/{fieldPars}")
+
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars);
 	
