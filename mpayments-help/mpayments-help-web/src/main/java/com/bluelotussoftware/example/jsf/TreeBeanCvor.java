@@ -115,7 +115,7 @@ public class TreeBeanCvor implements Serializable {
 		// String str = URLEncoder.encode("help[2]","UTF-8");
 		// String s = "http://localhost:8080/helprepo/" + str;
 		// System.out.println("Ispis stringa " + s);
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/help"), DocumentCvor.class));
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help"), DocumentCvor.class));
 		System.out.println("Ispis objekta " + object.getSelf_href());
 	}
 
