@@ -26,9 +26,15 @@ public interface RestAPI {
 	
 	
 	@GET
-	//@Path("/{apppath}/content")
-	@Path("/{rPath:.*}/content")
+	@Path("/{app}/{topic}/content")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDoc(@PathParam("rPath") String rPath);
+	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @QueryParam("language") String language, @QueryParam("reseller") String reseller);
+	
+//  za staro drvo!
+//	@GET
+//	//@Path("/{apppath}/content")
+//	@Path("/{rPath:.*}/content")
+//	@Produces(MediaType.TEXT_HTML)
+//	public Response getDoc(@PathParam("rPath") String rPath);
 
 }

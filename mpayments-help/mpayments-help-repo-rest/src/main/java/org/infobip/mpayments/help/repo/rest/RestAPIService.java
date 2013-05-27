@@ -15,8 +15,15 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.Workspace;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 import javax.naming.InitialContext;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
@@ -122,7 +129,8 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
-	@Override
+	// za staro drvo
+	//@Override
 	public Response getDoc(@PathParam("rPath") String rPath) {
 		Session session = null;
 		Repository repository = null;
@@ -220,6 +228,56 @@ public class RestAPIService implements RestAPI {
 				Node child = it.nextNode();
 				printChildren(child);
 			}
+		}
+	}
+
+
+	@Override
+	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic,
+			@QueryParam("language") String language, @QueryParam("reseller") String reseller){
+		Session session = null;
+		Repository repository = null;
+		boolean error = false;
+		InputStream input = null;
+		OutputStream output = null;
+		String result = null;
+		try {
+			//System.out.println("ovde1");
+			InitialContext initialContext = new InitialContext();
+			repository = (Repository) initialContext.lookup("java:jcr/local");
+			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+		
+			Workspace ws = session.getWorkspace();
+			QueryManager qm = ws.getQueryManager();
+
+			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+"' and [my:reseller] = '" +reseller+"'", Query.JCR_SQL2);
+			QueryResult res = query.execute();
+			NodeIterator it = res.getNodes();
+
+			Node node = null;
+			if (it.hasNext()) {
+				node = it.nextNode();
+			}
+
+			Node content = node.getNode("jcr:content");
+			input = content.getProperty("jcr:data").getBinary().getStream();
+			result = RestAPIService.getStringFromInputStream(input).toString();
+			res = null;
+			it = null;
+
+		} catch (Exception ex) {
+			error = true;
+			ex.printStackTrace();
+		} finally {
+			if (session != null)
+				session.logout();
+			closeStreams(input, output);
+		}
+
+		if (!error) {
+			return Response.status(Response.Status.OK).entity(result).build();
+		} else {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
 	}
 
