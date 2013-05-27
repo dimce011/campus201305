@@ -23,6 +23,7 @@ package com.bluelotussoftware.example.jsf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -111,7 +112,10 @@ public class TreeBeanCvor implements Serializable {
 		ObjectMapper mapper = new ObjectMapper();
 		// setObject(mapper.readValue(new File("C:\\user.json"),
 		// DocumentNode.class));
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/"), DocumentCvor.class));
+		//String str = URLEncoder.encode("help[2]","UTF-8");
+		//String s = "http://localhost:8080/helprepo/" + str;
+		//System.out.println("Ispis stringa " + s);
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/help"), DocumentCvor.class));
 		System.out.println("Ispis objekta " + object.getSelf_href());
 	}
 
@@ -173,6 +177,7 @@ public class TreeBeanCvor implements Serializable {
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
+		System.out.println("Usao u getSTring");
 		HttpGet httpGet = new HttpGet(prepareGetRequest(uri, map));
 		try {
 
@@ -180,6 +185,7 @@ public class TreeBeanCvor implements Serializable {
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				responseString = EntityUtils.toString(entity, "UTF-8");
+				//responseString = URLEncoder.encode(entity.toString(),"UTF-8");
 				System.out.println("Ispis responsaaaaa!!!!! " + responseString);
 
 			}
@@ -202,13 +208,14 @@ public class TreeBeanCvor implements Serializable {
 	private String prepareGetRequest(String url, Map<String, String> params) {
 
 		String fullUrl = url;
-
+		System.out.println("Usao u prepare");
 		if (params != null && !params.isEmpty()) {
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			for (Entry<String, String> entry : params.entrySet()) {
 				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
-
+			
+			
 			String queryString = URLEncodedUtils.format(nameValuePairs, "UTF-8");
 
 			if (url.indexOf("?") == -1) {
@@ -217,7 +224,7 @@ public class TreeBeanCvor implements Serializable {
 				fullUrl = url + "&" + queryString;
 			}
 		}
-
+		System.out.println("Izasao iz prepare" + fullUrl);
 		return fullUrl;
 
 	}
