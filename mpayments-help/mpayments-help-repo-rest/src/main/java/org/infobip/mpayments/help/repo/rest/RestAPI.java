@@ -1,6 +1,7 @@
 package org.infobip.mpayments.help.repo.rest;
 
 import javax.ejb.Local;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -42,6 +43,16 @@ public interface RestAPI {
 	@Path("help/{app}/{topic}/content")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic);
+	
+	@DELETE
+	@Path("help/{app}/{topic}/{fieldPars}")
+	@Produces(MediaType.TEXT_HTML)
+	public Response delDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars);
+	
+	@DELETE
+	@Path("help/{app}/{topic}/")
+	@Produces(MediaType.TEXT_HTML)
+	public Response delDocument(@PathParam("app") String app, @PathParam("topic") String topic);
 	
 //  za staro drvo!
 //	@GET

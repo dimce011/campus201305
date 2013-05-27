@@ -23,6 +23,7 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.naming.InitialContext;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -412,6 +413,103 @@ public class RestAPIService implements RestAPI {
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
 		}
+	}
+
+	@Override
+	public Response delDocument(@PathParam("app") String app, @PathParam("topic") String topic,
+			@PathParam("fieldPars") String fieldPars) {
+		Session session = null;
+		Repository repository = null;
+		boolean error = false;
+		InputStream input = null;
+		OutputStream output = null;
+		String result = null;
+		StringTokenizer stringTokenizer = null;
+		String reseller = null;
+		String language = null;
+		String path = "";
+		String errorString = "error";
+		System.out.println("POZVANA METODA delDocument");
+		try {
+			System.out.println("field par uri " + fieldPars);
+
+			if (fieldPars == null) {
+				error = true;
+				fieldPars = "";
+			}
+
+			if (fieldPars.startsWith("?"))
+				fieldPars = fieldPars.substring(1);
+
+			InitialContext initialContext = new InitialContext();
+			repository = (Repository) initialContext.lookup("java:jcr/local");
+			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			if (!fieldPars.equals("")) {
+				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
+				System.out.println("FIELD PARAMS " + fieldPars);
+				while (stringTokenizer.hasMoreTokens()) {
+					String first = stringTokenizer.nextToken();
+					String second = stringTokenizer.nextToken();
+					if ("reseller".equalsIgnoreCase(first)) {
+						reseller = second;
+						continue;
+					}
+					if ("language".equalsIgnoreCase(first)) {
+						language = second;
+						continue;
+					}
+				}
+			}
+
+			if (language == null && reseller == null) {
+				language = "";
+				reseller = "";
+			}
+			
+			path = "/help/" + app + "/" + topic;
+			Workspace ws = session.getWorkspace();
+			QueryManager qm = ws.getQueryManager();
+			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
+					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + path + "])", Query.JCR_SQL2);
+			
+			QueryResult res = query.execute();
+			NodeIterator it = res.getNodes();
+
+			Node node = null;
+			if (it.hasNext()) {
+				node = it.nextNode();
+			}else{
+				errorString = "Not found!";
+				return Response.status(Response.Status.NOT_FOUND).entity(errorString).build();
+			}
+
+			path = node.getPath();
+			node.remove();
+			session.save();
+			
+			res = null;
+			it = null;
+
+		} catch (Exception ex) {
+			error = true;
+			ex.printStackTrace();
+		} finally {
+			if (session != null)
+				session.logout();
+			closeStreams(input, output);
+		}
+		
+		if (!error) {
+			return Response.status(Response.Status.OK).entity("Deleted node with path: "+path+" .").build();
+		} else {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorString).build();
+		}
+	
+	}
+
+	@Override
+	public Response delDocument(@PathParam("app") String app, @PathParam("topic") String topic) {
+		return delDocument(app, topic,"");
 	}
 
 }
