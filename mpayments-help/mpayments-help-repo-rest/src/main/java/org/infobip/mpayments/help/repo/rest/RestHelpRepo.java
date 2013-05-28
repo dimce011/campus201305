@@ -20,7 +20,7 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/test")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response test(@Context HttpServletRequest request);
+	public Response test(@Context HttpServletRequest request, @QueryParam("action") String action);
 
 	@GET
 	@Path("/sayHello")

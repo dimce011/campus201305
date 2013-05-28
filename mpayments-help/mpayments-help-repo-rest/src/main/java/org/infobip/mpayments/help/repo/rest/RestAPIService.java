@@ -157,7 +157,7 @@ public class RestAPIService implements RestAPI {
 				return Response.status(Response.Status.OK).entity(returnResult.toString()).build();
 			}
 		} else {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
+			return Response.status(Response.Status.NOT_FOUND).entity("error").build();
 		}
 	}
 

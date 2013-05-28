@@ -3,6 +3,7 @@ package org.infobip.mpayments.help.repo.rest;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -12,18 +13,27 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.Stateless;
+import javax.jcr.AccessDeniedException;
 import javax.jcr.Binary;
+import javax.jcr.InvalidItemStateException;
+import javax.jcr.ItemExistsException;
 import javax.jcr.LoginException;
 import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
+import javax.jcr.ReferentialIntegrityException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.ValueFormatException;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeManager;
+import javax.jcr.version.VersionException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +62,13 @@ public class RestHelpRepoService implements RestHelpRepo {
 	InitialContext initialContext;
 
 	@Override
-	public Response test(HttpServletRequest request) {
+	/**
+	 * @param action (String "delete" - deletes help tree from repository,
+	 * 				  String "create" - creates help tree with template file in repository,
+	 * 				  otherwise prints info about repository)
+	 * 
+	 */
+	public Response test(HttpServletRequest request, String action) {
 
 		TestResponseVO responseVO = new TestResponseVO();
 
@@ -62,21 +78,28 @@ public class RestHelpRepoService implements RestHelpRepo {
 		boolean error = false;
 		try {
 			openSession();
+			
+			if ("delete".equals(action)) {
+				deleteHelpTree("/help");
+			} else if ("create".equals(action)) {
+				createHelpTree();
+			}
+			
+			ispisiSvuDecu(session.getNode("/"));
+
+			session.save();
 
 			// pravljenje namespace-a
-			NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry();
-
-			List<String> list = Arrays.asList(registry.getPrefixes());
-			if (!list.contains("my")) {
-				registry.registerNamespace("my", "com.infobip.jcr.my");
-			}
-
-			NodeTypeManager manager = session.getWorkspace().getNodeTypeManager();
-
-			// ispisiSvuDecu(session.getNode("/"));
-			// session.getNode("/help").remove();
-			// ispisiSvuDecu(session.getNode("/"));
-			// session.save();
+			// NamespaceRegistry registry =
+			// session.getWorkspace().getNamespaceRegistry();
+			//
+			// List<String> list = Arrays.asList(registry.getPrefixes());
+			// if (!list.contains("my")) {
+			// registry.registerNamespace("my", "com.infobip.jcr.my");
+			// }
+			//
+			// NodeTypeManager manager =
+			// session.getWorkspace().getNodeTypeManager();
 
 			// pravljenje novog tipa cvora sa novim propertijima
 
@@ -117,58 +140,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 			//
 			// ispisiSvuDecu(session.getNode("/"));
 
-			// promena fajla, po potrebi
-
-			// Node root = session.getRootNode();
-			// Node help = root.getNode("help[2]");
-			// Node pp = help.getNode("pp");
-			// Node service = pp.getNode("service");
-			// Node one = service.getNode("one");
-			//
-			// Node content = one.getNode("jcr:content");
-			// File f = new File("template.ftl");
-			// InputStream stream = new BufferedInputStream(new
-			// FileInputStream(f));
-			// Binary binary = session.getValueFactory().createBinary(stream);
-			// content.setProperty("jcr:data", binary);
-			// session.save();
-
-			// kraj promene
-
-			// kreiranje novog repozitorijuma
-
-			// Node root = session.getRootNode();
-			//
-			// Node help = root.addNode("help", NodeType.NT_FOLDER);
-			//
-			// Node pp = help.addNode("pp", NodeType.NT_FOLDER);
-			// Node cs = help.addNode("cs", NodeType.NT_FOLDER);
-			// Node wd = help.addNode("wd", NodeType.NT_FOLDER);
-			// Node fi = help.addNode("fi", NodeType.NT_FOLDER);
-			// Node ami = help.addNode("ami", NodeType.NT_FOLDER);
-			//
-			// Node service = pp.addNode("service", NodeType.NT_FOLDER);
-			// Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
-			// Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
-			// Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
-			//
-			// Node one = service.addNode("one", NodeType.NT_FILE);
-			// Node content = one.addNode("jcr:content", "nt:resource");
-			// one.addMixin("my:metaPageData");
-			//
-			// one.setProperty("my:lang", "en");
-			// one.setProperty("my:reseller", "1");
-			//
-			// System.out.println("ovde13 ");
-			//
-			// String enLang =
-			// one.getProperty("my:lang").getValue().getString();
-			// String reseller =
-			// one.getProperty("my:reseller").getValue().getString();
-			//
-			// System.out.println("ovde323232 "+enLang+" "+reseller);
-			//
-
 			// upit za trazenje cvora
 			// Workspace ws = session.getWorkspace();
 			// QueryManager qm = ws.getQueryManager();
@@ -193,58 +164,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 			//
 			// }
 
-			// kraj
-
-			ispisiSvuDecu(session.getNode("/"));
-			// File f = new File("template.ftl");
-			// InputStream stream = new BufferedInputStream(new
-			// FileInputStream(f));
-			// Binary binary = session.getValueFactory().createBinary(stream);
-			// content.setProperty("jcr:data", binary);
-
-			// // session.save();
-			// content.setProperty("my:language", "en");
-			//
-			// content.setProperty("reseller", "centili");
-
-			// Node two = service.addNode("2", NodeType.NT_FOLDER);
-			// Node three = service.addNode("3", NodeType.NT_FOLDER);
-			// Node seven = service.addNode("4", NodeType.NT_FOLDER);
-
-			// Node one =session.getNode("/help/pp/service/1");
-			// Node en = one.addNode("en", NodeType.NT_FILE);
-			// //Node cro = one.addNode("cro", NodeType.NT_FILE);
-			//
-			// Node content = en.addNode("jcr:content", "nt:resource");
-			//
-			// File f = new File("template.ftl");
-			// InputStream stream = new BufferedInputStream(new
-			// FileInputStream(f));
-			// Binary binary = session.getValueFactory().createBinary(stream);
-			// content.setProperty("jcr:data", binary);
-			//
-			session.save();
-
-			// Do something interesting with the Session ...
-			// logger.info("name: {}", sess.getRootNode().getName());
-			// logger.info("type name: {}",
-			// sess.getRootNode().getPrimaryNodeType().getName());
-			// logger.info("path: {}", sess.getRootNode().getPath());
-			//
-			// Node node = sess.getNode("/");
-			// logger.info("node: {}", node == null ? null : node);
-			//
-			// node.setProperty("name", "root");
-			// node.addNode("help", "nt:folder");
-			//
-			// node = sess.getNode("/help");
-			// logger.info("node: {}", node == null ? null : node);
-			//
-			// node = sess.getNode("/");
-			//
-			// logger.info("name: {}", node == null ? null : node.getName());
-			// logger.info("node: {}", node == null ? null : node);
-
 		} catch (Exception ex) {
 			error = true;
 			responseVO.setErrorMessage("Internal service error!");
@@ -258,6 +177,54 @@ public class RestHelpRepoService implements RestHelpRepo {
 			return Response.status(Response.Status.OK).entity(responseVO).build();
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseVO).build();
+		}
+	}
+
+	private void createHelpTree() {
+		try {
+			Node root = session.getRootNode();
+			Node help = root.addNode("help", NodeType.NT_FOLDER);
+
+			Node pp = help.addNode("pp", NodeType.NT_FOLDER);
+			Node cs = help.addNode("cs", NodeType.NT_FOLDER);
+			Node wd = help.addNode("wd", NodeType.NT_FOLDER);
+			Node fi = help.addNode("fi", NodeType.NT_FOLDER);
+			Node ami = help.addNode("ami", NodeType.NT_FOLDER);
+
+			Node service = pp.addNode("service", NodeType.NT_FOLDER);
+			Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
+			Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
+			Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
+
+			Node one = service.addNode("one", NodeType.NT_FILE);
+			Node content = one.addNode("jcr:content", "nt:resource");
+			one.addMixin("my:metaPageData");
+
+			one.setProperty("my:lang", "en");
+			one.setProperty("my:reseller", "1");
+			
+			/**
+			 * add template file
+			 */
+			File f = new File("template.ftl");
+			InputStream stream = new BufferedInputStream(new FileInputStream(f));
+			Binary binary = session.getValueFactory().createBinary(stream);
+			content.setProperty("jcr:data", binary);
+			
+		} catch (RepositoryException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void deleteHelpTree(String helpPath) {
+		try {
+			session.getNode(helpPath).remove();
+			ispisiSvuDecu(session.getNode("/"));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -489,7 +456,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 				} else {
 					dnl.setChildren_href("");
 				}
-				
+
 				if (hasFiles(node)) {
 					String content_href = node.getPath() + "/content";
 					dnl.setContent_href(content_href);
@@ -593,7 +560,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 		return false;
 	}
-	
+
 	public boolean hasFiles(Node node) throws RepositoryException {
 		openSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
