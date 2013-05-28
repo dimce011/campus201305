@@ -13,27 +13,25 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.Stateless;
-import javax.jcr.AccessDeniedException;
 import javax.jcr.Binary;
-import javax.jcr.InvalidItemStateException;
-import javax.jcr.ItemExistsException;
 import javax.jcr.LoginException;
 import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
-import javax.jcr.ReferentialIntegrityException;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
+import javax.jcr.PropertyType;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
-import javax.jcr.ValueFormatException;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.nodetype.NoSuchNodeTypeException;
+import javax.jcr.Value;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeManager;
-import javax.jcr.version.VersionException;
+import javax.jcr.nodetype.NodeTypeTemplate;
+import javax.jcr.nodetype.PropertyDefinitionTemplate;
+import javax.jcr.version.OnParentVersionAction;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +44,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.infobip.mpayments.help.dto.DocumentCvor;
 import org.infobip.mpayments.help.dto.DocumentCvorWrapper;
 import org.infobip.mpayments.help.dto.DocumentNode;
-import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.infobip.mpayments.help.repo.rest.vo.TestResponseVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,43 +75,46 @@ public class RestHelpRepoService implements RestHelpRepo {
 		boolean error = false;
 		try {
 			openSession();
-			
+
 			if ("delete".equals(action)) {
 				deleteHelpTree("/help");
 			} else if ("create".equals(action)) {
 				createHelpTree();
 			}
-			
+
 			ispisiSvuDecu(session.getNode("/"));
 
-			session.save();
+			// session.save();
 
 			// pravljenje namespace-a
-			// NamespaceRegistry registry =
-			// session.getWorkspace().getNamespaceRegistry();
-			//
-			// List<String> list = Arrays.asList(registry.getPrefixes());
-			// if (!list.contains("my")) {
-			// registry.registerNamespace("my", "com.infobip.jcr.my");
-			// }
-			//
-			// NodeTypeManager manager =
-			// session.getWorkspace().getNodeTypeManager();
+			NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry();
+
+			List<String> list = Arrays.asList(registry.getPrefixes());
+			if (!list.contains("my")) {
+				registry.registerNamespace("my", "com.infobip.jcr.my");
+			}
+
+			NodeTypeManager manager = session.getWorkspace().getNodeTypeManager();
 
 			// pravljenje novog tipa cvora sa novim propertijima
 
-			// NamespaceRegistry nsReg =
-			// (NamespaceRegistry)session.getWorkspace().getNamespaceRegistry();
-			// nsReg.registerNamespace("my","com.infobip.jcr.my");
-			//
-			// NodeTypeTemplate nodeType = manager.createNodeTypeTemplate();
-			// nodeType.setMixin(true);
-			// nodeType.setName("my:metaPageData");
-			// nodeType.setQueryable(true);
-			//
-			// nodeType.setDeclaredSuperTypeNames(new String[]{"mix:title"});
-			// System.out.println("ovde1");
-			//
+			// NamespaceRegistry nsReg = (NamespaceRegistry)
+			// session.getWorkspace().getNamespaceRegistry();
+			// nsReg.registerNamespace("my", "com.infobip.jcr.my");
+
+//			 NodeTypeTemplate nodeType = manager.createNodeTypeTemplate();
+//			 nodeType.setMixin(true);
+//			 nodeType.setName("my:metaPageData");
+//			 nodeType.setQueryable(true);
+//			 nodeType.setDeclaredSuperTypeNames(new String[]{"mix:title"});
+//			 System.out.println("ovde1");
+			
+//			 NodeTypeTemplate nodeType2 = manager.createNodeTypeTemplate();
+//			 nodeType2.setMixin(true);
+//			 nodeType2.setName("my:metaFolderData");
+//			 nodeType2.setQueryable(true);
+//			 nodeType2.setDeclaredSuperTypeNames(new String[]{"mix:title"});
+
 			// PropertyDefinitionTemplate propertyDef =
 			// manager.createPropertyDefinitionTemplate();
 			// propertyDef.setName("my:lang");
@@ -132,11 +132,25 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// propertyDef2.setOnParentVersion(OnParentVersionAction.COPY);
 			// propertyDef2.setProtected(false);
 			// System.out.println("ovde2");
-			//
-			// nodeType.getPropertyDefinitionTemplates().add(propertyDef);
-			// nodeType.getPropertyDefinitionTemplates().add(propertyDef2);
+
+//			PropertyDefinitionTemplate propertyDef3 = manager.createPropertyDefinitionTemplate();
+//			propertyDef3.setName("my:title");
+//			propertyDef3.setMultiple(true);
+//			propertyDef3.setRequiredType(PropertyType.STRING);
+//			propertyDef3.setOnParentVersion(OnParentVersionAction.COPY);
+//			propertyDef3.setProtected(false);
+//			propertyDef3.setMandatory(false);
+//			System.out.println("ovde MPM");
+
+//			nodeType.getPropertyDefinitionTemplates().add(propertyDef);
+//			nodeType.getPropertyDefinitionTemplates().add(propertyDef2);
+//			nodeType2.getPropertyDefinitionTemplates().add(propertyDef3);
+//			
+//			manager.registerNodeType(nodeType2, true);
+//			session.save();
+//			ispisiSvuDecu(session.getNode("/"));
 			// System.out.println("ovde3");
-			// manager.registerNodeType(nodeType, true);
+//			 manager.registerNodeType(nodeType, true);
 			//
 			// ispisiSvuDecu(session.getNode("/"));
 
@@ -163,6 +177,31 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// // current node
 			//
 			// }
+
+//			ispisiSvuDecu(session.getNode("/"));
+
+//			session.save();
+
+			Node help = session.getNode("/help");
+//			help.addMixin("my:metaFolderData");
+//			String[] niz = { "en#centili#Help Centili", "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+//			help.setProperty("my:title", niz);
+
+//			ispisiSvuDecu(session.getNode("/"));
+//			session.save();
+
+			Property p = help.getProperty("my:title");
+			System.out.println(p.getName());
+			Value[] v = p.getValues();
+			ArrayList<String> stringList = new ArrayList<String>();
+			for (Value value : v) {
+				stringList.add(value.getString());
+			}
+			System.out.println("LISTA STRINGOVA IZ PROPERTIA");
+			for (String string : stringList) {
+				System.out.println(string);
+			}
+			
 
 		} catch (Exception ex) {
 			error = true;
@@ -202,7 +241,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 			one.setProperty("my:lang", "en");
 			one.setProperty("my:reseller", "1");
-			
+
 			/**
 			 * add template file
 			 */
@@ -210,7 +249,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			InputStream stream = new BufferedInputStream(new FileInputStream(f));
 			Binary binary = session.getValueFactory().createBinary(stream);
 			content.setProperty("jcr:data", binary);
-			
+
 		} catch (RepositoryException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
