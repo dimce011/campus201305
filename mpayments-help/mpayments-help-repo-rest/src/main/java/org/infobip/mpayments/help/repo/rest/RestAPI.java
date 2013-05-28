@@ -21,12 +21,12 @@ public interface RestAPI {
 	
 
 	@GET
-	@Path("/documents/getParagraph/{docPath}/content/{parID}")
+	@Path("/documents/getParagraph/{docPath:.*}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID);
 
 	@GET
-	@Path("/documents/getParagraph/{docPath}/content/{parID}/{fieldPars}")
+	@Path("/documents/getParagraph/{docPath:.*}/content/{parID}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars);
 	

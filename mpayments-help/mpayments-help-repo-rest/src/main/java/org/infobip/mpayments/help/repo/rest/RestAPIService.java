@@ -106,20 +106,15 @@ public class RestAPIService implements RestAPI {
 			for (Map.Entry<String, Object> entry : mapParameters.entrySet()) {
 				System.out.println(entry.getKey() + " = " + entry.getValue());
 			}
-
-//			String path = "/help/" + app + "/" + topic;
-			StringBuffer bufferPath = new StringBuffer("");
-			StringTokenizer st = new StringTokenizer(docPath,">");
 			
-			while(st.hasMoreTokens()){
-				bufferPath.append("/"+st.nextToken());
+			if (!docPath.startsWith("/")) {
+				docPath = "/" + docPath;
 			}
-			
-			//path = "/help/" + app + "/" + topic;
+
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
 			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + bufferPath.toString() + "])", Query.JCR_SQL2);
+					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
