@@ -45,10 +45,12 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/root/{path:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLinksJSON(@PathParam("path") String path);
+	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller);
 
 	@GET
 	@Path("/{parent:.*}/children")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent);
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller);
 }
