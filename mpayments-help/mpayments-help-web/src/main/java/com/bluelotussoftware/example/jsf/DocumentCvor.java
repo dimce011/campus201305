@@ -2,10 +2,8 @@ package com.bluelotussoftware.example.jsf;
 
 public class DocumentCvor {
 
-	String key;
 	String title;
 	String category;
-	String type;
 	String self_href;
 	String parent_href;
 	String children_href;
@@ -15,24 +13,14 @@ public class DocumentCvor {
 
 	}
 
-	public DocumentCvor(String key, String title, String category, String type, String self_href, String parent_href) {
+	public DocumentCvor(String title, String category, String self_href, String parent_href) {
 		super();
-		this.key = key;
 		this.title = title;
 		this.category = category;
-		this.type = type;
 		this.self_href = self_href;
 		this.parent_href = parent_href;
 		// this.content_href = content_href;
 		// this.children_href = children_href;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
 	}
 
 	public String getTitle() {
@@ -49,14 +37,6 @@ public class DocumentCvor {
 
 	public void setCategory(String category) {
 		this.category = category;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getSelf_href() {
@@ -91,7 +71,7 @@ public class DocumentCvor {
 		if (content_href.equals("")) {
 			this.content_href = content_href;
 		} else {
-			this.content_href = "http://localhost:8080/helprepo" + content_href + "/language=en&reseller=1";
+			this.content_href = "http://localhost:8080/helprepo/documents" + content_href;
 		}
 	}
 
