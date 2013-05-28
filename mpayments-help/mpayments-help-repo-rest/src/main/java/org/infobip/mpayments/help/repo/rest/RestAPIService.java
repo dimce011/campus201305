@@ -558,40 +558,38 @@ public class RestAPIService implements RestAPI {
 	public Response delDocument(@PathParam("docPath") String docPath) {
 		return delDocument(docPath, "");
 	}
-	
-	 @Override
-	 public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller) {
+
+	@Override
+	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller) {
 		String response = null;
 		InputStream input = null;
 		String result = null;
 		try {
 			openSession();
-			result =(String) getDocument(docPath, "language="+language + "&reseller="+reseller).getEntity();
-			
+			result = (String) getDocument(docPath, "language=" + language + "&reseller=" + reseller).getEntity();
+
 			System.out.println("get jason novi");
-			
+
 			Document doc = Jsoup.parse(result);
 			Elements divs = doc.getElementsByTag("div");
-			Map <String, String> paragraphs = new TreeMap <String, String>();
+			Map<String, String> paragraphs = new TreeMap<String, String>();
 			for (Element elem : divs) {
 				if (!elem.id().isEmpty()) {
 					paragraphs.put(elem.id(), "/documents/" + docPath + "/content/" + elem.id());
-					
+
 				}
 			}
-			
-			Node node = session.getNode("/"+docPath);
+
+			Node node = session.getNode("/" + docPath);
 			String[] niz = node.getPath().split("/");
-			DocumentCvor dc = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
-					.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
-			
-			
-			
-//			DocumentCvor dc = new DocumentCvor();
+			DocumentCvor dc = new DocumentCvor(node.getName(), niz[1].toUpperCase(), node.getPath(), node.getParent()
+					.getPath());
 
-			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor("/"+docPath, paragraphs));
-			
+			// DocumentCvor dc = new DocumentCvor();
 
+			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
+					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -608,110 +606,109 @@ public class RestAPIService implements RestAPI {
 		} catch (RepositoryException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
-		Session session = null;
-		Repository repository = null;
-		InitialContext initialContext;
-	 
-		public void openSession() {
-			try {
-				initialContext = new InitialContext();
-				repository = (Repository) initialContext.lookup("java:jcr/local");
-				session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-				logger.info("SESSION OPENED");
-			} catch (NamingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (LoginException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (RepositoryException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
+	Session session = null;
+	Repository repository = null;
+	InitialContext initialContext;
+
+	public void openSession() {
+		try {
+			initialContext = new InitialContext();
+			repository = (Repository) initialContext.lookup("java:jcr/local");
+			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			logger.info("SESSION OPENED");
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (LoginException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void closeSession() {
+		session.logout();
+	}
+
+	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs) {
+		openSession();
+		logger.info("PARENT: {}", parent);
+		Node node = null;
+		DocumentCvor dnl = null;
+		try {
+			node = session.getNode(parent);
+			String[] niz = node.getPath().split("/");
+			dnl = new DocumentCvor(node.getName(), niz[1].toUpperCase(), node.getPath(), node.getParent().getPath());
+
+			List<Paragraph> lista = new ArrayList<Paragraph>();
+			Paragraph p = null;
+			for (Map.Entry<String, String> entry : paragraphs.entrySet()) {
+				p = new Paragraph();
+				p.setKey(entry.getKey());
+				p.setLink(entry.getValue());
+				lista.add(p);
 			}
-		}
-		
-		public void closeSession() {
-			session.logout();
-		}
-		
-		public DocumentCvor getDocumentCvor(String parent, Map <String, String> paragraphs) {
-			openSession();
-			logger.info("PARENT: {}", parent);
-			Node node = null;
-			DocumentCvor dnl = null;
-			try {
-				node = session.getNode(parent);
-				String[] niz = node.getPath().split("/");
-				dnl = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
-						.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
-
-				List <Paragraph> lista = new ArrayList <Paragraph>();
-				Paragraph p = null;
-				for (Map.Entry<String, String> entry : paragraphs.entrySet()) {
-					p = new Paragraph();
-				    p.setKey(entry.getKey());
-				    p.setLink(entry.getValue());
-					lista.add(p);
-				}
-				dnl.setList(lista);
-				if (node.hasNodes()) {
-					if (hasFolder(node)) {
-						String children_href = node.getPath() + "/children";
-						dnl.setChildren_href(children_href);
-					} else {
-						dnl.setChildren_href("");
-					}
-
-					if (hasFiles(node)) {
-						String content_href = node.getPath() + "/content";
-						dnl.setContent_href(content_href);
-					} else {
-						dnl.setContent_href("");
-					}
+			dnl.setList(lista);
+			if (node.hasNodes()) {
+				if (hasFolder(node)) {
+					String children_href = node.getPath() + "/children";
+					dnl.setChildren_href(children_href);
 				} else {
 					dnl.setChildren_href("");
+				}
+
+				if (hasFiles(node)) {
+					String content_href = node.getPath() + "/content";
+					dnl.setContent_href(content_href);
+				} else {
 					dnl.setContent_href("");
 				}
-
-			} catch (PathNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (RepositoryException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} finally {
-				if (session != null)
-					closeSession();
+			} else {
+				dnl.setChildren_href("");
+				dnl.setContent_href("");
 			}
-			return dnl;
 
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
 		}
-		
-		public boolean hasFolder(Node node) throws RepositoryException {
-			openSession();
-			for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
-				Node subNode = nodeIterator.nextNode();
-				if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
-					return true;
-				}
-			}
-			return false;
-		}
+		return dnl;
 
-		public boolean hasFiles(Node node) throws RepositoryException {
-			openSession();
-			for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
-				Node subNode = nodeIterator.nextNode();
-				if (subNode.getPrimaryNodeType().getName().equals("nt:file")) {
-					return true;
-				}
+	}
+
+	public boolean hasFolder(Node node) throws RepositoryException {
+		openSession();
+		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+			Node subNode = nodeIterator.nextNode();
+			if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
+				return true;
 			}
-			return false;
-		
-		
 		}
+		return false;
+	}
+
+	public boolean hasFiles(Node node) throws RepositoryException {
+		openSession();
+		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+			Node subNode = nodeIterator.nextNode();
+			if (subNode.getPrimaryNodeType().getName().equals("nt:file")) {
+				return true;
+			}
+		}
+		return false;
+
+	}
 
 }

@@ -688,4 +688,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 		return false;
 	}
+
+	public static ObjectMapper getJsonMapper() {
+		// TODO Auto-generated method stub
+		return jsonMapper;
+	}
 }
