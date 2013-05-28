@@ -152,7 +152,7 @@ public class RestAPIService implements RestAPI {
 				}
 			}
 			if ("".equals(returnResult.toString())) {
-				return Response.status(Response.Status.NO_CONTENT).entity(noSuchID).build();
+				return Response.status(Response.Status.OK).entity(noSuchID).build();
 			} else {
 				return Response.status(Response.Status.OK).entity(returnResult.toString()).build();
 			}
