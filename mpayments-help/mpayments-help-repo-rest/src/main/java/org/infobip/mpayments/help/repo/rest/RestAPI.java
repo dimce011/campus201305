@@ -33,23 +33,23 @@ public interface RestAPI {
 	//@Path("/mypath{param1 : (/param1)?}") {fuel : (/fuel/[^/]+)?}
 	@GET
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
-	@Path("/documents/{docPath}/content/{fieldPars}")
+	@Path("/documents/{docPath:.*}/content/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
 	
 	@GET
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
-	@Path("/documents/{docPath}/content")
+	@Path("/documents/{docPath:.*}/content")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDocument(@PathParam("docPath") String docPath);
 	
 	@DELETE
-	@Path("/documents/{docPath}/{fieldPars}")
+	@Path("/documents/{docPath:.*}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response delDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
 	
 	@DELETE
-	@Path("/documents/{docPath}/")
+	@Path("/documents/{docPath:.*}/")
 	@Produces(MediaType.TEXT_HTML)
 	public Response delDocument(@PathParam("docPath") String docPath);
 	
