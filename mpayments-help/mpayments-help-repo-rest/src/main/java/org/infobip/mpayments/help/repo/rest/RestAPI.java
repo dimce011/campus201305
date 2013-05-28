@@ -33,26 +33,25 @@ public interface RestAPI {
 	//@Path("/mypath{param1 : (/param1)?}") {fuel : (/fuel/[^/]+)?}
 	@GET
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
-	@Path("help/{app}/{topic}/content/{fieldPars}")
-
+	@Path("/documents/{docPath}/content/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars);
+	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
 	
 	@GET
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
-	@Path("help/{app}/{topic}/content")
+	@Path("/documents/{docPath}/content")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDocument(@PathParam("app") String app, @PathParam("topic") String topic);
+	public Response getDocument(@PathParam("docPath") String docPath);
 	
 	@DELETE
-	@Path("help/{app}/{topic}/{fieldPars}")
+	@Path("/documents/{docPath}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response delDocument(@PathParam("app") String app, @PathParam("topic") String topic, @PathParam("fieldPars") String fieldPars);
+	public Response delDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
 	
 	@DELETE
-	@Path("help/{app}/{topic}/")
+	@Path("/documents/{docPath}/")
 	@Produces(MediaType.TEXT_HTML)
-	public Response delDocument(@PathParam("app") String app, @PathParam("topic") String topic);
+	public Response delDocument(@PathParam("docPath") String docPath);
 	
 //  za staro drvo!
 //	@GET
