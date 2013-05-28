@@ -423,6 +423,7 @@ public class RestAPIService implements RestAPI {
 		String reseller = null;
 		String language = null;
 		String path = "";
+		boolean notFound = false;
 		String errorString = "error";
 		System.out.println("POZVANA METODA delDocument");
 		try {
@@ -472,14 +473,26 @@ public class RestAPIService implements RestAPI {
 
 			Node node = null;
 			if (it.hasNext()) {
-				node = it.nextNode();
-			}else{
-				errorString = "Not found!";
-				return Response.status(Response.Status.NOT_FOUND).entity(errorString).build();
+				
+				node = it.nextNode();				
+				path = node.getPath();
+				Node parent = node.getParent();
+				node.remove();
+				
+				if(!parent.hasNodes()){
+					parent.remove();
+				}
+				
+			}else{				
+				if(language.equals("") && reseller.equals("")){
+					node = session.getNode(path);
+					node.remove();
+				}else{
+					notFound = true;
+					errorString = "Not found!";		
+				}
 			}
 
-			path = node.getPath();
-			node.remove();
 			session.save();
 			
 			res = null;
@@ -494,6 +507,9 @@ public class RestAPIService implements RestAPI {
 			closeStreams(input, output);
 		}
 		
+		if(notFound){
+			return Response.status(Response.Status.NOT_FOUND).entity(errorString).build();
+		}		
 		if (!error) {
 			return Response.status(Response.Status.OK).entity("Deleted node with path: "+path+" .").build();
 		} else {
