@@ -3,10 +3,8 @@ package org.infobip.mpayments.help.dto;
 import java.util.List;
 
 public class DocumentCvor {
-	String key;
 	String title;
 	String category;
-	String type;
 	String self_href;
 	String parent_href;
 
@@ -23,12 +21,10 @@ public class DocumentCvor {
 
 	}
 
-	public DocumentCvor(String key, String title, String category, String type, String self_href, String parent_href) {
+	public DocumentCvor(String title, String category, String self_href, String parent_href) {
 		super();
-		this.key = key;
 		this.title = title;
 		this.category = category;
-		this.type = type;
 		this.self_href = self_href;
 		this.parent_href = parent_href;
 		//this.content_href = content_href;
@@ -36,13 +32,6 @@ public class DocumentCvor {
 	}
 	
 
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
-	}
 
 	public String getTitle() {
 		return title;
@@ -58,14 +47,6 @@ public class DocumentCvor {
 
 	public void setCategory(String category) {
 		this.category = category;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getSelf_href() {

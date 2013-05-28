@@ -49,16 +49,15 @@ import org.slf4j.LoggerFactory;
 public class RestAPIService implements RestAPI {
 
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
-	
+
 	@Override
-	public Response getParagraph(@PathParam("docPath") String docPath,
-			@PathParam("parID") String parID) {
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID) {
 		return getParagraph(docPath, parID, "");
 	}
 
 	@Override
-	public Response getParagraph(@PathParam("docPath") String docPath,
-			@PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars) {
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
+			@PathParam("fieldPars") String fieldPars) {
 
 		Session session = null;
 		Repository repository = null;
@@ -118,19 +117,14 @@ public class RestAPIService implements RestAPI {
 				System.out.println(entry.getKey() + " = " + entry.getValue());
 			}
 
-//			String path = "/help/" + app + "/" + topic;
-			StringBuffer bufferPath = new StringBuffer("");
-			StringTokenizer st = new StringTokenizer(docPath,">");
-			
-			while(st.hasMoreTokens()){
-				bufferPath.append("/"+st.nextToken());
+			if (!docPath.startsWith("/")) {
+				docPath = "/" + docPath;
 			}
-			
-			//path = "/help/" + app + "/" + topic;
+
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
 			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + bufferPath.toString() + "])", Query.JCR_SQL2);
+					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
@@ -318,12 +312,12 @@ public class RestAPIService implements RestAPI {
 	}
 
 	@Override
-	public Response getDocument(@PathParam("docPath") String docPath){
+	public Response getDocument(@PathParam("docPath") String docPath) {
 		return getDocument(docPath, "");
 	}
 
 	@Override
-	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars){
+	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
@@ -380,19 +374,18 @@ public class RestAPIService implements RestAPI {
 			for (Map.Entry<String, Object> entry : mapParameters.entrySet()) {
 				System.out.println(entry.getKey() + " = " + entry.getValue());
 			}
-			
-			if(!docPath.startsWith("/")){
+
+			if (!docPath.startsWith("/")) {
 				docPath = "/" + docPath;
 			}
 
-//			StringBuffer bufferPath = new StringBuffer("");
-//			StringTokenizer st = new StringTokenizer(docPath,">");
-//			
-//			while(st.hasMoreTokens()){
-//				bufferPath.append("/"+st.nextToken());
-//			}
-	
-			
+			// StringBuffer bufferPath = new StringBuffer("");
+			// StringTokenizer st = new StringTokenizer(docPath,">");
+			//
+			// while(st.hasMoreTokens()){
+			// bufferPath.append("/"+st.nextToken());
+			// }
+
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
 			// System.out.println("query " +
@@ -409,7 +402,7 @@ public class RestAPIService implements RestAPI {
 			Node node = null;
 			if (it.hasNext()) {
 				node = it.nextNode();
-				//System.out.println("path " + node.getPath());
+				// System.out.println("path " + node.getPath());
 				Node content = node.getNode("jcr:content");
 				input = content.getProperty("jcr:data").getBinary().getStream();
 				result = RestAPIService.getStringFromInputStream(input).toString();
@@ -418,9 +411,9 @@ public class RestAPIService implements RestAPI {
 					FreeMarker fm = new FreeMarker();
 					result = fm.process(mapParameters, result);
 				}
-			}else{
+			} else {
 				error = true;
-			}			
+			}
 
 			res = null;
 			it = null;
@@ -453,7 +446,7 @@ public class RestAPIService implements RestAPI {
 		String reseller = null;
 		String language = null;
 		boolean notFound = false;
-		//StringBuffer bufferPath = new StringBuffer("");
+		// StringBuffer bufferPath = new StringBuffer("");
 		String errorString = "error";
 		System.out.println("POZVANA METODA delDocument");
 		try {
@@ -491,51 +484,53 @@ public class RestAPIService implements RestAPI {
 				language = "";
 				reseller = "";
 			}
-			
-			if(!docPath.startsWith("/")){
+
+			if (!docPath.startsWith("/")) {
 				docPath = "/" + docPath;
 			}
-			
-//			bufferPath = new StringBuffer("");
-//			StringTokenizer st = new StringTokenizer(docPath,">");
-//			
-//			while(st.hasMoreTokens()){
-//				bufferPath.append("/"+st.nextToken());
-//			}
-			
-			//path = "/help/" + app + "/" + topic;
+
+			// bufferPath = new StringBuffer("");
+			// StringTokenizer st = new StringTokenizer(docPath,">");
+			//
+			// while(st.hasMoreTokens()){
+			// bufferPath.append("/"+st.nextToken());
+			// }
+
+			// path = "/help/" + app + "/" + topic;
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
 			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
 					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
-			
+
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
 			Node node = null;
 			if (it.hasNext()) {
-				
-				node = it.nextNode();				
-				String path = node.getPath();
+
+				node = it.nextNode();
 				Node parent = node.getParent();
 				node.remove();
-				
-				if(!parent.hasNodes()){
+
+				if (!parent.hasNodes()) {
 					parent.remove();
 				}
-				
-			}else{				
-				if(language.equals("") && reseller.equals("")){
+
+			} else {
+				if (language.equals("") && reseller.equals("")) {
 					node = session.getNode(docPath);
-					node.remove();
-				}else{
+					if (!node.hasNodes()) {
+						node = session.getNode(docPath);
+						node.remove();
+					}
+				} else {
 					notFound = true;
-					errorString = "Not found!";		
+					errorString = "Not found!";
 				}
 			}
 
 			session.save();
-			
+
 			res = null;
 			it = null;
 
@@ -547,21 +542,21 @@ public class RestAPIService implements RestAPI {
 				session.logout();
 			closeStreams(input, output);
 		}
-		
-		if(notFound){
+
+		if (notFound) {
 			return Response.status(Response.Status.NOT_FOUND).entity(errorString).build();
-		}		
+		}
 		if (!error) {
-			return Response.status(Response.Status.OK).entity("Deleted node with path: "+docPath+" .").build();
+			return Response.status(Response.Status.OK).entity("Deleted node with path: " + docPath + " .").build();
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorString).build();
 		}
-	
+
 	}
 
 	@Override
 	public Response delDocument(@PathParam("docPath") String docPath) {
-		return delDocument(docPath,"");
+		return delDocument(docPath, "");
 	}
 	
 	 @Override

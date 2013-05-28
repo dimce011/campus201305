@@ -36,6 +36,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -102,18 +103,18 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// session.getWorkspace().getNamespaceRegistry();
 			// nsReg.registerNamespace("my", "com.infobip.jcr.my");
 
-//			 NodeTypeTemplate nodeType = manager.createNodeTypeTemplate();
-//			 nodeType.setMixin(true);
-//			 nodeType.setName("my:metaPageData");
-//			 nodeType.setQueryable(true);
-//			 nodeType.setDeclaredSuperTypeNames(new String[]{"mix:title"});
-//			 System.out.println("ovde1");
-			
-//			 NodeTypeTemplate nodeType2 = manager.createNodeTypeTemplate();
-//			 nodeType2.setMixin(true);
-//			 nodeType2.setName("my:metaFolderData");
-//			 nodeType2.setQueryable(true);
-//			 nodeType2.setDeclaredSuperTypeNames(new String[]{"mix:title"});
+			// NodeTypeTemplate nodeType = manager.createNodeTypeTemplate();
+			// nodeType.setMixin(true);
+			// nodeType.setName("my:metaPageData");
+			// nodeType.setQueryable(true);
+			// nodeType.setDeclaredSuperTypeNames(new String[]{"mix:title"});
+			// System.out.println("ovde1");
+
+			// NodeTypeTemplate nodeType2 = manager.createNodeTypeTemplate();
+			// nodeType2.setMixin(true);
+			// nodeType2.setName("my:metaFolderData");
+			// nodeType2.setQueryable(true);
+			// nodeType2.setDeclaredSuperTypeNames(new String[]{"mix:title"});
 
 			// PropertyDefinitionTemplate propertyDef =
 			// manager.createPropertyDefinitionTemplate();
@@ -133,24 +134,25 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// propertyDef2.setProtected(false);
 			// System.out.println("ovde2");
 
-//			PropertyDefinitionTemplate propertyDef3 = manager.createPropertyDefinitionTemplate();
-//			propertyDef3.setName("my:title");
-//			propertyDef3.setMultiple(true);
-//			propertyDef3.setRequiredType(PropertyType.STRING);
-//			propertyDef3.setOnParentVersion(OnParentVersionAction.COPY);
-//			propertyDef3.setProtected(false);
-//			propertyDef3.setMandatory(false);
-//			System.out.println("ovde MPM");
+			// PropertyDefinitionTemplate propertyDef3 =
+			// manager.createPropertyDefinitionTemplate();
+			// propertyDef3.setName("my:title");
+			// propertyDef3.setMultiple(true);
+			// propertyDef3.setRequiredType(PropertyType.STRING);
+			// propertyDef3.setOnParentVersion(OnParentVersionAction.COPY);
+			// propertyDef3.setProtected(false);
+			// propertyDef3.setMandatory(false);
+			// System.out.println("ovde MPM");
 
-//			nodeType.getPropertyDefinitionTemplates().add(propertyDef);
-//			nodeType.getPropertyDefinitionTemplates().add(propertyDef2);
-//			nodeType2.getPropertyDefinitionTemplates().add(propertyDef3);
-//			
-//			manager.registerNodeType(nodeType2, true);
-//			session.save();
-//			ispisiSvuDecu(session.getNode("/"));
+			// nodeType.getPropertyDefinitionTemplates().add(propertyDef);
+			// nodeType.getPropertyDefinitionTemplates().add(propertyDef2);
+			// nodeType2.getPropertyDefinitionTemplates().add(propertyDef3);
+			//
+			// manager.registerNodeType(nodeType2, true);
+			// session.save();
+			// ispisiSvuDecu(session.getNode("/"));
 			// System.out.println("ovde3");
-//			 manager.registerNodeType(nodeType, true);
+			// manager.registerNodeType(nodeType, true);
 			//
 			// ispisiSvuDecu(session.getNode("/"));
 
@@ -178,30 +180,87 @@ public class RestHelpRepoService implements RestHelpRepo {
 			//
 			// }
 
-//			ispisiSvuDecu(session.getNode("/"));
+			// ispisiSvuDecu(session.getNode("/"));
 
-//			session.save();
+			// session.save();
 
-			Node help = session.getNode("/help");
-//			help.addMixin("my:metaFolderData");
-//			String[] niz = { "en#centili#Help Centili", "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
-//			help.setProperty("my:title", niz);
+			// Dodavanje propertija (title) u cvorove
+			//
+			// Node help = session.getNode("/help");
+			// help.addMixin("my:metaFolderData");
+			// String[] nizHelp = { "en#centili#Partner panel",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// help.setProperty("my:title", nizHelp);
+			//
 
-//			ispisiSvuDecu(session.getNode("/"));
-//			session.save();
+			Node pp = session.getNode("/help/pp");
+			pp.addMixin("my:metaFolderData");
+			String[] niz = { "en#centili#Partner panel", "de#centili#Partner Panel", "en#frogy#Partner Panel Frogy" };
+			pp.setProperty("my:title", niz);
 
-			Property p = help.getProperty("my:title");
-			System.out.println(p.getName());
-			Value[] v = p.getValues();
-			ArrayList<String> stringList = new ArrayList<String>();
-			for (Value value : v) {
-				stringList.add(value.getString());
-			}
-			System.out.println("LISTA STRINGOVA IZ PROPERTIA");
-			for (String string : stringList) {
-				System.out.println(string);
-			}
-			
+			Node cs = session.getNode("/help/cs");
+			cs.addMixin("my:metaFolderData");
+			String[] nizCs = { "en#centili#Customer Support", "de#centili#Customer Support de",
+					"en#frogy#Customer Support Frogy" };
+			cs.setProperty("my:title", nizCs);
+
+			// Node wd = session.getNode("/help/wd");
+			// wd.addMixin("my:metaFolderData");
+			// String[] nizWd = { "en#centili#World Double",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// wd.setProperty("my:title", nizWd);
+			//
+			// Node fi = session.getNode("/help/fi");
+			// fi.addMixin("my:metaFolderData");
+			// String[] nizFi = { "en#centili#Fijat Instant", "de#centili#Bmw",
+			// "en#frogy#Bubble" };
+			// fi.setProperty("my:title", nizFi);
+			//
+			// Node ami = session.getNode("/help/ami");
+			// ami.addMixin("my:metaFolderData");
+			// String[] nizAmi = { "en#centili#Amigo",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// ami.setProperty("my:title", nizAmi);
+			//
+			// Node service = session.getNode("/help/pp/service");
+			// service.addMixin("my:metaFolderData");
+			// String[] nizService = { "en#centili#Partner panel",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// service.setProperty("my:title", nizService);
+			//
+			// Node tran = session.getNode("/help/pp/tran");
+			// tran.addMixin("my:metaFolderData");
+			// String[] nizTran = { "en#centili#Partner panel",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// tran.setProperty("my:title", nizTran);
+			//
+			// Node sals = session.getNode("/help/pp/sals");
+			// sals.addMixin("my:metaFolderData");
+			// String[] nizSals = { "en#centili#Partner panel",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// sals.setProperty("my:title", nizSals);
+			//
+			// Node resel = session.getNode("/help/pp/resel");
+			// resel.addMixin("my:metaFolderData");
+			// String[] nizResel = { "en#centili#Partner panel",
+			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// resel.setProperty("my:title", nizResel);
+
+			// ispisiSvuDecu(session.getNode("/"));
+			session.save();
+
+			// ispis propertija
+			// Property p = help.getProperty("my:title");
+			// System.out.println(p.getName());
+			// Value[] v = p.getValues();
+			// ArrayList<String> stringList = new ArrayList<String>();
+			// for (Value value : v) {
+			// stringList.add(value.getString());
+			// }
+			// System.out.println("LISTA STRINGOVA IZ PROPERTIA");
+			// for (String string : stringList) {
+			// System.out.println(string);
+			// }
 
 		} catch (Exception ex) {
 			error = true;
@@ -477,16 +536,33 @@ public class RestHelpRepoService implements RestHelpRepo {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent) {
+	public DocumentCvor getDocumentCvor(String parent, String language, String reseller) {
 		openSession();
-		logger.info("PARENT: {}", parent);
 		Node node = null;
 		DocumentCvor dnl = null;
 		try {
 			node = session.getNode(parent);
+			String title = null;
+
+			if (node.hasProperty("my:title")) {
+				System.out.println("Node " + node.getName() + " ima properti");
+				Property p = node.getProperty("my:title");
+				Value[] v = p.getValues();
+				for (Value value : v) {
+					String[] mtitle = value.getString().split("#");
+					if (mtitle[0].equals(language) && mtitle[1].equals(reseller)) {
+						title = mtitle[2];
+					}
+				}
+			}
+
+			if (title == null) {
+				System.out.println("Node " + node.getName() + " nema odgovarajuci properti");
+				title = node.getName();
+			}
+
 			String[] niz = node.getPath().split("/");
-			dnl = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
-					.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
+			dnl = new DocumentCvor(title, niz[1].toUpperCase(), node.getPath(), node.getParent().getPath());
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
@@ -522,13 +598,15 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getLinksJSON(@PathParam("path") String path) {
+	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller) {
 		String response = null;
 		try {
 			String pom = "/" + path;
 			if (pom.equals("/"))
 				pom = "/help";
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor(pom));
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
+					getDocumentCvor(pom, language, reseller));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -547,9 +625,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent) {
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller) {
 
-		logger.info("POZVANA METODA GETCHILDRENLINKSJSON");
 		openSession();
 		String response = null;
 		Node node = null;
@@ -559,7 +637,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
-					children_list.add(getDocumentCvor(subNode.getPath()));
+					children_list.add(getDocumentCvor(subNode.getPath(), language, reseller));
 
 				}
 			}

@@ -115,7 +115,9 @@ public class TreeBeanCvor implements Serializable {
 		// String str = URLEncoder.encode("help[2]","UTF-8");
 		// String s = "http://localhost:8080/helprepo/" + str;
 		// System.out.println("Ispis stringa " + s);
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help"), DocumentCvor.class));
+		
+		//HARDCODE
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help?language=en&reseller=centili"), DocumentCvor.class));
 		System.out.println("Ispis objekta " + object.getSelf_href());
 	}
 
@@ -317,7 +319,7 @@ public class TreeBeanCvor implements Serializable {
 			event.getTreeNode().getChildren().remove(0);
 		}
 
-		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href());
+		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=en&reseller=centili");
 
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
