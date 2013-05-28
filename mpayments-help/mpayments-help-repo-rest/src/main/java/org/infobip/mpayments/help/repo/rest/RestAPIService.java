@@ -40,13 +40,13 @@ public class RestAPIService implements RestAPI {
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 	
 	@Override
-	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic,
+	public Response getParagraph(@PathParam("docPath") String docPath,
 			@PathParam("parID") String parID) {
-		return getParagraph(app, topic, parID, "");
+		return getParagraph(docPath, parID, "");
 	}
 
 	@Override
-	public Response getParagraph(@PathParam("app") String app, @PathParam("topic") String topic,
+	public Response getParagraph(@PathParam("docPath") String docPath,
 			@PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars) {
 
 		Session session = null;
@@ -107,11 +107,19 @@ public class RestAPIService implements RestAPI {
 				System.out.println(entry.getKey() + " = " + entry.getValue());
 			}
 
-			String path = "/help/" + app + "/" + topic;
+//			String path = "/help/" + app + "/" + topic;
+			StringBuffer bufferPath = new StringBuffer("");
+			StringTokenizer st = new StringTokenizer(docPath,">");
+			
+			while(st.hasMoreTokens()){
+				bufferPath.append("/"+st.nextToken());
+			}
+			
+			//path = "/help/" + app + "/" + topic;
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
 			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + path + "])", Query.JCR_SQL2);
+					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + bufferPath.toString() + "])", Query.JCR_SQL2);
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
