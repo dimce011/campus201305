@@ -1,5 +1,7 @@
 package org.infobip.mpayments.help.dto;
 
+import java.util.List;
+
 public class DocumentCvor {
 	String key;
 	String title;
@@ -7,10 +9,16 @@ public class DocumentCvor {
 	String type;
 	String self_href;
 	String parent_href;
+
 	String children_href;
 	String content_href;
+	List <Paragraph> list;
+	
+	
 
 	
+	
+
 	public DocumentCvor() {
 
 	}
@@ -26,6 +34,7 @@ public class DocumentCvor {
 		//this.content_href = content_href;
 		// this.children_href = children_href;
 	}
+	
 
 	public String getKey() {
 		return key;
@@ -90,6 +99,15 @@ public class DocumentCvor {
 	public void setContent_href(String content_href) {
 		this.content_href = content_href;
 	}
+	
+	public List<Paragraph> getList() {
+		return list;
+	}
+
+	public void setList(List<Paragraph> list) {
+		this.list = list;
+	}
+
 
 	
 }

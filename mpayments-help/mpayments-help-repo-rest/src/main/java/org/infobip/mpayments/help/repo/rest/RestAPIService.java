@@ -6,14 +6,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import javax.ejb.Stateless;
+import javax.jcr.LoginException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -23,9 +28,15 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.infobip.mpayments.help.dto.DocumentCvor;
+import org.infobip.mpayments.help.dto.Paragraph;
 import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -77,7 +88,7 @@ public class RestAPIService implements RestAPI {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 			if (!fieldPars.equals("")) {
-				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
+				stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
 				while (stringTokenizer.hasMoreTokens()) {
 					String first = stringTokenizer.nextToken();
@@ -243,7 +254,7 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
-	private static StringBuilder getStringFromInputStream(InputStream is) {
+	public static StringBuilder getStringFromInputStream(InputStream is) {
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
 		String line;
@@ -552,5 +563,160 @@ public class RestAPIService implements RestAPI {
 	public Response delDocument(@PathParam("docPath") String docPath) {
 		return delDocument(docPath,"");
 	}
+	
+	 @Override
+	 public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller) {
+		String response = null;
+		InputStream input = null;
+		String result = null;
+		try {
+			openSession();
+			result =(String) getDocument(docPath, "language="+language + "&reseller="+reseller).getEntity();
+			
+			System.out.println("get jason novi");
+			
+			Document doc = Jsoup.parse(result);
+			Elements divs = doc.getElementsByTag("div");
+			Map <String, String> paragraphs = new TreeMap <String, String>();
+			for (Element elem : divs) {
+				if (!elem.id().isEmpty()) {
+					paragraphs.put(elem.id(), "/documents/" + docPath + "/content/" + elem.id());
+					
+				}
+			}
+			
+			Node node = session.getNode("/"+docPath);
+			String[] niz = node.getPath().split("/");
+			DocumentCvor dc = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
+					.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
+			
+			
+			
+//			DocumentCvor dc = new DocumentCvor();
+
+			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter().writeValueAsString(getDocumentCvor("/"+docPath, paragraphs));
+			
+
+
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PathNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return Response.status(Response.Status.OK).entity(response).build();
+	}
+		Session session = null;
+		Repository repository = null;
+		InitialContext initialContext;
+	 
+		public void openSession() {
+			try {
+				initialContext = new InitialContext();
+				repository = (Repository) initialContext.lookup("java:jcr/local");
+				session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+				logger.info("SESSION OPENED");
+			} catch (NamingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (LoginException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (RepositoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		public void closeSession() {
+			session.logout();
+		}
+		
+		public DocumentCvor getDocumentCvor(String parent, Map <String, String> paragraphs) {
+			openSession();
+			logger.info("PARENT: {}", parent);
+			Node node = null;
+			DocumentCvor dnl = null;
+			try {
+				node = session.getNode(parent);
+				String[] niz = node.getPath().split("/");
+				dnl = new DocumentCvor(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
+						.getPrimaryNodeType().getName(), node.getPath(), node.getParent().getPath());
+
+				List <Paragraph> lista = new ArrayList <Paragraph>();
+				Paragraph p = null;
+				for (Map.Entry<String, String> entry : paragraphs.entrySet()) {
+					p = new Paragraph();
+				    p.setKey(entry.getKey());
+				    p.setLink(entry.getValue());
+					lista.add(p);
+				}
+				dnl.setList(lista);
+				if (node.hasNodes()) {
+					if (hasFolder(node)) {
+						String children_href = node.getPath() + "/children";
+						dnl.setChildren_href(children_href);
+					} else {
+						dnl.setChildren_href("");
+					}
+
+					if (hasFiles(node)) {
+						String content_href = node.getPath() + "/content";
+						dnl.setContent_href(content_href);
+					} else {
+						dnl.setContent_href("");
+					}
+				} else {
+					dnl.setChildren_href("");
+					dnl.setContent_href("");
+				}
+
+			} catch (PathNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (RepositoryException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} finally {
+				if (session != null)
+					closeSession();
+			}
+			return dnl;
+
+		}
+		
+		public boolean hasFolder(Node node) throws RepositoryException {
+			openSession();
+			for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+				Node subNode = nodeIterator.nextNode();
+				if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public boolean hasFiles(Node node) throws RepositoryException {
+			openSession();
+			for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+				Node subNode = nodeIterator.nextNode();
+				if (subNode.getPrimaryNodeType().getName().equals("nt:file")) {
+					return true;
+				}
+			}
+			return false;
+		
+		
+		}
 
 }

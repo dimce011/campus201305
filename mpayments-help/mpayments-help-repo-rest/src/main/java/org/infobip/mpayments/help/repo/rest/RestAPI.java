@@ -21,12 +21,12 @@ public interface RestAPI {
 	
 
 	@GET
-	@Path("/documents/getParagraph/{docPath}/content/{parID}")
+	@Path("/documents/getParagraph/{docPath:.*}/content/{parID}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID);
 
 	@GET
-	@Path("/documents/getParagraph/{docPath}/content/{parID}/{fieldPars}")
+	@Path("/documents/getParagraph/{docPath:.*}/content/{parID}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars);
 	
@@ -52,6 +52,18 @@ public interface RestAPI {
 	@Path("/documents/{docPath:.*}/")
 	@Produces(MediaType.TEXT_HTML)
 	public Response delDocument(@PathParam("docPath") String docPath);
+	
+//	@GET
+//	@Path("/documents/{docPath:.*}/")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Response getJSON(@PathParam("docPath") String docPath);
+	
+	
+	@GET
+	@Path("/documents/{docPath:.*}/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller);
+	
 	
 //  za staro drvo!
 //	@GET
