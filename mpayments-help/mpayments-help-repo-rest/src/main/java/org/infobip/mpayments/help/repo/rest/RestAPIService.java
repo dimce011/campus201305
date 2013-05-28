@@ -498,7 +498,6 @@ public class RestAPIService implements RestAPI {
 			if (it.hasNext()) {
 
 				node = it.nextNode();
-				String path = node.getPath();
 				Node parent = node.getParent();
 				node.remove();
 
@@ -508,6 +507,7 @@ public class RestAPIService implements RestAPI {
 
 			} else {
 				if (language.equals("") && reseller.equals("")) {
+					node = session.getNode(docPath);
 					if (!node.hasNodes()) {
 						node = session.getNode(docPath);
 						node.remove();
