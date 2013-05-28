@@ -50,6 +50,7 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.jboss.resteasy.spi.HttpRequest;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -98,6 +99,11 @@ public class TreeBeanCvor implements Serializable {
 	 */
 	public TreeBeanCvor() throws JsonParseException, JsonMappingException, IOException, JSONException {
 
+		FacesContext context = FacesContext.getCurrentInstance();
+		Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
+		language = paramMap.get("language");
+		reseller = paramMap.get("reseller");
+
 		makeFromJsonTree();
 		System.out.println("OBJECT: " + object);
 		root = new TreeNodeImpl("Root", null);
@@ -115,9 +121,10 @@ public class TreeBeanCvor implements Serializable {
 		// String str = URLEncoder.encode("help[2]","UTF-8");
 		// String s = "http://localhost:8080/helprepo/" + str;
 		// System.out.println("Ispis stringa " + s);
-		
-		//HARDCODE
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help?language=en&reseller=centili"), DocumentCvor.class));
+
+		// HARDCODE
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help?language=" + language
+				+ "&reseller=" + reseller), DocumentCvor.class));
 		System.out.println("Ispis objekta " + object.getSelf_href());
 	}
 
@@ -129,25 +136,34 @@ public class TreeBeanCvor implements Serializable {
 			// mapper.readValue(getString(uri), new
 			// List<DocumentCvor>().getClass());
 			for (int i = 0; i < dcw.data.size(); i++) {
-				//System.out.println("TITLE - " + dcw.data.get(i).getTitle() + " content_href = " + dcw.data.get(i).getContent_href());
+				// System.out.println("TITLE - " + dcw.data.get(i).getTitle() +
+				// " content_href = " + dcw.data.get(i).getContent_href());
 				TreeNode node = null;
 
 				if (dcw.data.get(i).getChildren_href().equals("")) {
 					if (dcw.data.get(i).getContent_href().equals("")) {
 						node = new TreeNodeImpl(TreeNodeType.EMPTY, dcw.data.get(i), selectedNode);
-					//	System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE empty>>> " + node.getType());
+						// System.out.println("TITLE >>> " +
+						// dcw.data.get(i).getTitle() + " TYPE empty>>> " +
+						// node.getType());
 					} else {
 						node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.data.get(i), selectedNode);
-						//System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE leaf>>> " + node.getType());
+						// System.out.println("TITLE >>> " +
+						// dcw.data.get(i).getTitle() + " TYPE leaf>>> " +
+						// node.getType());
 					}
 				} else {
 					if (dcw.data.get(i).getContent_href().equals("")) {
 						node = new TreeNodeImpl(TreeNodeType.NODE, dcw.data.get(i), selectedNode);
-						//System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE node>>> " + node.getType());
+						// System.out.println("TITLE >>> " +
+						// dcw.data.get(i).getTitle() + " TYPE node>>> " +
+						// node.getType());
 						TreeNode fake = new TreeNodeImpl("fake", node);
 					} else {
 						node = new TreeNodeImpl(TreeNodeType.CONTENTFOLDER, dcw.data.get(i), selectedNode);
-						//System.out.println("TITLE >>> " + dcw.data.get(i).getTitle() + " TYPE contentfolder>>> " + node.getType());
+						// System.out.println("TITLE >>> " +
+						// dcw.data.get(i).getTitle() +
+						// " TYPE contentfolder>>> " + node.getType());
 						TreeNode fake = new TreeNodeImpl("fake", node);
 					}
 				}
@@ -319,7 +335,8 @@ public class TreeBeanCvor implements Serializable {
 			event.getTreeNode().getChildren().remove(0);
 		}
 
-		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=en&reseller=centili");
+		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language
+				+ "&reseller=" + reseller);
 
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
