@@ -32,13 +32,12 @@
 }
 
 .contentx {
-	width: 70%;
+	width: 40%;
 	height: 100%;
 	background-color: white;
 	position: fixed;
 	float: left;
-	right: 0;
-	
+	left: 30%;
 }
 
 .contentx iframe {
@@ -52,4 +51,18 @@
 
 .ui-widget-content {
 	border:none;
+
+}
+
+.json {
+	width: 30%;
+	height: 100%;
+	background: #eee;
+	position: fixed;
+	right: 0;
+	float: right;
+	padding-left: 15px;
+	margin-right: -15px;
+	
+
 }

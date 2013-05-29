@@ -20,6 +20,7 @@
  */
 package com.bluelotussoftware.example.jsf;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -32,6 +33,7 @@ import java.util.Map.Entry;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
 import org.apache.http.HttpEntity;
@@ -82,6 +84,15 @@ public class TreeBeanCvor implements Serializable {
 	private DocumentCvor object;
 	private TreeNode fakeChild;
 	private String params = "";
+	private String stringA;
+
+	public String getStringA() {
+		return stringA;
+	}
+
+	public void setStringA(String stringA) {
+		this.stringA = stringA;
+	}
 
 	/**
 	 * Default constructor
@@ -296,15 +307,18 @@ public class TreeBeanCvor implements Serializable {
 	 * 
 	 * Adds a {@link javax.faces.application.FacesMessage} with event data to
 	 * the {@link javax.faces.context.FacesContext}.
+	 * @throws JSONException 
 	 */
 
-	public void onNodeSelect(NodeSelectEvent event) {
+	public void onNodeSelect(NodeSelectEvent event) throws JSONException {
 		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()
 				|| event.getTreeNode().getType() == TreeNodeType.CONTENTFOLDER.getType()) {
-			System.out.println("NodeExpandEvent Fired");
+			System.out.println("NodeSelectEvent Fired");
 			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentCvor) event
 					.getTreeNode().getData()).getTitle());
 			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+			
+		
 		} else {
 			DocumentCvor dNode = (DocumentCvor) event.getTreeNode().getData();
 			System.out.println("SELF >>> " + dNode.getSelf_href());
@@ -312,6 +326,14 @@ public class TreeBeanCvor implements Serializable {
 			System.out.println("NodeSelectEvent Fired LEAF" + dNode.getSelf_href());
 
 		}
+		
+		stringA = getString("http://localhost:8080/helprepo/documents"
+				 + ((DocumentCvor)event.getTreeNode().getData()).getSelf_href());
+		
+		System.out.println("Neformatirani " +stringA);
+		
+
+		
 		// DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
 		// addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
 	}
@@ -329,7 +351,7 @@ public class TreeBeanCvor implements Serializable {
 		if (event.getTreeNode().getChildCount() == 1) {
 			event.getTreeNode().getChildren().remove(0);
 		}
-
+		//stringA = "http://www.etf.rs";
 //		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language + "&reseller="
 //				+ reseller);
 		
