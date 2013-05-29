@@ -7,26 +7,28 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Local
 @Path("/")
 public interface RestAPI {
 	
-	@GET
-	@Path("/documents/{id}/content")
-	@Produces(MediaType.TEXT_HTML)
-	public Response getDocuments(@PathParam("id") String id);
-	
+//	@GET
+//	@Path("/documents/{id}/content")
+//	@Produces(MediaType.TEXT_HTML)
+//	public Response getDocuments(@PathParam("id") String id);
+//	
 
 	@GET
-	@Path("/documents/getParagraph/{docPath:.*}/content/{parID}")
+	@Path("/documents/{docPath:.*}/content/paragraph/{parID}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID);
 
 	@GET
-	@Path("/documents/getParagraph/{docPath:.*}/content/{parID}/{fieldPars}")
+	@Path("/documents/{docPath:.*}/content/paragraph/{parID}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars);
 	
@@ -35,13 +37,13 @@ public interface RestAPI {
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
 	@Path("/documents/{docPath:.*}/content/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
+	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars, @Context UriInfo ui);
 	
 	@GET
 	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
 	@Path("/documents/{docPath:.*}/content")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDocument(@PathParam("docPath") String docPath);
+	public Response getDocument(@PathParam("docPath") String docPath, @Context UriInfo ui);
 	
 	@DELETE
 	@Path("/documents/{docPath:.*}/{fieldPars}")
@@ -49,7 +51,7 @@ public interface RestAPI {
 	public Response delDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
 	
 	@DELETE
-	@Path("/documents/{docPath:.*}/")
+	@Path("/documents/{docPath:.*}")
 	@Produces(MediaType.TEXT_HTML)
 	public Response delDocument(@PathParam("docPath") String docPath);
 	
@@ -60,9 +62,9 @@ public interface RestAPI {
 	
 	
 	@GET
-	@Path("/documents/{docPath:.*}/")
+	@Path("/documents/{docPath:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller);
+	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
 	
 	
 //  za staro drvo!
@@ -71,5 +73,6 @@ public interface RestAPI {
 //	@Path("/{rPath:.*}/content")
 //	@Produces(MediaType.TEXT_HTML)
 //	public Response getDoc(@PathParam("rPath") String rPath);
+	
 
 }

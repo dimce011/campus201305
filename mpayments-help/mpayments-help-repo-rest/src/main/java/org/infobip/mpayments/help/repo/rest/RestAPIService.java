@@ -24,6 +24,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Workspace;
+import javax.jcr.nodetype.NodeType;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
@@ -31,11 +32,14 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.infobip.mpayments.help.dto.DocumentCvor;
+import org.infobip.mpayments.help.dto.DocumentCvorWrapper;
 import org.infobip.mpayments.help.dto.Paragraph;
 import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.jsoup.Jsoup;
@@ -174,43 +178,42 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
-	@Override
-	public Response getDocuments(@PathParam("id") String id) {
-		Session session = null;
-		Repository repository = null;
-		boolean error = false;
-		InputStream input = null;
-		OutputStream output = null;
-		String result = null;
-		System.out.println("POZVANA METODA getDocuments");
-		try {
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-
-			Node en = session.getNode("/help/pp/service/1/en");
-			Node target = session.getNodeByIdentifier(en.getIdentifier());
-
-			printChildren(session.getNode("/"));
-			Node content = target.getNode("jcr:content");
-			input = content.getProperty("jcr:data").getBinary().getStream();
-			result = RestAPIService.getStringFromInputStream(input).toString();
-
-		} catch (Exception ex) {
-			error = true;
-			ex.printStackTrace();
-		} finally {
-			if (session != null)
-				session.logout();
-			closeStreams(input, output);
-		}
-
-		if (!error) {
-			return Response.status(Response.Status.OK).entity(result).build();
-		} else {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-		}
-	}
+//	public Response getDocuments(@PathParam("id") String id) {
+//		Session session = null;
+//		Repository repository = null;
+//		boolean error = false;
+//		InputStream input = null;
+//		OutputStream output = null;
+//		String result = null;
+//		System.out.println("POZVANA METODA getDocuments");
+//		try {
+//			InitialContext initialContext = new InitialContext();
+//			repository = (Repository) initialContext.lookup("java:jcr/local");
+//			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+//
+//			Node en = session.getNode("/help/pp/service/1/en");
+//			Node target = session.getNodeByIdentifier(en.getIdentifier());
+//
+//			printChildren(session.getNode("/"));
+//			Node content = target.getNode("jcr:content");
+//			input = content.getProperty("jcr:data").getBinary().getStream();
+//			result = RestAPIService.getStringFromInputStream(input).toString();
+//
+//		} catch (Exception ex) {
+//			error = true;
+//			ex.printStackTrace();
+//		} finally {
+//			if (session != null)
+//				session.logout();
+//			closeStreams(input, output);
+//		}
+//
+//		if (!error) {
+//			return Response.status(Response.Status.OK).entity(result).build();
+//		} else {
+//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
+//		}
+//	}
 
 	// za staro drvo
 	// @Override
@@ -312,12 +315,13 @@ public class RestAPIService implements RestAPI {
 	}
 
 	@Override
-	public Response getDocument(@PathParam("docPath") String docPath) {
-		return getDocument(docPath, "");
+	public Response getDocument(@PathParam("docPath") String docPath, @Context UriInfo ui) {
+		return getDocument(docPath, "", ui);
 	}
 
 	@Override
-	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars) {
+	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars,
+			@Context UriInfo ui) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
@@ -328,6 +332,7 @@ public class RestAPIService implements RestAPI {
 		Map<String, Object> mapParameters = new HashMap<String, Object>();
 		String reseller = null;
 		String language = null;
+		boolean langAndReseller = false;
 		System.out.println("POZVANA METODA getDocument");
 		try {
 			System.out.println("field par uri " + fieldPars);
@@ -345,29 +350,35 @@ public class RestAPIService implements RestAPI {
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 			if (!fieldPars.equals("")) {
-				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
+				stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
 				while (stringTokenizer.hasMoreTokens()) {
 					String first = stringTokenizer.nextToken();
 					String second = stringTokenizer.nextToken();
 					if ("reseller".equalsIgnoreCase(first)) {
 						reseller = second;
+						langAndReseller = true;
 						continue;
 					}
 					if ("language".equalsIgnoreCase(first)) {
 						language = second;
+						langAndReseller = true;
 						continue;
 					}
-
+					System.out.println(first + " " + second);
 					mapParameters.put(first, second);
 				}
 			}
 
-			if (language == null) {
+			System.out.println("jezik= " + language + " preprodavac= " + reseller);
+
+			if (language == null || "null".equals(language)) {
 				language = "en";
+				System.out.println("language je null " + language);
 			}
-			if (reseller == null) {
+			if (reseller == null || "null".equals(reseller)) {
 				reseller = "1";
+				System.out.println("reseller je null " + reseller);
 			}
 
 			System.out.println("ispis mape");
@@ -412,7 +423,23 @@ public class RestAPIService implements RestAPI {
 					result = fm.process(mapParameters, result);
 				}
 			} else {
-				error = true;
+				System.out.println("else page "+langAndReseller+ " "+docPath);
+				if (!langAndReseller) {
+					node = session.getNode(docPath);
+					System.out.println("trazi samo path " + docPath);
+					NodeIterator nodeIt = node.getNodes();
+					Node node2 = null;
+					while (nodeIt.hasNext()) {
+						node2 = nodeIt.nextNode();
+						if (node2.isNodeType(NodeType.NT_FILE)) {
+							break;
+						}
+					}
+					Node content = node2.getNode("jcr:content");
+					input = content.getProperty("jcr:data").getBinary().getStream();
+					result = RestAPIService.getStringFromInputStream(input).toString();
+				}
+				//error = true;
 			}
 
 			res = null;
@@ -561,35 +588,49 @@ public class RestAPIService implements RestAPI {
 
 	@Override
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller) {
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 		String response = null;
 		InputStream input = null;
 		String result = null;
+		String langResel = "";
 		try {
+			System.out.println("get jason");
+			if (language != null) {
+				langResel += "?language=" + language;
+			}
+			if (reseller != null) {
+				langResel += (language == null ? "?reseller=" + reseller : "&reseller=" + reseller);
+			}
+
 			openSession();
-			result = (String) getDocument(docPath, "language=" + language + "&reseller=" + reseller).getEntity();
+			result = (String) getDocument(docPath, "language=" + language + "&reseller=" + reseller, ui).getEntity();
 
-			System.out.println("get jason novi");
+			System.out.println("get jason novi " +result );
 
+			if(result == null)
+				result ="";
 			Document doc = Jsoup.parse(result);
 			Elements divs = doc.getElementsByTag("div");
 			Map<String, String> paragraphs = new TreeMap<String, String>();
 			for (Element elem : divs) {
 				if (!elem.id().isEmpty()) {
-					paragraphs.put(elem.id(), "/documents/" + docPath + "/content/" + elem.id());
+					paragraphs.put(elem.id(), ui.getBaseUri().toString() + "documents/" + docPath
+							+ "/content/paragraph/" + elem.id() + langResel);
 
 				}
 			}
+			
 
 			Node node = session.getNode("/" + docPath);
 			String[] niz = node.getPath().split("/");
-			DocumentCvor dc = new DocumentCvor(node.getName(), niz[1].toUpperCase(), node.getPath(), node.getParent()
-					.getPath());
+//			DocumentCvor dc = new DocumentCvor(node.getName(), niz[1].toUpperCase(), ui.getBaseUri().toString()
+//					+ "/documents" + node.getPath(), ui.getBaseUri().toString() + "/documents"
+//					+ node.getParent().getPath());
 
 			// DocumentCvor dc = new DocumentCvor();
 
 			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
-					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs));
+					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -636,7 +677,7 @@ public class RestAPIService implements RestAPI {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs) {
+	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui) {
 		openSession();
 		logger.info("PARENT: {}", parent);
 		Node node = null;
@@ -644,7 +685,9 @@ public class RestAPIService implements RestAPI {
 		try {
 			node = session.getNode(parent);
 			String[] niz = node.getPath().split("/");
-			dnl = new DocumentCvor(node.getName(), niz[1].toUpperCase(), node.getPath(), node.getParent().getPath());
+			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length()-1);
+			dnl = new DocumentCvor(node.getName(), niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
+					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
 
 			List<Paragraph> lista = new ArrayList<Paragraph>();
 			Paragraph p = null;
@@ -654,18 +697,19 @@ public class RestAPIService implements RestAPI {
 				p.setLink(entry.getValue());
 				lista.add(p);
 			}
-			dnl.setList(lista);
+			dnl.setParagraphs(lista);
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
-					String children_href = node.getPath() + "/children";
-					dnl.setChildren_href(children_href);
+					String children_href = ui.getBaseUri().toString() + "documents" + node.getPath() + "/children";
+
+					dnl.setChildren_href(children_href + fieldPars);
 				} else {
 					dnl.setChildren_href("");
 				}
 
 				if (hasFiles(node)) {
-					String content_href = node.getPath() + "/content";
-					dnl.setContent_href(content_href);
+					String content_href = ui.getBaseUri().toString() + "documents" + node.getPath() + "/content";
+					dnl.setContent_href(content_href + fieldPars);
 				} else {
 					dnl.setContent_href("");
 				}

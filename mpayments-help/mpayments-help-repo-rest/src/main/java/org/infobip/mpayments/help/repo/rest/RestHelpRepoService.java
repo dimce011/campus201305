@@ -37,7 +37,9 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -536,7 +538,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, String language, String reseller) {
+	public DocumentCvor getDocumentCvor(String parent, String language, String reseller, @Context UriInfo ui) {
 		openSession();
 		Node node = null;
 		DocumentCvor dnl = null;
@@ -562,19 +564,19 @@ public class RestHelpRepoService implements RestHelpRepo {
 			}
 
 			String[] niz = node.getPath().split("/");
-			dnl = new DocumentCvor(title, niz[1].toUpperCase(), node.getPath(), node.getParent().getPath());
+			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents" + node.getPath(), ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
 					String children_href = node.getPath() + "/children";
-					dnl.setChildren_href(children_href);
+					dnl.setChildren_href(ui.getBaseUri().toString() + "documents" + children_href);
 				} else {
 					dnl.setChildren_href("");
 				}
 
 				if (hasFiles(node)) {
 					String content_href = node.getPath() + "/content";
-					dnl.setContent_href(content_href);
+					dnl.setContent_href(ui.getBaseUri().toString() + "documents" + content_href);
 				} else {
 					dnl.setContent_href("");
 				}
@@ -599,14 +601,14 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	@Override
 	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller) {
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 		String response = null;
 		try {
 			String pom = "/" + path;
 			if (pom.equals("/"))
 				pom = "/help";
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
-					getDocumentCvor(pom, language, reseller));
+					getDocumentCvor(pom, language, reseller, ui));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -626,7 +628,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	@Override
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller) {
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
 		openSession();
 		String response = null;
@@ -637,7 +639,10 @@ public class RestHelpRepoService implements RestHelpRepo {
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
-					children_list.add(getDocumentCvor(subNode.getPath(), language, reseller));
+					if (!subNode.isNodeType("nt:file")){
+						children_list.add(getDocumentCvor(subNode.getPath(), language, reseller, ui));
+					}
+					//children_list.add(getDocumentCvor(subNode.getPath(), language, reseller, ui));
 
 				}
 			}

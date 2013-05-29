@@ -12,6 +12,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Local
 @Path("/")
@@ -46,11 +47,11 @@ public interface RestHelpRepo {
 	@Path("/root/{path:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller);
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
 
 	@GET
-	@Path("/{parent:.*}/children")
+	@Path("documents/{parent:.*}/children")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller);
+			@QueryParam("reseller") String reseller,  @Context UriInfo ui);
 }
