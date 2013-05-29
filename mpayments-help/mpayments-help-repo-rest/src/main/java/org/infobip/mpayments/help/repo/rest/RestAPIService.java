@@ -24,6 +24,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Workspace;
+import javax.jcr.nodetype.NodeType;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
@@ -412,7 +413,24 @@ public class RestAPIService implements RestAPI {
 					result = fm.process(mapParameters, result);
 				}
 			} else {
-				error = true;
+				node = session.getNode(docPath);
+				System.out.println("trazi samo path " + docPath);
+				NodeIterator nodeIt = node.getNodes();
+				Node node2 = null;
+				while (nodeIt.hasNext()){
+					node2 = nodeIt.nextNode();
+					if(node2.isNodeType(NodeType.NT_FILE)){
+						break;
+					}
+				}
+				Node content = node2.getNode("jcr:content");
+				input = content.getProperty("jcr:data").getBinary().getStream();
+				result = RestAPIService.getStringFromInputStream(input).toString();
+
+				if (!mapParameters.isEmpty()) {
+					FreeMarker fm = new FreeMarker();
+					result = fm.process(mapParameters, result);
+				}
 			}
 
 			res = null;

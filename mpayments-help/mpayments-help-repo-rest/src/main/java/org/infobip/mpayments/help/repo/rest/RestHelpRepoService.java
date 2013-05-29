@@ -270,6 +270,25 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// System.out.println(string);
 			// }
 
+			// ubacivanje fajla u pp folder
+//			Node one = session.getNode("/help/pp").addNode("one", NodeType.NT_FILE);
+//			Node content = one.addNode("jcr:content", "nt:resource");
+//			one.addMixin("my:metaPageData");
+//
+//			one.setProperty("my:lang", "en");
+//			one.setProperty("my:reseller", "centili");
+//
+//			/**
+//			 * add template file
+//			 */
+//			File f = new File("templatePP.ftl");
+//			InputStream stream = new BufferedInputStream(new FileInputStream(f));
+//			Binary binary = session.getValueFactory().createBinary(stream);
+//			content.setProperty("jcr:data", binary);
+
+			ispisiSvuDecu(session.getNode("/"));
+			session.save();
+
 		} catch (Exception ex) {
 			error = true;
 			responseVO.setErrorMessage("Internal service error!");

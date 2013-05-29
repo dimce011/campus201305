@@ -85,8 +85,7 @@ public class TreeBeanCvor implements Serializable {
 	private TreeNode selectedNode;
 	private DocumentCvor object;
 	private TreeNode fakeChild;
-	private String language = "";
-	private String reseller = "";
+	private String params = "";
 
 	/**
 	 * Default constructor
@@ -101,13 +100,12 @@ public class TreeBeanCvor implements Serializable {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
-		language = paramMap.get("language");
-		if (language == null) {
-			language = "";
-		}
-		reseller = paramMap.get("reseller");
-		if (reseller == null) {
-			reseller = "";
+		for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+			if (!params.equals("")) {
+				params += "&";
+			}
+			params += entry.getKey() + "=" + entry.getValue();
 		}
 
 		makeFromJsonTree();
@@ -116,7 +114,6 @@ public class TreeBeanCvor implements Serializable {
 		pointer = new TreeNodeImpl(TreeNodeType.NODE, object, root);
 		fakeChild = new TreeNodeImpl("fake", pointer);
 		// createNodes(object, node0);
-		System.out.println("Izasao");
 	}
 
 	private void makeFromJsonTree() throws JsonParseException, JsonMappingException, IOException, JSONException {
@@ -129,9 +126,7 @@ public class TreeBeanCvor implements Serializable {
 		// System.out.println("Ispis stringa " + s);
 
 		// HARDCODE
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help?language=" + language
-				+ "&reseller=" + reseller), DocumentCvor.class));
-		System.out.println("Ispis objekta " + object.getSelf_href());
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help?" + params), DocumentCvor.class));
 	}
 
 	public void addChildren(String uri) {
@@ -222,7 +217,6 @@ public class TreeBeanCvor implements Serializable {
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
-		System.out.println("Usao u getSTring");
 		HttpGet httpGet = new HttpGet(prepareGetRequest(uri, map));
 		try {
 
@@ -232,7 +226,6 @@ public class TreeBeanCvor implements Serializable {
 				responseString = EntityUtils.toString(entity, "UTF-8");
 				// responseString =
 				// URLEncoder.encode(entity.toString(),"UTF-8");
-				System.out.println("Ispis responsaaaaa!!!!! " + responseString);
 
 			}
 
@@ -341,8 +334,9 @@ public class TreeBeanCvor implements Serializable {
 			event.getTreeNode().getChildren().remove(0);
 		}
 
-		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language + "&reseller="
-				+ reseller);
+//		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language + "&reseller="
+//				+ reseller);
+		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?" +params);
 
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
