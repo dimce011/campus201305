@@ -423,6 +423,7 @@ public class RestAPIService implements RestAPI {
 					result = fm.process(mapParameters, result);
 				}
 			} else {
+
 				System.out.println("else page "+langAndReseller+ " "+docPath);
 				if (!langAndReseller) {
 					node = session.getNode(docPath);
