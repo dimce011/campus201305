@@ -571,10 +571,10 @@ public class RestHelpRepoService implements RestHelpRepo {
 			node = session.getNode(parent);
 			String title = null;
 
-			if (reseller.equals("")) {
+			if (reseller==null) {
 				reseller = "centili";
 			}
-			if (language.equals("")) {
+			if (language==null) {
 				language = "en";
 			}
 
