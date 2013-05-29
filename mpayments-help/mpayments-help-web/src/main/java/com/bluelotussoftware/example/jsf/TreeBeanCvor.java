@@ -85,8 +85,8 @@ public class TreeBeanCvor implements Serializable {
 	private TreeNode selectedNode;
 	private DocumentCvor object;
 	private TreeNode fakeChild;
-	private String language;
-	private String reseller;
+	private String language = "";
+	private String reseller = "";
 
 	/**
 	 * Default constructor
@@ -102,7 +102,13 @@ public class TreeBeanCvor implements Serializable {
 		FacesContext context = FacesContext.getCurrentInstance();
 		Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
 		language = paramMap.get("language");
+		if (language == null) {
+			language = "";
+		}
 		reseller = paramMap.get("reseller");
+		if (reseller == null) {
+			reseller = "";
+		}
 
 		makeFromJsonTree();
 		System.out.println("OBJECT: " + object);
@@ -335,8 +341,8 @@ public class TreeBeanCvor implements Serializable {
 			event.getTreeNode().getChildren().remove(0);
 		}
 
-		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language
-				+ "&reseller=" + reseller);
+		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language + "&reseller="
+				+ reseller);
 
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
