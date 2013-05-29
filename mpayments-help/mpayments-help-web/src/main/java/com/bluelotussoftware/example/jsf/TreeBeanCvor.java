@@ -303,6 +303,7 @@ public class TreeBeanCvor implements Serializable {
 	 * the {@link javax.faces.context.FacesContext}.
 	 */
 
+	
 	public void onNodeSelect(NodeSelectEvent event) {
 		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()
 				|| event.getTreeNode().getType() == TreeNodeType.CONTENTFOLDER.getType()) {
@@ -319,6 +320,9 @@ public class TreeBeanCvor implements Serializable {
 		}
 		// DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
 		// addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
+		
+	EditorBean.setSelectedDocumentNode((DocumentCvor) event.getTreeNode());
+		
 	}
 
 	/**

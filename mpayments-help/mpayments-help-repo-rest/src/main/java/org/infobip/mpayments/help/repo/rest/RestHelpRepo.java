@@ -53,4 +53,12 @@ public interface RestHelpRepo {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller);
+	
+	@GET
+	@Path("/getSaveStatus")
+	@Produces(MediaType.TEXT_PLAIN)
+	// @Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response getSaveStatus(@QueryParam("node_path") String node_path, @QueryParam("html_page") String html_page,
+			@QueryParam("f_name") String f_name, @QueryParam("is_file") String is_file,
+			@QueryParam("to_save") String to_save);
 }

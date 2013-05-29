@@ -14,24 +14,24 @@ import java.util.Map;
 
 import javax.ejb.Stateless;
 import javax.jcr.Binary;
+import javax.jcr.ItemExistsException;
 import javax.jcr.LoginException;
 import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
-import javax.jcr.PropertyType;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Value;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeManager;
-import javax.jcr.nodetype.NodeTypeTemplate;
-import javax.jcr.nodetype.PropertyDefinitionTemplate;
-import javax.jcr.version.OnParentVersionAction;
+import javax.jcr.version.VersionException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -693,4 +693,85 @@ public class RestHelpRepoService implements RestHelpRepo {
 		// TODO Auto-generated method stub
 		return jsonMapper;
 	}
+	
+	
+	
+	
+	@Override
+	public Response getSaveStatus(@QueryParam("node_path") String node_path, @QueryParam("html_page") String html_page,
+			@QueryParam("f_name") String f_name, @QueryParam("is_file") String is_file,
+			@QueryParam("to_save") String to_save) {
+		Node node = null;
+		Node f = null;
+		Node content = null;
+		openSession();
+		try {
+			node = session.getNode(node_path);
+			if (to_save.equalsIgnoreCase("true")) {
+				if (node.isNodeType(NodeType.NT_FOLDER)) {
+
+					if (is_file.equalsIgnoreCase("true")) {
+						f = node.addNode(f_name.toString() + ".txt", "nt:file");
+						content = f.addNode("jcr:content", "nt:resource");
+						content.setProperty("jcr:data", html_page);
+						// jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(file);
+						session.save();
+						// ispisiSvuDecu(node);
+						return Response.status(Response.Status.OK).entity(content.getName()).build();
+					} else {
+						f = node.addNode(f_name.toString(), "nt:folder");
+						session.save();
+						System.out.println("folder je sacuvan");
+						return Response.status(Response.Status.OK).entity(f.getName()).build();
+					}
+				}
+				if (node.isNodeType(NodeType.NT_FILE)) {
+					node.setProperty(f_name, html_page);
+					session.save();
+					return Response.status(Response.Status.OK).entity(node.getPath()).build();
+				}
+
+			} else if (to_save.equalsIgnoreCase("false")) {
+				if (node.isNodeType(NodeType.NT_FILE)) {
+					node.setProperty("jcr:data", html_page);
+					session.save();
+					return Response.status(Response.Status.OK).entity(node.getPath()).build();
+				} else if (node.isNodeType(NodeType.NT_FOLDER)) {
+					node.getSession().move(node.getPath(), node.getParent().getPath() + "/" + f_name);
+					// session.save();
+					node.getSession().move(node.getPath(), node.getParent().getPath() + "/" + f);
+					return Response.status(Response.Status.OK).entity(node.getParent().getPath()).build();
+				}
+			} else {
+				System.out.println("Probao je da sacuva.....");
+				return Response.status(Response.Status.NOT_MODIFIED).entity(content).build();
+			}
+		} catch (ItemExistsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PathNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchNodeTypeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (LockException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (VersionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ConstraintViolationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (RepositoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			closeSession();
+		}
+		return null;
+	}
+
+	
 }

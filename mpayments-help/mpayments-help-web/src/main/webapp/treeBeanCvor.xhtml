@@ -7,6 +7,63 @@
 	<title>Custom PrimeFaces Tree</title>
 	<h:outputStylesheet name="custom-tree.css" library="css" />
 </h:head>
+
+
+<h:form id="formAddContent">
+	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
+	<p:dialog id="dlgAddContent" header="HTML file"
+		widgetVar="dlgAddContent" modal="true" resizable="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<h:outputText value="Insert file name: " />
+			<p:inputText value="#{editorBean.f_name}" id="file_name"
+				required="true" label="file_name" />
+			<p:editor id="editor" value="#{editorBean.page}" resizable="true" />
+			<p:commandButton id="saveButton" value="Save" update="growl"
+				actionListener="#{editorBean.saveFile}"
+				oncomplete="dlgAddContent.close())" />
+		</h:panelGrid>
+	</p:dialog>
+</h:form>
+<h:form id="formAddFolder">
+	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
+	<p:dialog id="dlgAddFolder" header="Insert folder name"
+		widgetVar="dlgAddFolder" resizable="false" modal="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:inputText value="#{editorBean.f_name}" id="folder_name"
+				required="true" label="folder_name" />
+			<p:commandButton id="saveButton" value="Save" update="growl"
+				actionListener="#{editorBean.saveFolder}"
+				oncomplete="dlgAddFolder.close())" />
+		</h:panelGrid>
+	</p:dialog>
+</h:form>
+<h:form id="formEditContent">
+	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
+	<p:dialog id="dlgEditContent" header="Edit file content"
+		widgetVar="dlgEditContent" resizable="true" modal="true">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:editor id="editContent" value="#{node.link}" width="600" />
+			<p:commandButton id="saveButton" value="Save" update="growl"
+				actionListener="#{editorBean.editContent('true')}" />
+		</h:panelGrid>
+	</p:dialog>
+</h:form>
+<h:form id="formEditFolderName">
+	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
+	<p:dialog id="dialog" header="Edit folder name"
+		widgetVar="dlgEditFolderName" resizable="false">
+		<h:panelGrid columns="2" cellpadding="5">
+			<p:inputText value="#{editorBean.node_name}" id="f_name" />
+			<p:commandButton id="saveButton" value="Save" update="growl"
+				actionListener="#{editorBean.editContent('false')}" />
+		</h:panelGrid>
+	</p:dialog>
+</h:form>
+
+
+
+
+
 <h:body>
 
 	<h:form id="form1" styleClass="menux">
@@ -35,7 +92,7 @@
 				<p:treeNode type="empty" icon="folder-collapsed">
 					<h:outputText value="#{node.title}" />
 				</p:treeNode>
-				
+
 				<p:treeNode type="contentFolder" expandedIcon="folder-open"
 					collapsedIcon="folder-collapsed">
 					<a href="#{node.content_href}" target="myFrame"> <h:outputText
@@ -44,6 +101,20 @@
 
 			</p:tree>
 		</p:panel>
+
+		<p:contextMenu for="tree1">
+			<p:menuitem value="Add content" oncomplete="dlgAddContent.show()" />
+			<p:menuitem value="Add folder" oncomplete="dlgAddFolder.show()" />
+			<p:menuitem value="Edit content" oncomplete="dlgEditContent.show()"
+				target="formEditContent.dlgEditContent.editContent" />
+			<a href="#{node.link}" target="myFrame"> <h:outputText
+					value="#{node.title} (#{node.link})" id="lblNode" />
+			</a>
+			<p:menuitem value="Edit folder name"
+				oncomplete="dlgEditFolderName.show()" />
+		</p:contextMenu>
+
+
 	</h:form>
 	<p:outputPanel styleClass="contentx">
 		<iframe name="myFrame" width="680" height="680" />
