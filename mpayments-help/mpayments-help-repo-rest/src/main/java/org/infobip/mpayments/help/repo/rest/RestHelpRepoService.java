@@ -544,6 +544,13 @@ public class RestHelpRepoService implements RestHelpRepo {
 			node = session.getNode(parent);
 			String title = null;
 
+			if (reseller.equals("")) {
+				reseller = "centili";
+			}
+			if (language.equals("")) {
+				language = "en";
+			}
+
 			if (node.hasProperty("my:title")) {
 				System.out.println("Node " + node.getName() + " ima properti");
 				Property p = node.getProperty("my:title");

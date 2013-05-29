@@ -1,5 +1,9 @@
 package com.bluelotussoftware.example.jsf;
 
+import java.util.List;
+
+
+
 public class DocumentCvor {
 
 	String title;
@@ -8,6 +12,7 @@ public class DocumentCvor {
 	String parent_href;
 	String children_href;
 	String content_href;
+	List <Paragraph> list;
 
 	public DocumentCvor() {
 
@@ -74,5 +79,14 @@ public class DocumentCvor {
 			this.content_href = "http://localhost:8080/helprepo/documents" + content_href;
 		}
 	}
+	
+	public List<Paragraph> getList() {
+		return list;
+	}
+
+	public void setList(List<Paragraph> list) {
+		this.list = list;
+	}
+
 
 }
