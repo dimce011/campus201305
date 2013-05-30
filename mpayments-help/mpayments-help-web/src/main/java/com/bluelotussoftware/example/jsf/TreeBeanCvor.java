@@ -23,14 +23,11 @@ package com.bluelotussoftware.example.jsf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.StringTokenizer;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -50,7 +47,6 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -126,7 +122,7 @@ public class TreeBeanCvor implements Serializable {
 		// System.out.println("Ispis stringa " + s);
 
 		// HARDCODE
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/root/help?" + params), DocumentCvor.class));
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/documents/help?" + params), DocumentCvor.class));
 	}
 
 	public void addChildren(String uri) {
@@ -336,7 +332,9 @@ public class TreeBeanCvor implements Serializable {
 
 //		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language + "&reseller="
 //				+ reseller);
-		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?" +params);
+		
+		//addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?" +params);
+		addChildren(dc.getChildren_href());
 
 		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
