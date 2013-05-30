@@ -85,6 +85,20 @@ public class TreeBeanCvor implements Serializable {
 	private TreeNode fakeChild;
 	private String params = "";
 	private String stringA;
+	private boolean showForm;
+
+	public boolean isShowForm() {
+		return showForm;
+	}
+
+	public void setShowForm(boolean showForm) {
+		if(stringA!=null) {
+		this.showForm = true;
+		} else {
+			this.showForm = false;
+		}
+		
+	}
 
 	public String getStringA() {
 		return stringA;
@@ -330,10 +344,9 @@ public class TreeBeanCvor implements Serializable {
 		}
 		
 		stringA = getString(((DocumentCvor)event.getTreeNode().getData()).getSelf_href());
-		
 		System.out.println("Neformatirani " +stringA);
 		
-
+		System.out.println("SELECT " + ((DocumentCvor)event.getTreeNode().getData()).getContent_href());
 		
 		// DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
 		// addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());

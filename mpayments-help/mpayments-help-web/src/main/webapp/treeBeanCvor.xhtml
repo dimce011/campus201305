@@ -100,7 +100,9 @@
 
 				<p:treeNode type="node" expandedIcon="folder-open"
 					collapsedIcon="folder-collapsed">
-					<h:outputText value="#{node.title}" />
+					<a href="#{node.content_href}" target="myFrame"> <h:outputText
+							value="#{node.title}" />
+					</a>
 				</p:treeNode>
 
 				<p:treeNode type="leaf" icon="document-node">
@@ -109,7 +111,9 @@
 				</p:treeNode>
 
 				<p:treeNode type="empty" icon="folder-collapsed">
-					<h:outputText value="#{node.title}" />
+					<a href="#{node.content_href}" target="myFrame"> <h:outputText
+							value="#{node.title}" />
+					</a>
 				</p:treeNode>
 
 				<p:treeNode type="contentFolder" expandedIcon="folder-open"
@@ -143,7 +147,6 @@
 	<p:outputPanel styleClass="contentx">
 		<iframe name="myFrame" width="680" height="680" />
 	</p:outputPanel>
-
 	<h:form id="form2" styleClass="json">
 		<pre class="prettyprint">
 			<h:outputText id="label" value="#{treeBeanCvor.stringA}"

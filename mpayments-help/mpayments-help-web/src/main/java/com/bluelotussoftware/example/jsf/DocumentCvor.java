@@ -9,29 +9,23 @@ public class DocumentCvor {
 	String parent_href;
 
 	String children_href;
-	String content_href;
-	List <Paragraph> paragraphs;
-	
-	
-
-	
-	
+	String content_href = "http://localhost:8080/mpayments-help-web/emptyState.html";
+	List<Paragraph> paragraphs;
 
 	public DocumentCvor() {
 
 	}
 
-	public DocumentCvor(String title, String category, String self_href, String parent_href) {
+	public DocumentCvor(String title, String category, String self_href,
+			String parent_href) {
 		super();
 		this.title = title;
 		this.category = category;
 		this.self_href = self_href;
 		this.parent_href = parent_href;
-		//this.content_href = content_href;
+		// this.content_href = content_href;
 		// this.children_href = children_href;
 	}
-	
-
 
 	public String getTitle() {
 		return title;
@@ -78,9 +72,13 @@ public class DocumentCvor {
 	}
 
 	public void setContent_href(String content_href) {
-		this.content_href = content_href;
+		if (content_href.equals("")) {
+			this.content_href = "http://localhost:8080/mpayments-help-web/emptyState.html";
+		} else {
+			this.content_href = content_href;
+		}
 	}
-	
+
 	public List<Paragraph> getParagraphs() {
 		return paragraphs;
 	}
@@ -89,6 +87,4 @@ public class DocumentCvor {
 		this.paragraphs = paragraphs;
 	}
 
-
-	
 }
