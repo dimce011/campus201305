@@ -109,6 +109,23 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 			ispisiSvuDecu(session.getNode("/"));
 
+			// ubacivanje fajla u signUp folder
+//			Node signUp = session.getNode("/help/pp/singUp");
+//			Node onesu = signUp.addNode("one", NodeType.NT_FILE);
+			Node contentsu = session.getNode("/help/pp/singUp/one/jcr:content");
+//			onesu.addMixin("my:metaPageData");
+
+//			onesu.setProperty("my:lang", "en");
+//			onesu.setProperty("my:reseller", "centili");
+
+			/**
+			 * add template file
+			 */
+			File fsu = new File("signup.ftl");
+			InputStream streamsu = new BufferedInputStream(new FileInputStream(fsu));
+			Binary binarysu = session.getValueFactory().createBinary(streamsu);
+			contentsu.setProperty("jcr:data", binarysu);
+
 			// session.save();
 
 			// pravljenje namespace-a
@@ -119,16 +136,13 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// NamespaceRegistry registry =
 			// session.getWorkspace().getNamespaceRegistry();
 
-
 			// List<String> list = Arrays.asList(registry.getPrefixes());
 			// if (!list.contains("my")) {
 			// registry.registerNamespace("my", "com.infobip.jcr.my");
 			// }
 
-
-			//NodeTypeManager manager = session.getWorkspace()
-			//		.getNodeTypeManager();
-
+			// NodeTypeManager manager = session.getWorkspace()
+			// .getNodeTypeManager();
 
 			// pravljenje novog tipa cvora sa novim propertijima
 
@@ -743,7 +757,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller, @Context UriInfo ui) {
+	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
+			@Context UriInfo ui) {
 
 		openSession();
 		Node node = null;
@@ -758,8 +773,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 			if (language == null) {
 				language = "en";
 			}
-			
-			System.out.println("fp u getDocumentCvor "+fieldPars);
+
+			System.out.println("fp u getDocumentCvor " + fieldPars);
 
 			if (node.hasProperty("my:title")) {
 				Property p = node.getProperty("my:title");
@@ -791,21 +806,20 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 			String[] niz = node.getPath().split("/");
 
-
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
-					+ node.getPath()+"/"+fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
-
+					+ node.getPath() + "/" + fieldPars, ui.getBaseUri().toString() + "documents"
+					+ node.getParent().getPath());
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
-					String children_href = node.getPath() + "/children/"+fieldPars;
+					String children_href = node.getPath() + "/children/" + fieldPars;
 					dnl.setChildren_href(ui.getBaseUri().toString() + "documents" + children_href);
 				} else {
 					dnl.setChildren_href("");
 				}
 
 				if (hasFiles(node)) {
-					String content_href = node.getPath() + "/content/"+fieldPars;
+					String content_href = node.getPath() + "/content/" + fieldPars;
 					dnl.setContent_href(ui.getBaseUri().toString() + "documents" + content_href);
 				} else {
 					dnl.setContent_href("");
@@ -833,8 +847,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
-
-		
 		String response = null;
 		try {
 			String pom = "/" + path;
@@ -861,8 +873,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent,@PathParam("fieldPars") String fieldPars, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @PathParam("fieldPars") String fieldPars,
+			@QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
 		openSession();
 		Map<String, String> mapParameters = new HashMap<String, String>();
@@ -876,28 +888,27 @@ public class RestHelpRepoService implements RestHelpRepo {
 				String second = stringTokenizer.nextToken();
 				if ("reseller".equalsIgnoreCase(first)) {
 					reseller = second;
-		
+
 					continue;
 				}
 				if ("language".equalsIgnoreCase(first)) {
 					language = second;
-					
+
 					continue;
 				}
 				System.out.println(first + " " + second);
-			
+
 				mapParameters.put(first, second);
 			}
 		}
-		
+
 		if (reseller == null) {
 			reseller = "1";
 		}
 		if (language == null) {
 			language = "en";
 		}
-		
-		
+
 		String response = null;
 		Node node = null;
 		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
@@ -912,7 +923,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 					}
 					// children_list.add(getDocumentCvor(subNode.getPath(),
 					// language, reseller, ui));
-
 
 				}
 			}
@@ -1091,7 +1101,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 	@Override
 	public Response getChildrenLinksJSON2(@PathParam("parent") String parent, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
-		return getChildrenLinksJSON(parent,"",language,reseller,ui);
+		return getChildrenLinksJSON(parent, "", language, reseller, ui);
 	}
 
 }

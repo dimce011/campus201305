@@ -439,9 +439,36 @@ public class RestAPIService implements RestAPI {
 							break;
 						}
 					}
+				
 					Node content = node2.getNode("jcr:content");
 					input = content.getProperty("jcr:data").getBinary().getStream();
 					result = RestAPIService.getStringFromInputStream(input).toString();
+					
+					if (!mapParameters.isEmpty()) {
+						FreeMarker fm = new FreeMarker();
+						result = fm.process(mapParameters, result);
+					}
+				}else{
+					node = session.getNode(docPath);
+					System.out.println("trazi samo path " + docPath);
+					NodeIterator nodeIt = node.getNodes();
+					Node node2 = null;
+					while (nodeIt.hasNext()) {
+						node2 = nodeIt.nextNode();
+						if (node2.isNodeType(NodeType.NT_FILE)) {
+							break;
+						}
+					}
+				
+					Node content = node2.getNode("jcr:content");
+					input = content.getProperty("jcr:data").getBinary().getStream();
+					result = RestAPIService.getStringFromInputStream(input).toString();
+					
+					if (!mapParameters.isEmpty()) {
+						FreeMarker fm = new FreeMarker();
+						result = fm.process(mapParameters, result);
+					}
+					
 				}
 				// error = true;
 //<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git

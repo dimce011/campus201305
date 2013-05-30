@@ -35,6 +35,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.swing.text.AsyncBoxView.ChildLocator;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -365,9 +366,12 @@ public class TreeBeanCvor implements Serializable {
 		selectedNode = event.getTreeNode();
 		System.out.println("NodeExpandEvent Fired");
 		DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
-		if (event.getTreeNode().getChildCount() == 1) {
+		while (event.getTreeNode().getChildCount()!= 0) {
 			event.getTreeNode().getChildren().remove(0);
 		}
+//		if (event.getTreeNode().getChildCount() == 1) {
+//			event.getTreeNode().getChildren().remove(0);
+//		}
 		//stringA = "http://www.etf.rs";
 //		addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?language=" + language + "&reseller="
 //				+ reseller);
