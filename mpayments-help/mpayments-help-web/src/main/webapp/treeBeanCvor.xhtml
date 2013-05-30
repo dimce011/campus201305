@@ -6,8 +6,10 @@
 	xmlns:f="http://java.sun.com/jsf/core">
 <h:head>
 	<h:outputStylesheet name="custom-tree.css" library="css" />
-	<h:outputScript name="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" library="javascript" />
-	
+	<h:outputScript
+		name="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"
+		library="javascript" />
+
 </h:head>
 
 
@@ -36,12 +38,12 @@
 			</p:selectOneMenu>
 			<p:editor id="editor" value="#{editorBean.page}" resizable="true" />
 		</h:panelGrid>
-		<p:commandButton id="saveButton" value="Save" update="growl"
+		<p:commandButton id="saveButton" value="Save" update=":form1:tree1"
 			actionListener="#{editorBean.saveFile}"
 			oncomplete="dlgAddContent.close())" />
-
 	</p:dialog>
 </h:form>
+
 <h:form id="formAddFolder">
 	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
 	<p:dialog id="dlgAddFolder" header="Insert folder name"
@@ -49,7 +51,7 @@
 		<h:panelGrid columns="2" cellpadding="5">
 			<p:inputText value="#{editorBean.f_name}" id="folder_name"
 				required="true" label="folder_name" />
-			<p:commandButton id="saveButton" value="Save" update="growl"
+			<p:commandButton id="saveButton" value="Save" update=":form1:tree1"
 				actionListener="#{editorBean.saveFolder}"
 				oncomplete="dlgAddFolder.close())" />
 		</h:panelGrid>
@@ -61,8 +63,9 @@
 		widgetVar="dlgEditContent" resizable="true" modal="true">
 		<h:panelGrid columns="2" cellpadding="5">
 			<p:editor id="editContent" value="#{editorBean.content}" width="600" />
-			<p:commandButton id="saveButton" value="Save" update="growl"
-				actionListener="#{editorBean.editContent('true')}" />
+			<p:commandButton id="saveButton" value="Save" update=":form1:tree1"
+				actionListener="#{editorBean.editContent('true')}"
+				oncomplete="dlgEditContent.close())" />
 		</h:panelGrid>
 	</p:dialog>
 </h:form>
@@ -72,18 +75,14 @@
 		widgetVar="dlgEditFolderName" resizable="false">
 		<h:panelGrid columns="2" cellpadding="5">
 			<p:inputText value="#{editorBean.new_folder_name}" id="f_name" />
-			<p:commandButton id="saveButton" value="Save" update="growl"
-				actionListener="#{editorBean.editContent('false')}" />
+			<p:commandButton id="saveButton" value="Save"
+				actionListener="#{editorBean.editContent('false')}"
+				oncomplete="dlgEditFolderName.close())" update=":form1:tree1" />
 		</h:panelGrid>
 	</p:dialog>
 </h:form>
-
-
-
-
-
 <h:body>
-	<title>Help system </title>
+	<title>Help system</title>
 	<h:form id="form1" styleClass="menux">
 		<p:panel id="panel1">
 			<p:growl id="growl1" showSummary="true" showDetail="true"
@@ -91,9 +90,8 @@
 
 			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node"
 				dynamic="true" selectionMode="single"
-				selection="#{treeBeanCvor.selectedNode}">
+				selection="#{treeBeanCvor.selectedNode}" autoUpdate="true">
 				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}"
-
 					update=":form2:label" />
 
 				<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}"
@@ -149,7 +147,7 @@
 	<h:form id="form2" styleClass="json">
 		<pre class="prettyprint">
 			<h:outputText id="label" value="#{treeBeanCvor.stringA}"
-				escape="false"  />
+				escape="false" />
 		</pre>
 	</h:form>
 </h:body>

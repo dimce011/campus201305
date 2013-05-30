@@ -118,15 +118,16 @@ public class EditorBean {
 		saveNodeChanges(is_file, "false", getNew_folder_name(), getContent());
 	}
 
-	public String saveNodeChanges(String is_file, String to_save, String name,
-			String html_pg) {
+	public String saveNodeChanges(String is_file, String to_save, String name, String html_pg) {
 
 		HttpClient httpClient = new DefaultHttpClient();
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
 
-		map.put("node_path", node.getSelf_href());
+		String putanja = node.getSelf_href().replaceAll("http://localhost:8080/helprepo/documents", "");
+		System.out.println("PUUUUUUTanja" + putanja);
+		map.put("node_path", putanja);
 		map.put("html_page", html_pg);
 		map.put("f_name", name);
 		map.put("is_file", is_file);
@@ -136,22 +137,19 @@ public class EditorBean {
 
 		System.out.println("lang " + language + " res " + reseller);
 
-		HttpGet httpPost = new HttpGet(prepareGetRequest(
-				"http://localhost:8080/helprepo/getSaveStatus", map));
+		HttpGet httpPost = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getSaveStatus", map));
 		try {
 
 			response = httpClient.execute(httpPost);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				responseString = EntityUtils.toString(entity, "UTF-8");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"Info", "Successfully saved!");
+				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Successfully saved!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
 				System.out.println("Uspesno je sacuvao!" + responseString);
 			} else {
 				System.out.println("Nije sklisko");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"Info", "Error!");
+				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Error!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
 			}
 
@@ -170,10 +168,11 @@ public class EditorBean {
 		String responseString = null;
 		HttpResponse response = null;
 
-		map.put("node_path", node.getSelf_href());
+		String putanja = node.getSelf_href().replaceAll("http://localhost:8080/helprepo/documents", "");
+		map.put("node_path", putanja);
 		map.put("language", "English");
 		map.put("reseller", "Centili");
-		System.out.println("ovdje " + node.getContent_href());
+
 		HttpGet httpPost = new HttpGet(node.getContent_href());
 		try {
 
@@ -181,14 +180,12 @@ public class EditorBean {
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				responseString = EntityUtils.toString(entity, "UTF-8");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"Info", "Successfully edited!");
+				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Successfully edited!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
 				System.out.println("Uspesno je !" + responseString);
 			} else {
 				System.out.println("Nije sklisko");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"Info", "Error!");
+				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Error!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
 			}
 
@@ -208,12 +205,10 @@ public class EditorBean {
 		if (params != null && !params.isEmpty()) {
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 			for (Entry<String, String> entry : params.entrySet()) {
-				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry
-						.getValue()));
+				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
 
-			String queryString = URLEncodedUtils
-					.format(nameValuePairs, "UTF-8");
+			String queryString = URLEncodedUtils.format(nameValuePairs, "UTF-8");
 
 			if (url.indexOf("?") == -1) {
 				fullUrl = url + "?" + queryString;
