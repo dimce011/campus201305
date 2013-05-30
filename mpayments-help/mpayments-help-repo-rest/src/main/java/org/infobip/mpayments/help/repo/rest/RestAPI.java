@@ -46,9 +46,9 @@ public interface RestAPI {
 	public Response getDocument(@PathParam("docPath") String docPath, @Context UriInfo ui);
 	
 	@DELETE
-	@Path("/documents/{docPath:.*}/{fieldPars}")
+	@Path("/documents/{docPath:.*}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response delDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars);
+	public Response delDocument(@PathParam("docPath") String docPath,  @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
 	
 	@GET
 	@Path("/documents/{docPath:.*}")
@@ -56,10 +56,10 @@ public interface RestAPI {
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
 	
 	
-	@DELETE
-	@Path("/documents/{docPath:.*}")
-	@Produces(MediaType.TEXT_HTML)
-	public Response delDocument(@PathParam("docPath") String docPath);
+//	@DELETE
+//	@Path("/documents/{docPath:.*}")
+//	@Produces(MediaType.TEXT_HTML)
+//	public Response delDocument(@PathParam("docPath") String docPath);
 	
 //	@GET
 //	@Path("/documents/{docPath:.*}/")

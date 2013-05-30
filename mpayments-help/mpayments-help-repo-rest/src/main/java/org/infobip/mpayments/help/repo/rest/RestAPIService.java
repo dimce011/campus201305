@@ -497,7 +497,7 @@ public class RestAPIService implements RestAPI {
 	}
 
 	@Override
-	public Response delDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars) {
+	public Response delDocument(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
 		Session session = null;
 		Repository repository = null;
 		boolean error = false;
@@ -505,42 +505,40 @@ public class RestAPIService implements RestAPI {
 		OutputStream output = null;
 		String result = null;
 		StringTokenizer stringTokenizer = null;
-		String reseller = null;
-		String language = null;
+		boolean notEmpty = false;
 		boolean notFound = false;
 		// StringBuffer bufferPath = new StringBuffer("");
 		String errorString = "error";
 		System.out.println("POZVANA METODA delDocument");
 		try {
-			System.out.println("field par uri " + fieldPars);
+//			System.out.println("field par uri " + fieldPars);
 
-			if (fieldPars == null) {
-				error = true;
-				fieldPars = "";
-			}
+//			if (fieldPars == null) {
+//				error = true;
+//				fieldPars = "";
+//			}
 
-			if (fieldPars.startsWith("?"))
-				fieldPars = fieldPars.substring(1);
+//			/
 
 			InitialContext initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-			if (!fieldPars.equals("")) {
-				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
-				System.out.println("FIELD PARAMS " + fieldPars);
-				while (stringTokenizer.hasMoreTokens()) {
-					String first = stringTokenizer.nextToken();
-					String second = stringTokenizer.nextToken();
-					if ("reseller".equalsIgnoreCase(first)) {
-						reseller = second;
-						continue;
-					}
-					if ("language".equalsIgnoreCase(first)) {
-						language = second;
-						continue;
-					}
-				}
-			}
+//			if (!fieldPars.equals("")) {
+//				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
+//				System.out.println("FIELD PARAMS " + fieldPars);
+//				while (stringTokenizer.hasMoreTokens()) {
+//					String first = stringTokenizer.nextToken();
+//					String second = stringTokenizer.nextToken();
+//					if ("reseller".equalsIgnoreCase(first)) {
+//						reseller = second;
+//						continue;
+//					}
+//					if ("language".equalsIgnoreCase(first)) {
+//						language = second;
+//						continue;
+//					}
+//				}
+//			}
 
 			if (language == null && reseller == null) {
 				language = "";
@@ -584,6 +582,9 @@ public class RestAPIService implements RestAPI {
 					if (!node.hasNodes()) {
 						node = session.getNode(docPath);
 						node.remove();
+					}else{
+						notEmpty = true;
+						errorString = "Folder not empty!";
 					}
 				} else {
 					notFound = true;
@@ -596,7 +597,11 @@ public class RestAPIService implements RestAPI {
 			res = null;
 			it = null;
 
-		} catch (Exception ex) {
+		}catch (PathNotFoundException ex) {
+			notFound = true;
+			errorString = "Not found!";
+		}
+		catch (Exception ex) {
 			error = true;
 			ex.printStackTrace();
 		} finally {
@@ -608,19 +613,22 @@ public class RestAPIService implements RestAPI {
 		if (notFound) {
 			return Response.status(Response.Status.NOT_FOUND).entity(errorString).build();
 		}
+		if (notEmpty) {
+			return Response.status(Response.Status.BAD_REQUEST).entity(errorString).build();
+		}
 		if (!error) {
-			return Response.status(Response.Status.OK).entity("Deleted node with path: " + docPath + " .").build();
+			return Response.status(Response.Status.OK).entity("Deleted node!").build();
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorString).build();
 		}
-
+				
 	}
 
-	@Override
-	public Response delDocument(@PathParam("docPath") String docPath) {
-		return delDocument(docPath, "");
-	}
-	
+//	@Override
+//	public Response delDocument(@PathParam("docPath") String docPath) {
+//		return delDocument(docPath, "");
+//	}
+//	
 
 	@Override
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
