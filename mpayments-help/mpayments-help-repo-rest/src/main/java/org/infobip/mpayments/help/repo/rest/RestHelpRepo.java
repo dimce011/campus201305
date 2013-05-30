@@ -1,10 +1,10 @@
 package org.infobip.mpayments.help.repo.rest;
 
-import java.net.URI;
-
 import javax.ejb.Local;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -59,10 +59,10 @@ public interface RestHelpRepo {
 			@QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
 
-	@GET
+	@POST
 	@Path("/getSaveStatus")
 	@Produces(MediaType.TEXT_PLAIN)
-	// @Consumes(MediaType.MULTIPART_FORM_DATA)
+   // @Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response getSaveStatus(@QueryParam("node_path") String node_path,
 			@QueryParam("html_page") String html_page,
 			@QueryParam("f_name") String f_name,

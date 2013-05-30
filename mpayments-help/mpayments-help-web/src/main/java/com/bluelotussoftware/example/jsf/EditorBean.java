@@ -18,6 +18,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -126,7 +127,6 @@ public class EditorBean {
 		HttpResponse response = null;
 
 		String putanja = node.getSelf_href().replaceAll("http://localhost:8080/helprepo/documents", "");
-		System.out.println("PUUUUUUTanja" + putanja);
 		map.put("node_path", putanja);
 		map.put("html_page", html_pg);
 		map.put("f_name", name);
@@ -135,9 +135,8 @@ public class EditorBean {
 		map.put("language", language);
 		map.put("reseller", reseller);
 
-		System.out.println("lang " + language + " res " + reseller);
 
-		HttpGet httpPost = new HttpGet(prepareGetRequest("http://localhost:8080/helprepo/getSaveStatus", map));
+		HttpPost httpPost = new HttpPost(prepareGetRequest("http://localhost:8080/helprepo/getSaveStatus", map));
 		try {
 
 			response = httpClient.execute(httpPost);
@@ -146,10 +145,8 @@ public class EditorBean {
 				responseString = EntityUtils.toString(entity, "UTF-8");
 				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Successfully saved!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
-				System.out.println("Uspesno je sacuvao!" + responseString);
 			} else {
-				System.out.println("Nije sklisko");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Error!");
+				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Error while saving!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
 			}
 
@@ -170,8 +167,8 @@ public class EditorBean {
 
 		String putanja = node.getSelf_href().replaceAll("http://localhost:8080/helprepo/documents", "");
 		map.put("node_path", putanja);
-		map.put("language", "English");
-		map.put("reseller", "Centili");
+		//map.put("language", "English");
+		//map.put("reseller", "Centili");
 
 		HttpGet httpPost = new HttpGet(node.getContent_href());
 		try {
@@ -180,12 +177,8 @@ public class EditorBean {
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				responseString = EntityUtils.toString(entity, "UTF-8");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Successfully edited!");
-				FacesContext.getCurrentInstance().addMessage("", msg);
-				System.out.println("Uspesno je !" + responseString);
 			} else {
-				System.out.println("Nije sklisko");
-				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Error!");
+				FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "Error while retrieving document!");
 				FacesContext.getCurrentInstance().addMessage("", msg);
 			}
 
