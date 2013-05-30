@@ -21,7 +21,8 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/test")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-	public Response test(@Context HttpServletRequest request, @QueryParam("action") String action);
+	public Response test(@Context HttpServletRequest request,
+			@QueryParam("action") String action);
 
 	@GET
 	@Path("/sayHello")
@@ -31,7 +32,8 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/document")
 	@Produces(MediaType.TEXT_HTML)
-	public String getDocument(@QueryParam("language") String language, @QueryParam("test") String test);
+	public String getDocument(@QueryParam("language") String language,
+			@QueryParam("test") String test);
 
 	@GET
 	@Path("/testJSON")
@@ -46,22 +48,27 @@ public interface RestHelpRepo {
 	@GET
 	@Path("/root/{path:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
+	public Response getLinksJSON(@PathParam("path") String path,
+			@QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
 
 	@GET
 	@Path("documents/{parent:.*}/children")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
-			@QueryParam("reseller") String reseller);
-	
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
+			@QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+
 	@GET
 	@Path("/getSaveStatus")
 	@Produces(MediaType.TEXT_PLAIN)
 	// @Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response getSaveStatus(@QueryParam("node_path") String node_path, @QueryParam("html_page") String html_page,
-			@QueryParam("f_name") String f_name, @QueryParam("is_file") String is_file,
-			@QueryParam("to_save") String to_save, @QueryParam("language") String language,@QueryParam("reseller") String reseller  ) ;
-			@QueryParam("reseller") String reseller,  @Context UriInfo ui);
+	public Response getSaveStatus(@QueryParam("node_path") String node_path,
+			@QueryParam("html_page") String html_page,
+			@QueryParam("f_name") String f_name,
+			@QueryParam("is_file") String is_file,
+			@QueryParam("to_save") String to_save,
+			@QueryParam("language") String language,
+			@QueryParam("reseller") String reseller);
 
 }
