@@ -72,8 +72,9 @@ a {
 	right: 0;
 	bottom: 0;
 	float: right;
-	padding-left: 13px;
-	margin-right: -15px;
+	/* padding-left: 13px; */
+	/* margin-right: -15px; */
+	overflow: auto;
 	/* border-left-color: #ccc;
 border-left-width: 2px;
 border-left-style: solid; */
