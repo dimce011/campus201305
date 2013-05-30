@@ -133,7 +133,7 @@ public class TreeBeanCvor implements Serializable {
 		// System.out.println("Ispis stringa " + s);
 
 		// HARDCODE
-		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/documents/help?" + params), DocumentCvor.class));
+		setObject(mapper.readValue(getString("http://localhost:8080/helprepo/documents/help/" + params), DocumentCvor.class));
 	}
 
 	public void addChildren(String uri) {
@@ -143,32 +143,32 @@ public class TreeBeanCvor implements Serializable {
 			// List<DocumentCvor> documentCvors =
 			// mapper.readValue(getString(uri), new
 			// List<DocumentCvor>().getClass());
-			for (int i = 0; i < dcw.data.size(); i++) {
+			for (int i = 0; i < dcw.documents.size(); i++) {
 				// System.out.println("TITLE - " + dcw.data.get(i).getTitle() +
 				// " content_href = " + dcw.data.get(i).getContent_href());
 				TreeNode node = null;
 
-				if (dcw.data.get(i).getChildren_href().equals("")) {
-					if (dcw.data.get(i).getContent_href().equals("")) {
-						node = new TreeNodeImpl(TreeNodeType.EMPTY, dcw.data.get(i), selectedNode);
+				if (dcw.documents.get(i).getChildren_href().equals("")) {
+					if (dcw.documents.get(i).getContent_href().equals("")) {
+						node = new TreeNodeImpl(TreeNodeType.EMPTY, dcw.documents.get(i), selectedNode);
 						// System.out.println("TITLE >>> " +
 						// dcw.data.get(i).getTitle() + " TYPE empty>>> " +
 						// node.getType());
 					} else {
-						node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.data.get(i), selectedNode);
+						node = new TreeNodeImpl(TreeNodeType.LEAF, dcw.documents.get(i), selectedNode);
 						// System.out.println("TITLE >>> " +
 						// dcw.data.get(i).getTitle() + " TYPE leaf>>> " +
 						// node.getType());
 					}
 				} else {
-					if (dcw.data.get(i).getContent_href().equals("")) {
-						node = new TreeNodeImpl(TreeNodeType.NODE, dcw.data.get(i), selectedNode);
+					if (dcw.documents.get(i).getContent_href().equals("")) {
+						node = new TreeNodeImpl(TreeNodeType.NODE, dcw.documents.get(i), selectedNode);
 						// System.out.println("TITLE >>> " +
 						// dcw.data.get(i).getTitle() + " TYPE node>>> " +
 						// node.getType());
 						TreeNode fake = new TreeNodeImpl("fake", node);
 					} else {
-						node = new TreeNodeImpl(TreeNodeType.CONTENTFOLDER, dcw.data.get(i), selectedNode);
+						node = new TreeNodeImpl(TreeNodeType.CONTENTFOLDER, dcw.documents.get(i), selectedNode);
 						// System.out.println("TITLE >>> " +
 						// dcw.data.get(i).getTitle() +
 						// " TYPE contentfolder>>> " + node.getType());

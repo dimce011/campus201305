@@ -593,6 +593,7 @@ public class RestAPIService implements RestAPI {
 	public Response delDocument(@PathParam("docPath") String docPath) {
 		return delDocument(docPath, "");
 	}
+	
 
 	@Override
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
@@ -602,6 +603,7 @@ public class RestAPIService implements RestAPI {
 		String result = null;
 		String langResel = "";
 		String fieldPars = "";
+		Map<String, String> mapParameters = new HashMap<String, String>();
 		String docPathShort;
 		try {
 
@@ -612,6 +614,32 @@ public class RestAPIService implements RestAPI {
 				fieldPars = "";
 				docPathShort = docPath;
 			}
+			
+			
+			if (!fieldPars.equals("")) {
+				StringTokenizer stringTokenizer = new StringTokenizer(fieldPars, "&=");
+				System.out.println("FIELD PARAMS " + fieldPars);
+				while (stringTokenizer.hasMoreTokens()) {
+					String first = stringTokenizer.nextToken();
+					String second = stringTokenizer.nextToken();
+					if ("reseller".equalsIgnoreCase(first)) {
+						reseller = second;
+					
+						continue;
+					}
+					if ("language".equalsIgnoreCase(first)) {
+						language = second;
+						
+						continue;
+					}
+					System.out.println(first + " " + second);
+					
+					mapParameters.put(first, second);
+				}
+			}
+			
+			
+			
 			// Map<String, List<String>> callParameters =
 			// ui.getQueryParameters();
 			//
@@ -651,13 +679,13 @@ public class RestAPIService implements RestAPI {
 				reseller = "";
 				// fieldPars += "&reseller=1";
 			}
-
-			if (language != null) {
-				langResel += "language=" + language;
-			}
-			if (reseller != null) {
-				langResel += (language == null ? "reseller=" + reseller : "&reseller=" + reseller);
-			}
+//
+//			if (language != null) {
+//				langResel += "language=" + language;
+//			}
+//			if (reseller != null) {
+//				langResel += (language == null ? "reseller=" + reseller : "&reseller=" + reseller);
+//			}
 
 			openSession();
 			// result = (String) getDocument(docPath, "language=" + language +
@@ -688,7 +716,7 @@ public class RestAPIService implements RestAPI {
 			// + node.getParent().getPath());
 
 			// DocumentCvor dc = new DocumentCvor();
-
+System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
 					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui,language,reseller));
 //<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
@@ -794,9 +822,6 @@ public class RestAPIService implements RestAPI {
 			
 
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
-//=======
-//			dnl = new DocumentCvor(node.getName(), niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
-//>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
 
 			List<Paragraph> lista = new ArrayList<Paragraph>();
