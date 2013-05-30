@@ -316,11 +316,12 @@ public class RestAPIService implements RestAPI {
 		boolean error = false;
 		InputStream input = null;
 		OutputStream output = null;
-		String result = null;
+		String result = "";
 		StringTokenizer stringTokenizer = null;
 		Map<String, Object> mapParameters = new HashMap<String, Object>();
 		String reseller = null;
 		String language = null;
+		boolean hasChild = false;
 		boolean langAndReseller = false;
 		System.out.println("POZVANA METODA getDocument");
 		try {
@@ -436,17 +437,19 @@ public class RestAPIService implements RestAPI {
 					while (nodeIt.hasNext()) {
 						node2 = nodeIt.nextNode();
 						if (node2.isNodeType(NodeType.NT_FILE)) {
+							hasChild = true;
 							break;
 						}
 					}
-				
-					Node content = node2.getNode("jcr:content");
-					input = content.getProperty("jcr:data").getBinary().getStream();
-					result = RestAPIService.getStringFromInputStream(input).toString();
-					
-					if (!mapParameters.isEmpty()) {
-						FreeMarker fm = new FreeMarker();
-						result = fm.process(mapParameters, result);
+					if(hasChild){
+						Node content = node2.getNode("jcr:content");
+						input = content.getProperty("jcr:data").getBinary().getStream();
+						result = RestAPIService.getStringFromInputStream(input).toString();
+
+						if (!mapParameters.isEmpty()) {
+							FreeMarker fm = new FreeMarker();
+							result = fm.process(mapParameters, result);
+						}
 					}
 				}else{
 					node = session.getNode(docPath);
