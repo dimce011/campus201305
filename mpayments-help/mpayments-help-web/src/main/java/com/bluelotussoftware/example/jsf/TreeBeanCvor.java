@@ -316,9 +316,9 @@ public class TreeBeanCvor implements Serializable {
 		if (event.getTreeNode().getType() == TreeNodeType.NODE.getType()
 				|| event.getTreeNode().getType() == TreeNodeType.CONTENTFOLDER.getType()) {
 			System.out.println("NodeSelectEvent Fired");
-			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentCvor) event
-					.getTreeNode().getData()).getTitle());
-			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+//			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", ((DocumentCvor) event
+//					.getTreeNode().getData()).getTitle());
+//			FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 			
 		
 		} else {
@@ -362,8 +362,8 @@ public class TreeBeanCvor implements Serializable {
 		//addChildren("http://localhost:8080/helprepo" + dc.getChildren_href() + "?" +params);
 		addChildren(dc.getChildren_href());
 
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
-		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+//		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Expanded", dc.getTitle());
+//		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 
 	}
 
@@ -376,9 +376,9 @@ public class TreeBeanCvor implements Serializable {
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
 
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentCvor) event
-				.getTreeNode().getData()).getTitle());
-		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
+//		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentCvor) event
+//				.getTreeNode().getData()).getTitle());
+//		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 	}
 
 	private DocumentCvor getObject() {
