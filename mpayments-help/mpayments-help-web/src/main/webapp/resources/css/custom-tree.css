@@ -47,6 +47,7 @@
 	border-left-color: #ccc;
 	border-left-width: 2px;
 	border-left-style: solid;
+	
 }
 
 .ui-widget-content {
@@ -57,12 +58,14 @@
 .json {
 	width: 30%;
 	height: 100%;
-	background: #eee;
+	background-color: white;
 	position: fixed;
 	right: 0;
 	float: right;
 	padding-left: 15px;
 	margin-right: -15px;
-	
+	border-left-color: #ccc;
+	border-left-width: 2px;
+	border-left-style: solid;
 
 }

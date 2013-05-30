@@ -327,8 +327,7 @@ public class TreeBeanCvor implements Serializable {
 
 		}
 		
-		stringA = getString("http://localhost:8080/helprepo/documents"
-				 + ((DocumentCvor)event.getTreeNode().getData()).getSelf_href());
+		stringA = getString(((DocumentCvor)event.getTreeNode().getData()).getSelf_href());
 		
 		System.out.println("Neformatirani " +stringA);
 		
