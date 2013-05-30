@@ -842,15 +842,11 @@ public class RestHelpRepoService implements RestHelpRepo {
 				if (node.isNodeType(NodeType.NT_FILE)) {
 					System.out.println("Nt file Jelena");
 
-					// content = file.addNode("jcr:content", "nt:resource");
 					InputStream stream = new ByteArrayInputStream(
 							html_page.getBytes());
 					Binary binary = session.getValueFactory().createBinary(
 							stream);
-
 					node.setProperty("jcr:data", binary);
-
-					// node.setProperty("jcr:data", html_page);
 					session.save();
 					return Response.status(Response.Status.OK)
 							.entity(node.getPath()).build();
