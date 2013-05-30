@@ -24,16 +24,16 @@
 			<h:outputText value="Reseller: " />
 			<p:selectOneMenu value="#{editorBean.reseller}">
 				<f:selectItem itemLabel="Select One" itemValue="" />
-				<f:selectItem itemLabel="Centili" itemValue="Centili" />
-				<f:selectItem itemLabel="Froggie" itemValue="Froggie" />
+				<f:selectItem itemLabel="Centili" itemValue="centili" />
+				<f:selectItem itemLabel="Froggie" itemValue="frogy" />
 			</p:selectOneMenu>
 			<h:outputText value="Language: " />
 			<p:selectOneMenu value="#{editorBean.language}">
 				<f:selectItem itemLabel="Select One" />
-				<f:selectItem itemLabel="English" itemValue="English" />
-				<f:selectItem itemLabel="Croatian" itemValue="Croatian" />
-				<f:selectItem itemLabel="Serbian" itemValue="Serbian" />
-				<f:selectItem itemLabel="Bosnian" itemValue="Bosnian" />
+				<f:selectItem itemLabel="English" itemValue="en" />
+				<f:selectItem itemLabel="Croatian" itemValue="cro" />
+				<f:selectItem itemLabel="Serbian" itemValue="ser" />
+				<f:selectItem itemLabel="Bosnian" itemValue="bs" />
 
 			</p:selectOneMenu>
 			<p:editor id="editor" value="#{editorBean.page}" resizable="true" />
