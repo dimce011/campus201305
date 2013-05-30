@@ -876,7 +876,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 				}
 			}
 			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
-			dcw.data = children_list;
+			dcw.documents = children_list;
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dcw);
 
 		} catch (PathNotFoundException e1) {

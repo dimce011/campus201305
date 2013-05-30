@@ -4,6 +4,6 @@ import java.util.List;
 
 public class DocumentCvorWrapper {
 	
-	public List<DocumentCvor> data;
+	public List<DocumentCvor> documents;
 
 }

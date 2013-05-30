@@ -339,7 +339,7 @@ public class RestAPIService implements RestAPI {
 		boolean langAndReseller = false;
 		System.out.println("POZVANA METODA getDocument");
 		try {
-			System.out.println("field par uri " + fieldPars);
+			System.out.println("field par uri " + fieldPars + " lang " + language + " res " + reseller);
 			System.out.println("docPath" + docPath);
 
 			if (fieldPars == null) {
@@ -372,6 +372,18 @@ public class RestAPIService implements RestAPI {
 					System.out.println(first + " " + second);
 					mapParameters.put(first, second);
 				}
+			}
+
+			if (language == null) {
+				language = "en";
+			}
+
+			if (language.equals("")) {
+				language = "en";
+			}
+
+			if (reseller == null) {
+				reseller = "";
 			}
 
 			System.out.println("jezik= " + language + " preprodavac= " + reseller);
@@ -447,7 +459,10 @@ public class RestAPIService implements RestAPI {
 					result = RestAPIService.getStringFromInputStream(input).toString();
 				}
 				// error = true;
+<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
 
+=======
+>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 			}
 
 			res = null;
@@ -601,17 +616,68 @@ public class RestAPIService implements RestAPI {
 		InputStream input = null;
 		String result = null;
 		String langResel = "";
+		String fieldPars = "";
+		String docPathShort;
 		try {
-			System.out.println("get jason");
+
+			if (docPath.contains("=")) {
+				fieldPars = docPath.substring(docPath.lastIndexOf("/") + 1, docPath.length());
+				docPathShort = docPath.substring(0, docPath.lastIndexOf("/"));
+			} else {
+				fieldPars = "";
+				docPathShort = docPath;
+			}
+			// Map<String, List<String>> callParameters =
+			// ui.getQueryParameters();
+			//
+			//
+			//
+			// for (Map.Entry<String, List<String>> entry :
+			// callParameters.entrySet()) {
+			// if (entry.getKey().equals("language")) {
+			// language = entry.getValue().get(0);
+			// continue;
+			// }
+			// if (entry.getKey().equals("reseller")) {
+			// reseller = entry.getValue().get(0);
+			// continue;
+			// }
+			//
+			// // callParameters.put(entry.getKey(), entry.getValue().get(0);
+			// fieldPars += entry.getKey() + "=" + entry.getValue().get(0) +
+			// "&";
+			// }
+
+			if (fieldPars.endsWith("&")) {
+				// fieldPars = fieldPars.substring(0, fieldPars.length() - 1);
+			}
+
+			if (fieldPars.startsWith("&")) {
+				// fieldPars = "&"+ fieldPars;
+			}
+
+			System.out.println("get jason " + docPath + " fp " + fieldPars);
+
+			if (language == null) {
+				language = "en";
+				// fieldPars += "&language=en";
+			}
+			if (reseller == null) {
+				reseller = "1";
+				// fieldPars += "&reseller=1";
+			}
+
 			if (language != null) {
-				langResel += "?language=" + language;
+				langResel += "language=" + language;
 			}
 			if (reseller != null) {
-				langResel += (language == null ? "?reseller=" + reseller : "&reseller=" + reseller);
+				langResel += (language == null ? "reseller=" + reseller : "&reseller=" + reseller);
 			}
 
 			openSession();
-			result = (String) getDocument(docPath, "language=" + language + "&reseller=" + reseller, ui).getEntity();
+			// result = (String) getDocument(docPath, "language=" + language +
+			// "&reseller=" + reseller+fieldPars, ui).getEntity();
+			result = (String) getDocument(docPathShort, fieldPars, ui).getEntity();
 
 			System.out.println("get jason novi " + result);
 
@@ -622,13 +688,13 @@ public class RestAPIService implements RestAPI {
 			Map<String, String> paragraphs = new TreeMap<String, String>();
 			for (Element elem : divs) {
 				if (!elem.id().isEmpty()) {
-					paragraphs.put(elem.id(), ui.getBaseUri().toString() + "documents/" + docPath
-							+ "/content/paragraph/" + elem.id() + langResel);
+					paragraphs.put(elem.id(), ui.getBaseUri().toString() + "documents/" + docPathShort
+							+ "/content/paragraph/" + elem.id() + "/" + fieldPars);
 
 				}
 			}
 
-			Node node = session.getNode("/" + docPath);
+			Node node = session.getNode("/" + docPathShort);
 			String[] niz = node.getPath().split("/");
 			// DocumentCvor dc = new DocumentCvor(node.getName(),
 			// niz[1].toUpperCase(), ui.getBaseUri().toString()
@@ -639,7 +705,11 @@ public class RestAPIService implements RestAPI {
 			// DocumentCvor dc = new DocumentCvor();
 
 			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
+<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
 					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui, language, reseller));
+=======
+					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui));
+>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -696,6 +766,7 @@ public class RestAPIService implements RestAPI {
 			node = session.getNode(parent);
 			String[] niz = node.getPath().split("/");
 			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length() - 1);
+//<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
 
 			// ubacivanje title-a
 			String title = null;
@@ -737,6 +808,9 @@ public class RestAPIService implements RestAPI {
 			
 
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
+//=======
+//			dnl = new DocumentCvor(node.getName(), niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
+//>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
 
 			List<Paragraph> lista = new ArrayList<Paragraph>();
