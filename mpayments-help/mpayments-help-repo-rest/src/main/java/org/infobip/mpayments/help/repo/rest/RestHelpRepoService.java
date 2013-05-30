@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.ejb.Stateless;
 import javax.jcr.Binary;
@@ -45,7 +46,10 @@ import javax.jcr.version.VersionException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -739,7 +743,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, String language, String reseller, @Context UriInfo ui) {
+	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller, @Context UriInfo ui) {
 
 		openSession();
 		Node node = null;
@@ -754,6 +758,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 			if (language == null) {
 				language = "en";
 			}
+			
+			System.out.println("fp u getDocumentCvor "+fieldPars);
 
 			if (node.hasProperty("my:title")) {
 				Property p = node.getProperty("my:title");
@@ -787,19 +793,19 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
-					+ node.getPath(), ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
+					+ node.getPath()+"/"+fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
 
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
-					String children_href = node.getPath() + "/children";
+					String children_href = node.getPath() + "/children/"+fieldPars;
 					dnl.setChildren_href(ui.getBaseUri().toString() + "documents" + children_href);
 				} else {
 					dnl.setChildren_href("");
 				}
 
 				if (hasFiles(node)) {
-					String content_href = node.getPath() + "/content";
+					String content_href = node.getPath() + "/content/"+fieldPars;
 					dnl.setContent_href(ui.getBaseUri().toString() + "documents" + content_href);
 				} else {
 					dnl.setContent_href("");
@@ -827,6 +833,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
+
+		
 		String response = null;
 		try {
 			String pom = "/" + path;
@@ -834,7 +842,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 				pom = "/help";
 
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
-					getDocumentCvor(pom, language, reseller, ui));
+					getDocumentCvor(pom, "", language, reseller, ui));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -853,10 +861,43 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent,@PathParam("fieldPars") String fieldPars, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
 		openSession();
+		Map<String, String> mapParameters = new HashMap<String, String>();
+		System.out.println("getChildrenLinksJSON " + fieldPars);
+
+		if (!fieldPars.equals("")) {
+			StringTokenizer stringTokenizer = new StringTokenizer(fieldPars, "&=");
+			System.out.println("FIELD PARAMS " + fieldPars);
+			while (stringTokenizer.hasMoreTokens()) {
+				String first = stringTokenizer.nextToken();
+				String second = stringTokenizer.nextToken();
+				if ("reseller".equalsIgnoreCase(first)) {
+					reseller = second;
+		
+					continue;
+				}
+				if ("language".equalsIgnoreCase(first)) {
+					language = second;
+					
+					continue;
+				}
+				System.out.println(first + " " + second);
+			
+				mapParameters.put(first, second);
+			}
+		}
+		
+		if (reseller == null) {
+			reseller = "1";
+		}
+		if (language == null) {
+			language = "en";
+		}
+		
+		
 		String response = null;
 		Node node = null;
 		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
@@ -867,7 +908,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 					Node subNode = nodeIterator.nextNode();
 
 					if (!subNode.isNodeType("nt:file")) {
-						children_list.add(getDocumentCvor(subNode.getPath(), language, reseller, ui));
+						children_list.add(getDocumentCvor(subNode.getPath(), fieldPars, language, reseller, ui));
 					}
 					// children_list.add(getDocumentCvor(subNode.getPath(),
 					// language, reseller, ui));
@@ -1045,6 +1086,12 @@ public class RestHelpRepoService implements RestHelpRepo {
 			closeSession();
 		}
 		return null;
+	}
+
+	@Override
+	public Response getChildrenLinksJSON2(@PathParam("parent") String parent, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
+		return getChildrenLinksJSON(parent,"",language,reseller,ui);
 	}
 
 }

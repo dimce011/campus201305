@@ -53,11 +53,20 @@ public interface RestHelpRepo {
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
 
 	@GET
-	@Path("documents/{parent:.*}/children")
+	@Path("documents/{parent:.*}/children/{fieldPars}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
+			@PathParam("fieldPars") String fieldPars,
 			@QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+	
+	@GET
+	@Path("documents/{parent:.*}/children/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getChildrenLinksJSON2(@PathParam("parent") String parent,
+			@QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+
 
 	@POST
 	@Path("/getSaveStatus")
