@@ -57,13 +57,13 @@ public class RestAPIService implements RestAPI {
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 
 	@Override
-	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID) {
-		return getParagraph(docPath, parID, "");
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @Context UriInfo ui) {
+		return getParagraph(docPath, parID, "", ui);
 	}
 
 	@Override
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
-			@PathParam("fieldPars") String fieldPars) {
+			@PathParam("fieldPars") String fieldPars, @Context UriInfo ui) {
 
 		Session session = null;
 		Repository repository = null;
@@ -115,7 +115,7 @@ public class RestAPIService implements RestAPI {
 				language = "en";
 			}
 			if (reseller == null) {
-				reseller = "1";
+				reseller = "";
 			}
 
 			System.out.println("ispis mape");
@@ -126,31 +126,16 @@ public class RestAPIService implements RestAPI {
 			if (!docPath.startsWith("/")) {
 				docPath = "/" + docPath;
 			}
-
-			Workspace ws = session.getWorkspace();
-			QueryManager qm = ws.getQueryManager();
-			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
-			QueryResult res = query.execute();
-			NodeIterator it = res.getNodes();
-
-			Node node = null;
-			while (it.hasNext()) {
-				node = it.nextNode();
-			}
-
-			System.out.println("path " + node.getPath());
-			Node content = node.getNode("jcr:content");
-			input = content.getProperty("jcr:data").getBinary().getStream();
-			result = RestAPIService.getStringFromInputStream(input).toString();
-
+			
+			result = getDocument(docPath, fieldPars, ui).getEntity().toString();
+	
 			if (!mapParameters.isEmpty()) {
 				FreeMarker fm = new FreeMarker();
 				result = fm.process(mapParameters, result);
 			}
 
-			res = null;
-			it = null;
+//			res = null;
+//			it = null;
 
 		} catch (Exception ex) {
 			error = true;

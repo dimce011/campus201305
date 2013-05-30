@@ -25,12 +25,12 @@ public interface RestAPI {
 	@GET
 	@Path("/documents/{docPath:.*}/content/paragraph/{parID}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID);
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @Context UriInfo ui);
 
 	@GET
 	@Path("/documents/{docPath:.*}/content/paragraph/{parID}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars);
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars, @Context UriInfo ui);
 	
 	//@Path("/mypath{param1 : (/param1)?}") {fuel : (/fuel/[^/]+)?}
 	@GET
