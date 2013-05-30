@@ -1,6 +1,7 @@
 package org.infobip.mpayments.help.repo.rest;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,16 +22,21 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Value;
+import javax.jcr.Workspace;
 import javax.jcr.lock.LockException;
 import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.nodetype.NodeTypeManager;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryManager;
+import javax.jcr.query.QueryResult;
 import javax.jcr.version.VersionException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -46,13 +52,15 @@ import org.infobip.mpayments.help.dto.DocumentCvor;
 import org.infobip.mpayments.help.dto.DocumentCvorWrapper;
 import org.infobip.mpayments.help.dto.DocumentNode;
 import org.infobip.mpayments.help.repo.rest.vo.TestResponseVO;
+import org.jboss.resteasy.spi.PropertyInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 public class RestHelpRepoService implements RestHelpRepo {
 
-	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
+	static final Logger logger = LoggerFactory
+			.getLogger(RestHelpRepoService.class);
 	private static ObjectMapper jsonMapper = new ObjectMapper();
 
 	Session session = null;
@@ -88,14 +96,16 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// session.save();
 
 			// pravljenje namespace-a
-			NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry();
+			NamespaceRegistry registry = session.getWorkspace()
+					.getNamespaceRegistry();
 
 			List<String> list = Arrays.asList(registry.getPrefixes());
 			if (!list.contains("my")) {
 				registry.registerNamespace("my", "com.infobip.jcr.my");
 			}
 
-			NodeTypeManager manager = session.getWorkspace().getNodeTypeManager();
+			NodeTypeManager manager = session.getWorkspace()
+					.getNodeTypeManager();
 
 			// pravljenje novog tipa cvora sa novim propertijima
 
@@ -193,16 +203,18 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// help.setProperty("my:title", nizHelp);
 			//
 
-			Node pp = session.getNode("/help/pp");
-			pp.addMixin("my:metaFolderData");
-			String[] niz = { "en#centili#Partner panel", "de#centili#Partner Panel", "en#frogy#Partner Panel Frogy" };
-			pp.setProperty("my:title", niz);
-
-			Node cs = session.getNode("/help/cs");
-			cs.addMixin("my:metaFolderData");
-			String[] nizCs = { "en#centili#Customer Support", "de#centili#Customer Support de",
-					"en#frogy#Customer Support Frogy" };
-			cs.setProperty("my:title", nizCs);
+			// Node pp = session.getNode("/help/pp");
+			// pp.addMixin("my:metaFolderData");
+			// String[] niz = { "en#centili#Partner panel",
+			// "de#centili#Partner Panel", "en#frogy#Partner Panel Frogy" };
+			// pp.setProperty("my:title", niz);
+			//
+			// Node cs = session.getNode("/help/cs");
+			// cs.addMixin("my:metaFolderData");
+			// String[] nizCs = { "en#centili#Customer Support",
+			// "de#centili#Customer Support de",
+			// "en#frogy#Customer Support Frogy" };
+			// cs.setProperty("my:title", nizCs);
 
 			// Node wd = session.getNode("/help/wd");
 			// wd.addMixin("my:metaFolderData");
@@ -247,8 +259,18 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// resel.setProperty("my:title", nizResel);
 
 			// ispisiSvuDecu(session.getNode("/"));
-			session.save();
 
+			// rename foldera
+			// Node n = session.getNode("/help/pp");
+			// n.getSession().move(n.getPath(), n.getParent().getPath() +
+			// "/peradetla");
+			// ispisiSvuDecu(session.getNode("/help"));
+			// session.save();
+			// rename contenta
+
+			Node n = session.getNode("/help/wdddd/mncmxnvmxcbvmbxcmvx");
+			n.setProperty("blabal", "m222");
+			System.out.println("promena kontenta");
 			// ispis propertija
 			// Property p = help.getProperty("my:title");
 			// System.out.println(p.getName());
@@ -272,9 +294,11 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 
 		if (!error) {
-			return Response.status(Response.Status.OK).entity(responseVO).build();
+			return Response.status(Response.Status.OK).entity(responseVO)
+					.build();
 		} else {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(responseVO).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(responseVO).build();
 		}
 	}
 
@@ -328,8 +352,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	@Override
 	public String sayHtmlHello() {
-		return "<html> " + "<title>" + "Hello guys" + "</title>" + "<body><h1>" + "Hello guys" + "</body></h1>"
-				+ "</html> ";
+		return "<html> " + "<title>" + "Hello guys" + "</title>" + "<body><h1>"
+				+ "Hello guys" + "</body></h1>" + "</html> ";
 	}
 
 	@Override
@@ -362,11 +386,13 @@ public class RestHelpRepoService implements RestHelpRepo {
 		DocumentNode dn = null;
 		try {
 			String[] niz = node.getPath().split("/");
-			dn = new DocumentNode(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node.getPrimaryNodeType()
-					.getName(), node.getParent().getPath(), node.getPath());
+			dn = new DocumentNode(node.getIdentifier(), node.getName(),
+					niz[1].toUpperCase(), node.getPrimaryNodeType().getName(),
+					node.getParent().getPath(), node.getPath());
 
 			if (node.hasNodes()) {
-				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator
+						.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
 					dn.addChild(createTree(subNode));
 				}
@@ -451,7 +477,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 		// help.addChild(pp);
 		// help.addChild(cs);
 		try {
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(help);
+			response = jsonMapper.defaultPrettyPrintingWriter()
+					.writeValueAsString(help);
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -479,18 +506,22 @@ public class RestHelpRepoService implements RestHelpRepo {
 		try {
 			node = session.getNode("/" + nodePath);
 			String[] niz = node.getPath().split("/");
-			DocumentNode dn = new DocumentNode(node.getIdentifier(), node.getName(), niz[1].toUpperCase(), node
-					.getPrimaryNodeType().getName(), node.getParent().getPath(), node.getPath());
+			DocumentNode dn = new DocumentNode(node.getIdentifier(),
+					node.getName(), niz[1].toUpperCase(), node
+							.getPrimaryNodeType().getName(), node.getParent()
+							.getPath(), node.getPath());
 
 			if (node.hasNodes()) {
-				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator
+						.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
 					DocumentNode dnc = new DocumentNode();
 					dnc.setSelfPath(subNode.getPath());
 					dn.addChild(dnc);
 				}
 			}
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dn);
+			response = jsonMapper.defaultPrettyPrintingWriter()
+					.writeValueAsString(dn);
 
 		} catch (PathNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -518,7 +549,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 		try {
 			initialContext = new InitialContext();
 			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			session = repository.login(new SimpleCredentials("admin", "admin"
+					.toCharArray()));
 			logger.info("SESSION OPENED");
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
@@ -536,7 +568,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, String language, String reseller) {
+	public DocumentCvor getDocumentCvor(String parent, String language,
+			String reseller) {
 		openSession();
 		Node node = null;
 		DocumentCvor dnl = null;
@@ -557,19 +590,22 @@ public class RestHelpRepoService implements RestHelpRepo {
 				Value[] v = p.getValues();
 				for (Value value : v) {
 					String[] mtitle = value.getString().split("#");
-					if (mtitle[0].equals(language) && mtitle[1].equals(reseller)) {
+					if (mtitle[0].equals(language)
+							&& mtitle[1].equals(reseller)) {
 						title = mtitle[2];
 					}
 				}
 			}
 
 			if (title == null) {
-				System.out.println("Node " + node.getName() + " nema odgovarajuci properti");
+				System.out.println("Node " + node.getName()
+						+ " nema odgovarajuci properti");
 				title = node.getName();
 			}
 
 			String[] niz = node.getPath().split("/");
-			dnl = new DocumentCvor(title, niz[1].toUpperCase(), node.getPath(), node.getParent().getPath());
+			dnl = new DocumentCvor(title, niz[1].toUpperCase(), node.getPath(),
+					node.getParent().getPath());
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
@@ -605,15 +641,17 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
+	public Response getLinksJSON(@PathParam("path") String path,
+			@QueryParam("language") String language,
 			@QueryParam("reseller") String reseller) {
 		String response = null;
 		try {
 			String pom = "/" + path;
 			if (pom.equals("/"))
 				pom = "/help";
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
-					getDocumentCvor(pom, language, reseller));
+			response = jsonMapper.defaultPrettyPrintingWriter()
+					.writeValueAsString(
+							getDocumentCvor(pom, language, reseller));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -632,7 +670,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
+			@QueryParam("language") String language,
 			@QueryParam("reseller") String reseller) {
 
 		openSession();
@@ -642,15 +681,18 @@ public class RestHelpRepoService implements RestHelpRepo {
 		try {
 			node = session.getNode("/" + parent);
 			if (node.hasNodes()) {
-				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator
+						.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
-					children_list.add(getDocumentCvor(subNode.getPath(), language, reseller));
+					children_list.add(getDocumentCvor(subNode.getPath(),
+							language, reseller));
 
 				}
 			}
 			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
 			dcw.data = children_list;
-			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dcw);
+			response = jsonMapper.defaultPrettyPrintingWriter()
+					.writeValueAsString(dcw);
 
 		} catch (PathNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -676,7 +718,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	public boolean hasFolder(Node node) throws RepositoryException {
 		openSession();
-		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator
+				.hasNext();) {
 			Node subNode = nodeIterator.nextNode();
 			if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
 				return true;
@@ -687,7 +730,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 	public boolean hasFiles(Node node) throws RepositoryException {
 		openSession();
-		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator
+				.hasNext();) {
 			Node subNode = nodeIterator.nextNode();
 			if (subNode.getPrimaryNodeType().getName().equals("nt:file")) {
 				return true;
@@ -700,58 +744,133 @@ public class RestHelpRepoService implements RestHelpRepo {
 		// TODO Auto-generated method stub
 		return jsonMapper;
 	}
-	
-	
-	
-	
+
 	@Override
-	public Response getSaveStatus(@QueryParam("node_path") String node_path, @QueryParam("html_page") String html_page,
-			@QueryParam("f_name") String f_name, @QueryParam("is_file") String is_file,
-			@QueryParam("to_save") String to_save) {
+	public Response getSaveStatus(@QueryParam("node_path") String node_path,
+			@QueryParam("html_page") String html_page,
+			@QueryParam("f_name") String f_name,
+			@QueryParam("is_file") String is_file,
+			@QueryParam("to_save") String to_save,
+			@QueryParam("language") String language,
+			@QueryParam("reseller") String reseller) {
 		Node node = null;
-		Node f = null;
+		Node file = null;
 		Node content = null;
 		openSession();
 		try {
-			node = session.getNode(node_path);
+
+			if (language == null) {
+				language = "en";
+			}
+
+			if (reseller == null) {
+				reseller = "";
+			}
+
+			if (!node_path.startsWith("/")) {
+				node_path = "/" + node_path;
+			}
+
+			System.out.println("getSaveStatus path " + node_path);
+
+			Workspace ws = session.getWorkspace();
+			QueryManager qm = ws.getQueryManager();
+			Query query = qm.createQuery(
+					"SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
+							+ "' and [my:reseller] = '" + reseller
+							+ "' and ISCHILDNODE([" + node_path + "])",
+					Query.JCR_SQL2);
+			QueryResult res = query.execute();
+			NodeIterator it = res.getNodes();
+
+			if (it.hasNext()) {
+				node = it.nextNode();
+			}
+
+			if (node == null) {
+				node = session.getNode(node_path);
+			}
+
 			if (to_save.equalsIgnoreCase("true")) {
 				if (node.isNodeType(NodeType.NT_FOLDER)) {
 
 					if (is_file.equalsIgnoreCase("true")) {
-						f = node.addNode(f_name.toString() + ".txt", "nt:file");
-						content = f.addNode("jcr:content", "nt:resource");
-						content.setProperty("jcr:data", html_page);
-						// jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(file);
+
+						// Node one = service.addNode("one", NodeType.NT_FILE);
+						// Node content = one.addNode("jcr:content",
+						// "nt:resource");
+
+						// File f = new File("template.ftl");
+						// InputStream stream = new BufferedInputStream(new
+						// FileInputStream(f));
+						// Binary binary =
+						// session.getValueFactory().createBinary(stream);
+						// content.setProperty("jcr:data", binary);
+						//
+
+						file = node.addNode(f_name.toString() + "", "nt:file");
+						file.addMixin("my:metaPageData");
+
+						file.setProperty("my:lang", language);
+						file.setProperty("my:reseller", reseller);
+						content = file.addNode("jcr:content", "nt:resource");
+						InputStream stream = new ByteArrayInputStream(
+								html_page.getBytes());
+						Binary binary = session.getValueFactory().createBinary(
+								stream);
+
+						content.setProperty("jcr:data", binary);
 						session.save();
-						// ispisiSvuDecu(node);
-						return Response.status(Response.Status.OK).entity(content.getName()).build();
+						return Response.status(Response.Status.OK)
+								.entity(content.getName()).build();
 					} else {
-						f = node.addNode(f_name.toString(), "nt:folder");
+						file = node.addNode(f_name.toString(), "nt:folder");
 						session.save();
 						System.out.println("folder je sacuvan");
-						return Response.status(Response.Status.OK).entity(f.getName()).build();
+						return Response.status(Response.Status.OK)
+								.entity(file.getName()).build();
 					}
 				}
 				if (node.isNodeType(NodeType.NT_FILE)) {
 					node.setProperty(f_name, html_page);
 					session.save();
-					return Response.status(Response.Status.OK).entity(node.getPath()).build();
+					return Response.status(Response.Status.OK)
+							.entity(node.getPath()).build();
 				}
 
 			} else if (to_save.equalsIgnoreCase("false")) {
 				if (node.isNodeType(NodeType.NT_FILE)) {
-					node.setProperty("jcr:data", html_page);
+					System.out.println("Nt file Jelena");
+
+					// content = file.addNode("jcr:content", "nt:resource");
+					InputStream stream = new ByteArrayInputStream(
+							html_page.getBytes());
+					Binary binary = session.getValueFactory().createBinary(
+							stream);
+
+					node.setProperty("jcr:data", binary);
+
+					// node.setProperty("jcr:data", html_page);
 					session.save();
-					return Response.status(Response.Status.OK).entity(node.getPath()).build();
+					return Response.status(Response.Status.OK)
+							.entity(node.getPath()).build();
 				} else if (node.isNodeType(NodeType.NT_FOLDER)) {
-					node.getSession().move(node.getPath(), node.getParent().getPath() + "/" + f_name);
+					System.out.println("PATH >>> " + node.getPath()
+							+ " FOLDER_NAME >>> " + f_name + " PARENT PATH >>> "
+							+ node.getParent().getPath());
+					node.getSession().move(node.getPath(),
+							node.getParent().getPath() + "/" + f_name);
 					// session.save();
-					node.getSession().move(node.getPath(), node.getParent().getPath() + "/" + f);
-					return Response.status(Response.Status.OK).entity(node.getParent().getPath()).build();
+					// node.getSession().move(node.getPath(),
+					// node.getParent().getPath() + "/" + file);
+					session.save();
+					return Response.status(Response.Status.OK)
+							.entity(node.getParent().getPath()).build();
 				}
 			} else {
 				System.out.println("Probao je da sacuva.....");
-				return Response.status(Response.Status.NOT_MODIFIED).entity(content).build();
+				return Response.status(Response.Status.NOT_MODIFIED)
+						.entity(content).build();
 			}
 		} catch (ItemExistsException e) {
 			// TODO Auto-generated catch block
@@ -780,5 +899,4 @@ public class RestHelpRepoService implements RestHelpRepo {
 		return null;
 	}
 
-	
 }

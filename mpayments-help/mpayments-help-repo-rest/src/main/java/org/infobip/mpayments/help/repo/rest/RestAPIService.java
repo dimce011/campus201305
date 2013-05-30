@@ -399,10 +399,12 @@ public class RestAPIService implements RestAPI {
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
+			System.out.println(""+it.getSize());
+			
 			Node node = null;
 			if (it.hasNext()) {
 				node = it.nextNode();
-				// System.out.println("path " + node.getPath());
+				System.out.println("path " + node.getPath());
 				Node content = node.getNode("jcr:content");
 				input = content.getProperty("jcr:data").getBinary().getStream();
 				result = RestAPIService.getStringFromInputStream(input).toString();
@@ -412,7 +414,21 @@ public class RestAPIService implements RestAPI {
 					result = fm.process(mapParameters, result);
 				}
 			} else {
-				error = true;
+				node = session.getNode(docPath);
+				System.out.println("trazi samo path "+docPath);
+				NodeIterator nodeIt = node.getNodes();
+				Node node2 = null;
+				if(nodeIt.hasNext())
+					node2 = nodeIt.nextNode();
+				Node content = node2.getNode("jcr:content");
+				input = content.getProperty("jcr:data").getBinary().getStream();
+				result = RestAPIService.getStringFromInputStream(input).toString();
+
+				if (!mapParameters.isEmpty()) {
+					FreeMarker fm = new FreeMarker();
+					result = fm.process(mapParameters, result);
+				}
+				
 			}
 
 			res = null;

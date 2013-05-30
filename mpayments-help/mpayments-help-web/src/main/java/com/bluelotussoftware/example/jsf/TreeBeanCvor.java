@@ -321,8 +321,8 @@ public class TreeBeanCvor implements Serializable {
 		// DocumentCvor dc = (DocumentCvor) event.getTreeNode().getData();
 		// addChildren("http://localhost:8080/helprepo"+dc.getChildren_href());
 		
-	EditorBean.setSelectedDocumentNode((DocumentCvor) event.getTreeNode());
-		
+	EditorBean.setSelectedDocumentNode((DocumentCvor) event.getTreeNode().getData());
+		System.out.println(((DocumentCvor) event.getTreeNode().getData()).title+"setSelectedDocumentNode");
 	}
 
 	/**
@@ -356,7 +356,7 @@ public class TreeBeanCvor implements Serializable {
 	public void onNodeCollapse(NodeCollapseEvent event) {
 		System.out.println("NodeCollapseEvent Fired");
 
-		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentNode) event
+		FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Collapsed", ((DocumentCvor) event
 				.getTreeNode().getData()).getTitle());
 		FacesContext.getCurrentInstance().addMessage(event.getComponent().getId(), msg);
 	}

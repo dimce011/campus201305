@@ -2,7 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:p="http://primefaces.org/ui"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
 <h:head>
 	<title>Custom PrimeFaces Tree</title>
 	<h:outputStylesheet name="custom-tree.css" library="css" />
@@ -13,15 +14,31 @@
 	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
 	<p:dialog id="dlgAddContent" header="HTML file"
 		widgetVar="dlgAddContent" modal="true" resizable="true">
-		<h:panelGrid columns="2" cellpadding="5">
+		<h:panelGrid columns="1" cellpadding="2">
 			<h:outputText value="Insert file name: " />
 			<p:inputText value="#{editorBean.f_name}" id="file_name"
 				required="true" label="file_name" />
+			<h:outputText value="Reseller: " />
+			<p:selectOneMenu value="#{editorBean.reseller}">
+				<f:selectItem itemLabel="Select One" itemValue="" />
+				<f:selectItem itemLabel="Centili" itemValue="Centili" />
+				<f:selectItem itemLabel="Froggie" itemValue="Froggie" />
+			</p:selectOneMenu>
+			<h:outputText value="Language: " />
+			<p:selectOneMenu value="#{editorBean.language}">
+				<f:selectItem itemLabel="Select One" />
+				<f:selectItem itemLabel="English" itemValue="English" />
+				<f:selectItem itemLabel="Croatian" itemValue="Croatian" />
+				<f:selectItem itemLabel="Serbian" itemValue="Serbian" />
+				<f:selectItem itemLabel="Bosnian" itemValue="Bosnian" />
+
+			</p:selectOneMenu>
 			<p:editor id="editor" value="#{editorBean.page}" resizable="true" />
-			<p:commandButton id="saveButton" value="Save" update="growl"
-				actionListener="#{editorBean.saveFile}"
-				oncomplete="dlgAddContent.close())" />
 		</h:panelGrid>
+		<p:commandButton id="saveButton" value="Save" update="growl"
+			actionListener="#{editorBean.saveFile}"
+			oncomplete="dlgAddContent.close())" />
+
 	</p:dialog>
 </h:form>
 <h:form id="formAddFolder">
@@ -42,7 +59,7 @@
 	<p:dialog id="dlgEditContent" header="Edit file content"
 		widgetVar="dlgEditContent" resizable="true" modal="true">
 		<h:panelGrid columns="2" cellpadding="5">
-			<p:editor id="editContent" value="#{node.link}" width="600" />
+			<p:editor id="editContent" value="#{editorBean.content}" width="600" />
 			<p:commandButton id="saveButton" value="Save" update="growl"
 				actionListener="#{editorBean.editContent('true')}" />
 		</h:panelGrid>
@@ -50,10 +67,10 @@
 </h:form>
 <h:form id="formEditFolderName">
 	<p:growl id="growl" showDetail="true" life="3000" autoUpdate="true" />
-	<p:dialog id="dialog" header="Edit folder name"
+	<p:dialog id="dlgEditFolderName" header="Edit folder name"
 		widgetVar="dlgEditFolderName" resizable="false">
 		<h:panelGrid columns="2" cellpadding="5">
-			<p:inputText value="#{editorBean.node_name}" id="f_name" />
+			<p:inputText value="#{editorBean.new_folder_name}" id="f_name" />
 			<p:commandButton id="saveButton" value="Save" update="growl"
 				actionListener="#{editorBean.editContent('false')}" />
 		</h:panelGrid>
@@ -74,7 +91,8 @@
 			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node"
 				dynamic="true" selectionMode="single"
 				selection="#{treeBeanCvor.selectedNode}">
-				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}" />
+				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}"
+					update="tree1" />
 				<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}"
 					update="tree1" />
 				<p:ajax event="collapse" listener="#{treeBeanCvor.onNodeCollapse}" />
@@ -103,15 +121,18 @@
 		</p:panel>
 
 		<p:contextMenu for="tree1">
-			<p:menuitem value="Add content" oncomplete="dlgAddContent.show()" />
-			<p:menuitem value="Add folder" oncomplete="dlgAddFolder.show()" />
-			<p:menuitem value="Edit content" oncomplete="dlgEditContent.show()"
-				target="formEditContent.dlgEditContent.editContent" />
-			<a href="#{node.link}" target="myFrame"> <h:outputText
-					value="#{node.title} (#{node.link})" id="lblNode" />
-			</a>
+			<p:menuitem value="Add content" oncomplete="dlgAddContent.show()"
+				icon="ui-icon-disk" />
+			<p:menuitem value="Add folder" oncomplete="dlgAddFolder.show()"
+				icon="ui-icon-disk" />
+			<p:menuitem value="Edit content"
+				actionListener="#{editorBean.setNodeContent}"
+				update=":formEditContent:dlgEditContent"
+				oncomplete="dlgEditContent.show()" icon="ui-icon-pencil" />
 			<p:menuitem value="Edit folder name"
-				oncomplete="dlgEditFolderName.show()" />
+				actionListener="#{editorBean.setNewFolderName}"
+				update=":formEditFolderName:dlgEditFolderName"
+				oncomplete="dlgEditFolderName.show()" icon="ui-icon-pencil" />
 		</p:contextMenu>
 
 

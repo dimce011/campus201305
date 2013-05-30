@@ -60,5 +60,5 @@ public interface RestHelpRepo {
 	// @Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response getSaveStatus(@QueryParam("node_path") String node_path, @QueryParam("html_page") String html_page,
 			@QueryParam("f_name") String f_name, @QueryParam("is_file") String is_file,
-			@QueryParam("to_save") String to_save);
+			@QueryParam("to_save") String to_save, @QueryParam("language") String language,@QueryParam("reseller") String reseller  ) ;
 }
