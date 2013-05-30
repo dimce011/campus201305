@@ -23,6 +23,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.primefaces.context.RequestContext;
 
 @ManagedBean
 @ViewScoped
@@ -125,8 +126,17 @@ public class EditorBean {
 		Map<String, String> map = new HashMap<String, String>();
 		String responseString = null;
 		HttpResponse response = null;
+		String putanja = "";
 
-		String putanja = node.getSelf_href().replaceAll("http://localhost:8080/helprepo/documents", "");
+		String nodeSelfHref=node.getSelf_href();
+		String link="";
+		if (nodeSelfHref.contains("=")) {
+			link = nodeSelfHref.substring(0,nodeSelfHref.lastIndexOf("/"));
+			putanja = link.replaceAll("http://localhost:8080/helprepo/documents", "");
+		}
+		else {
+			putanja = nodeSelfHref.replaceAll("http://localhost:8080/helprepo/documents", "");
+		}
 		map.put("node_path", putanja);
 		map.put("html_page", html_pg);
 		map.put("f_name", name);
@@ -155,7 +165,6 @@ public class EditorBean {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		return responseString;
 	}
 

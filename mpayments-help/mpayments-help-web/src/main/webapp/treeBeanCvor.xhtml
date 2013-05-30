@@ -51,9 +51,10 @@
 		<h:panelGrid columns="2" cellpadding="5">
 			<p:inputText value="#{editorBean.f_name}" id="folder_name"
 				required="true" label="folder_name" />
-			<p:commandButton id="saveButton" value="Save" update=":form1:tree1" icon="ui-icon-disk"
+			<p:commandButton id="saveButton" value="Save"  icon="ui-icon-disk"
 				actionListener="#{editorBean.saveFolder}"
-				oncomplete="dlgAddFolder.close())" />
+				oncomplete="dlgAddFolder.close())"
+				update=":form1:tree1" />
 		</h:panelGrid>
 	</p:dialog>
 </h:form>
@@ -84,13 +85,13 @@
 <h:body>
 	<title>Help system</title>
 	<h:form id="form1" styleClass="menux">
-		<p:panel id="panel1">
+		<p:panel id="panel1" name="panel1">
 			<p:growl id="growl1" showSummary="true" showDetail="true"
 				autoUpdate="true" />
 
-			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node"
-				dynamic="true" selectionMode="single" cache="false"
-				selection="#{treeBeanCvor.selectedNode}" autoUpdate="true">
+			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node" 
+				dynamic="true" selectionMode="single" 
+				selection="#{treeBeanCvor.selectedNode}" autoUpdate="true"  cache="false"  >
 				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}"
 					update=":form2:label" />
 
