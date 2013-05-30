@@ -5,8 +5,9 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core">
 <h:head>
-	<title>Custom PrimeFaces Tree</title>
 	<h:outputStylesheet name="custom-tree.css" library="css" />
+	<h:outputScript name="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js" library="javascript" />
+	
 </h:head>
 
 
@@ -82,9 +83,9 @@
 
 
 <h:body>
-
+	<title>Help system </title>
 	<h:form id="form1" styleClass="menux">
-		<p:panel id="panel1" header="Custom PrimeFaces Tree 3">
+		<p:panel id="panel1">
 			<p:growl id="growl1" showSummary="true" showDetail="true"
 				autoUpdate="true" />
 
@@ -92,9 +93,11 @@
 				dynamic="true" selectionMode="single"
 				selection="#{treeBeanCvor.selectedNode}">
 				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}"
-					update="tree1" />
+
+					update=":form2:label" />
+
 				<p:ajax event="expand" listener="#{treeBeanCvor.onNodeExpand}"
-					update="tree1" />
+					update=":form2:label" />
 				<p:ajax event="collapse" listener="#{treeBeanCvor.onNodeCollapse}" />
 
 				<p:treeNode type="node" expandedIcon="folder-open"
@@ -120,6 +123,7 @@
 			</p:tree>
 		</p:panel>
 
+
 		<p:contextMenu for="tree1">
 			<p:menuitem value="Add content" oncomplete="dlgAddContent.show()"
 				icon="ui-icon-disk" />
@@ -136,11 +140,18 @@
 		</p:contextMenu>
 
 
+
 	</h:form>
 	<p:outputPanel styleClass="contentx">
 		<iframe name="myFrame" width="680" height="680" />
 	</p:outputPanel>
 
+	<h:form id="form2" styleClass="json">
+		<pre class="prettyprint">
+			<h:outputText id="label" value="#{treeBeanCvor.stringA}"
+				escape="false"  />
+		</pre>
+	</h:form>
 </h:body>
 
 </html>

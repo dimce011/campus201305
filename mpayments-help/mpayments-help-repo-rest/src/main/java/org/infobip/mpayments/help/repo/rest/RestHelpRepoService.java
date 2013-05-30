@@ -43,7 +43,9 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -216,49 +218,59 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// "en#frogy#Customer Support Frogy" };
 			// cs.setProperty("my:title", nizCs);
 
+
 			// Node wd = session.getNode("/help/wd");
 			// wd.addMixin("my:metaFolderData");
-			// String[] nizWd = { "en#centili#World Double",
-			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// String[] nizWd = { "en#centili#Payment Widget",
+			// "de#centili#Zahlung Widget", "en#frogy#Frogy payment widget" };
 			// wd.setProperty("my:title", nizWd);
 			//
 			// Node fi = session.getNode("/help/fi");
 			// fi.addMixin("my:metaFolderData");
-			// String[] nizFi = { "en#centili#Fijat Instant", "de#centili#Bmw",
-			// "en#frogy#Bubble" };
+			// String[] nizFi = { "en#centili#Finance",
+			// "de#centili#Finanzieren",
+			// "en#frogy#Finance frogy" };
 			// fi.setProperty("my:title", nizFi);
 			//
 			// Node ami = session.getNode("/help/ami");
-			// ami.addMixin("my:metaFolderData");
-			// String[] nizAmi = { "en#centili#Amigo",
-			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
-			// ami.setProperty("my:title", nizAmi);
+			// ami.remove();
 			//
 			// Node service = session.getNode("/help/pp/service");
 			// service.addMixin("my:metaFolderData");
-			// String[] nizService = { "en#centili#Partner panel",
-			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			// String[] nizService = { "en#centili#Service",
+			// "de#centili#Dienst", "en#frogy#Service Frogy" };
 			// service.setProperty("my:title", nizService);
+
+			// Node pp = session.getNode("/help/pp");
 			//
 			// Node tran = session.getNode("/help/pp/tran");
-			// tran.addMixin("my:metaFolderData");
-			// String[] nizTran = { "en#centili#Partner panel",
-			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
-			// tran.setProperty("my:title", nizTran);
+			// tran.remove();
+			// Node signUp = pp.addNode("singUp", NodeType.NT_FOLDER);
+			// signUp.addMixin("my:metaFolderData");
+			// String[] nizTran = { "en#centili#Sign Up", "de#centili#Anmelden",
+			// "en#frogy#Sign up Frogy" };
+			// signUp.setProperty("my:title", nizTran);
 			//
 			// Node sals = session.getNode("/help/pp/sals");
-			// sals.addMixin("my:metaFolderData");
-			// String[] nizSals = { "en#centili#Partner panel",
-			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
-			// sals.setProperty("my:title", nizSals);
+			// sals.remove();
+			// Node login = pp.addNode("login", NodeType.NT_FOLDER);
+			// login.addMixin("my:metaFolderData");
+			// String[] nizSals = { "en#centili#Login", "de#centili#Anmelden",
+			// "en#frogy#Login Frogy" };
+			// login.setProperty("my:title", nizSals);
 			//
 			// Node resel = session.getNode("/help/pp/resel");
-			// resel.addMixin("my:metaFolderData");
-			// String[] nizResel = { "en#centili#Partner panel",
-			// "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
-			// resel.setProperty("my:title", nizResel);
-
+			// resel.remove();
+			// Node profile = pp.addNode("profile", NodeType.NT_FOLDER);
+			// profile.addMixin("my:metaFolderData");
+			// String[] nizResel = { "en#centili#Profile", "de#centili#Profil",
+			// "en#frogy#Profile Frogy" };
+			// profile.setProperty("my:title", nizResel);
+			//
 			// ispisiSvuDecu(session.getNode("/"));
+
+			// session.save();
+
 
 			// rename foldera
 			// Node n = session.getNode("/help/pp");
@@ -268,9 +280,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// session.save();
 			// rename contenta
 
-			Node n = session.getNode("/help/wdddd/mncmxnvmxcbvmbxcmvx");
-			n.setProperty("blabal", "m222");
-			System.out.println("promena kontenta");
+		
 			// ispis propertija
 			// Property p = help.getProperty("my:title");
 			// System.out.println(p.getName());
@@ -283,6 +293,25 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// for (String string : stringList) {
 			// System.out.println(string);
 			// }
+
+			// ubacivanje fajla u pp folder
+//			Node one = session.getNode("/help/pp").addNode("one", NodeType.NT_FILE);
+//			Node content = one.addNode("jcr:content", "nt:resource");
+//			one.addMixin("my:metaPageData");
+//
+//			one.setProperty("my:lang", "en");
+//			one.setProperty("my:reseller", "centili");
+//
+//			/**
+//			 * add template file
+//			 */
+//			File f = new File("templatePP.ftl");
+//			InputStream stream = new BufferedInputStream(new FileInputStream(f));
+//			Binary binary = session.getValueFactory().createBinary(stream);
+//			content.setProperty("jcr:data", binary);
+
+			ispisiSvuDecu(session.getNode("/"));
+			session.save();
 
 		} catch (Exception ex) {
 			error = true;
@@ -568,8 +597,9 @@ public class RestHelpRepoService implements RestHelpRepo {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, String language,
-			String reseller) {
+
+	public DocumentCvor getDocumentCvor(String parent, String language, String reseller, @Context UriInfo ui) {
+
 		openSession();
 		Node node = null;
 		DocumentCvor dnl = null;
@@ -577,22 +607,32 @@ public class RestHelpRepoService implements RestHelpRepo {
 			node = session.getNode(parent);
 			String title = null;
 
-			if (reseller.equals("")) {
+			if (reseller==null) {
 				reseller = "centili";
 			}
-			if (language.equals("")) {
+			if (language==null) {
 				language = "en";
 			}
 
 			if (node.hasProperty("my:title")) {
-				System.out.println("Node " + node.getName() + " ima properti");
 				Property p = node.getProperty("my:title");
 				Value[] v = p.getValues();
 				for (Value value : v) {
 					String[] mtitle = value.getString().split("#");
-					if (mtitle[0].equals(language)
-							&& mtitle[1].equals(reseller)) {
-						title = mtitle[2];
+
+					if (mtitle[1].equals(reseller)) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+					} else if (mtitle[1].equals("centili")) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+
 					}
 				}
 			}
@@ -604,20 +644,21 @@ public class RestHelpRepoService implements RestHelpRepo {
 			}
 
 			String[] niz = node.getPath().split("/");
-			dnl = new DocumentCvor(title, niz[1].toUpperCase(), node.getPath(),
-					node.getParent().getPath());
+
+			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents" + node.getPath(), ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
+
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
 					String children_href = node.getPath() + "/children";
-					dnl.setChildren_href(children_href);
+					dnl.setChildren_href(ui.getBaseUri().toString() + "documents" + children_href);
 				} else {
 					dnl.setChildren_href("");
 				}
 
 				if (hasFiles(node)) {
 					String content_href = node.getPath() + "/content";
-					dnl.setContent_href(content_href);
+					dnl.setContent_href(ui.getBaseUri().toString() + "documents" + content_href);
 				} else {
 					dnl.setContent_href("");
 				}
@@ -641,17 +682,19 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getLinksJSON(@PathParam("path") String path,
-			@QueryParam("language") String language,
-			@QueryParam("reseller") String reseller) {
+
+	public Response getLinksJSON(@PathParam("path") String path, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
+
 		String response = null;
 		try {
 			String pom = "/" + path;
 			if (pom.equals("/"))
 				pom = "/help";
-			response = jsonMapper.defaultPrettyPrintingWriter()
-					.writeValueAsString(
-							getDocumentCvor(pom, language, reseller));
+
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
+					getDocumentCvor(pom, language, reseller, ui));
+
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -670,9 +713,10 @@ public class RestHelpRepoService implements RestHelpRepo {
 	}
 
 	@Override
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
-			@QueryParam("language") String language,
-			@QueryParam("reseller") String reseller) {
+
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
+
 
 		openSession();
 		String response = null;
@@ -684,8 +728,12 @@ public class RestHelpRepoService implements RestHelpRepo {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator
 						.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
-					children_list.add(getDocumentCvor(subNode.getPath(),
-							language, reseller));
+
+					if (!subNode.isNodeType("nt:file")){
+						children_list.add(getDocumentCvor(subNode.getPath(), language, reseller, ui));
+					}
+					//children_list.add(getDocumentCvor(subNode.getPath(), language, reseller, ui));
+
 
 				}
 			}

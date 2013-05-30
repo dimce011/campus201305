@@ -2,17 +2,20 @@ package com.bluelotussoftware.example.jsf;
 
 import java.util.List;
 
-
-
 public class DocumentCvor {
-
 	String title;
 	String category;
 	String self_href;
 	String parent_href;
+
 	String children_href;
 	String content_href;
-	List <Paragraph> list;
+	List <Paragraph> paragraphs;
+	
+	
+
+	
+	
 
 	public DocumentCvor() {
 
@@ -24,9 +27,11 @@ public class DocumentCvor {
 		this.category = category;
 		this.self_href = self_href;
 		this.parent_href = parent_href;
-		// this.content_href = content_href;
+		//this.content_href = content_href;
 		// this.children_href = children_href;
 	}
+	
+
 
 	public String getTitle() {
 		return title;
@@ -73,20 +78,17 @@ public class DocumentCvor {
 	}
 
 	public void setContent_href(String content_href) {
-		if (content_href.equals("")) {
-			this.content_href = content_href;
-		} else {
-			this.content_href = "http://localhost:8080/helprepo/documents" + content_href;
-		}
+		this.content_href = content_href;
 	}
 	
-	public List<Paragraph> getList() {
-		return list;
+	public List<Paragraph> getParagraphs() {
+		return paragraphs;
 	}
 
-	public void setList(List<Paragraph> list) {
-		this.list = list;
+	public void setParagraphs(List<Paragraph> paragraphs) {
+		this.paragraphs = paragraphs;
 	}
 
 
+	
 }

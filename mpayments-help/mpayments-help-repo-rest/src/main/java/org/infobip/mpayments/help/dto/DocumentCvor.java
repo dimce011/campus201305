@@ -10,7 +10,7 @@ public class DocumentCvor {
 
 	String children_href;
 	String content_href;
-	List <Paragraph> list;
+	List <Paragraph> paragraphs;
 	
 	
 
@@ -81,12 +81,12 @@ public class DocumentCvor {
 		this.content_href = content_href;
 	}
 	
-	public List<Paragraph> getList() {
-		return list;
+	public List<Paragraph> getParagraphs() {
+		return paragraphs;
 	}
 
-	public void setList(List<Paragraph> list) {
-		this.list = list;
+	public void setParagraphs(List<Paragraph> paragraphs) {
+		this.paragraphs = paragraphs;
 	}
 
 
