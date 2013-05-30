@@ -92,6 +92,14 @@ public class RestHelpRepoService implements RestHelpRepo {
 				deleteHelpTree("/help");
 			} else if ("create".equals(action)) {
 				createHelpTree();
+			} else if ("createproperty".equals(action)) {
+				createProperty();
+			} else if ("createnamespace".equals(action)) {
+				createNamespace();
+			} else if ("createall".equals(action)) {
+				createNamespace();
+				createProperty();
+				createHelpTree();
 			}
 
 			ispisiSvuDecu(session.getNode("/"));
@@ -99,15 +107,23 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// session.save();
 
 			// pravljenje namespace-a
+
 			// NamespaceRegistry registry = session.getWorkspace()
 			// .getNamespaceRegistry();
+
+			// NamespaceRegistry registry =
+			// session.getWorkspace().getNamespaceRegistry();
+
 
 			// List<String> list = Arrays.asList(registry.getPrefixes());
 			// if (!list.contains("my")) {
 			// registry.registerNamespace("my", "com.infobip.jcr.my");
 			// }
 
-			NodeTypeManager manager = session.getWorkspace().getNodeTypeManager();
+
+			//NodeTypeManager manager = session.getWorkspace()
+			//		.getNodeTypeManager();
+
 
 			// pravljenje novog tipa cvora sa novim propertijima
 
@@ -328,6 +344,73 @@ public class RestHelpRepoService implements RestHelpRepo {
 		}
 	}
 
+	private void createNamespace() throws RepositoryException {
+		// TODO Auto-generated method stub
+		NamespaceRegistry registry = session.getWorkspace().getNamespaceRegistry();
+
+		List<String> list = Arrays.asList(registry.getPrefixes());
+		if (!list.contains("my")) {
+			registry.registerNamespace("my", "com.infobip.jcr.my");
+		}
+
+		// pravljenje novog tipa cvora sa novim propertijima
+
+		NamespaceRegistry nsReg = (NamespaceRegistry) session.getWorkspace().getNamespaceRegistry();
+		nsReg.registerNamespace("my", "com.infobip.jcr.my");
+	}
+
+	private void createProperty() throws RepositoryException {
+		// TODO Auto-generated method stub
+		NodeTypeManager manager = session.getWorkspace().getNodeTypeManager();
+		NodeTypeTemplate nodeType = manager.createNodeTypeTemplate();
+		nodeType.setMixin(true);
+		nodeType.setName("my:metaPageData");
+		nodeType.setQueryable(true);
+		nodeType.setDeclaredSuperTypeNames(new String[] { "mix:title" });
+		System.out.println("ovde1");
+
+		NodeTypeTemplate nodeType2 = manager.createNodeTypeTemplate();
+		nodeType2.setMixin(true);
+		nodeType2.setName("my:metaFolderData");
+		nodeType2.setQueryable(true);
+		nodeType2.setDeclaredSuperTypeNames(new String[] { "mix:title" });
+
+		PropertyDefinitionTemplate propertyDef = manager.createPropertyDefinitionTemplate();
+		propertyDef.setName("my:lang");
+		propertyDef.setMultiple(false);
+		propertyDef.setRequiredType(PropertyType.STRING);
+		propertyDef.setOnParentVersion(OnParentVersionAction.COPY);
+		propertyDef.setProtected(false);
+		System.out.println("ovde2");
+
+		PropertyDefinitionTemplate propertyDef2 = manager.createPropertyDefinitionTemplate();
+		propertyDef2.setName("my:reseller");
+		propertyDef2.setMultiple(false);
+		propertyDef2.setRequiredType(PropertyType.STRING);
+		propertyDef2.setOnParentVersion(OnParentVersionAction.COPY);
+		propertyDef2.setProtected(false);
+		System.out.println("ovde2");
+
+		PropertyDefinitionTemplate propertyDef3 = manager.createPropertyDefinitionTemplate();
+		propertyDef3.setName("my:title");
+		propertyDef3.setMultiple(true);
+		propertyDef3.setRequiredType(PropertyType.STRING);
+		propertyDef3.setOnParentVersion(OnParentVersionAction.COPY);
+		propertyDef3.setProtected(false);
+		propertyDef3.setMandatory(false);
+		System.out.println("ovde MPM");
+
+		nodeType.getPropertyDefinitionTemplates().add(propertyDef);
+		nodeType.getPropertyDefinitionTemplates().add(propertyDef2);
+		nodeType2.getPropertyDefinitionTemplates().add(propertyDef3);
+
+		manager.registerNodeType(nodeType, true);
+		manager.registerNodeType(nodeType2, true);
+		session.save();
+		ispisiSvuDecu(session.getNode("/"));
+
+	}
+
 	private void createHelpTree() {
 		try {
 			Node root = session.getRootNode();
@@ -337,17 +420,11 @@ public class RestHelpRepoService implements RestHelpRepo {
 			Node cs = help.addNode("cs", NodeType.NT_FOLDER);
 			Node wd = help.addNode("wd", NodeType.NT_FOLDER);
 			Node fi = help.addNode("fi", NodeType.NT_FOLDER);
-			Node ami = help.addNode("ami", NodeType.NT_FOLDER);
 
 			Node service = pp.addNode("service", NodeType.NT_FOLDER);
-			Node tran = pp.addNode("tran", NodeType.NT_FOLDER);
-			Node sals = pp.addNode("sals", NodeType.NT_FOLDER);
-			Node resel = pp.addNode("resel", NodeType.NT_FOLDER);
-
 			Node one = service.addNode("one", NodeType.NT_FILE);
 			Node content = one.addNode("jcr:content", "nt:resource");
 			one.addMixin("my:metaPageData");
-
 			one.setProperty("my:lang", "en");
 			one.setProperty("my:reseller", "1");
 
@@ -358,6 +435,81 @@ public class RestHelpRepoService implements RestHelpRepo {
 			InputStream stream = new BufferedInputStream(new FileInputStream(f));
 			Binary binary = session.getValueFactory().createBinary(stream);
 			content.setProperty("jcr:data", binary);
+
+			// dodavanje title propertija
+			help.addMixin("my:metaFolderData");
+			String[] nizHelp = { "en#centili#Partner panel", "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			help.setProperty("my:title", nizHelp);
+
+			pp.addMixin("my:metaFolderData");
+			String[] niz = { "en#centili#Partner panel", "de#centili#Partner Panel", "en#frogy#Partner Panel Frogy" };
+			pp.setProperty("my:title", niz);
+
+			cs.addMixin("my:metaFolderData");
+			String[] nizCs = { "en#centili#Customer Support", "de#centili#Customer Support de",
+					"en#frogy#Customer Support Frogy" };
+			cs.setProperty("my:title", nizCs);
+
+			wd.addMixin("my:metaFolderData");
+			String[] nizWd = { "en#centili#Payment Widget", "de#centili#Zahlung Widget",
+					"en#frogy#Frogy payment widget" };
+			wd.setProperty("my:title", nizWd);
+
+			fi.addMixin("my:metaFolderData");
+			String[] nizFi = { "en#centili#Finance", "de#centili#Finanzieren", "en#frogy#Finance frogy" };
+			fi.setProperty("my:title", nizFi);
+
+			service.addMixin("my:metaFolderData");
+			String[] nizService = { "en#centili#Service", "de#centili#Dienst", "en#frogy#Service Frogy" };
+			service.setProperty("my:title", nizService);
+
+			// dodavanje dece sa propertijima u pp
+			Node signUp = pp.addNode("signup", NodeType.NT_FOLDER);
+			signUp.addMixin("my:metaFolderData");
+			String[] nizTran = { "en#centili#Sign Up", "de#centili#Anmelden", "en#frogy#Sign up Frogy" };
+			signUp.setProperty("my:title", nizTran);
+
+			Node login = pp.addNode("login", NodeType.NT_FOLDER);
+			login.addMixin("my:metaFolderData");
+			String[] nizSals = { "en#centili#Login", "de#centili#Anmelden", "en#frogy#Login Frogy" };
+			login.setProperty("my:title", nizSals);
+
+			Node profile = pp.addNode("profile", NodeType.NT_FOLDER);
+			profile.addMixin("my:metaFolderData");
+			String[] nizResel = { "en#centili#Profile", "de#centili#Profil", "en#frogy#Profile Frogy" };
+			profile.setProperty("my:title", nizResel);
+
+			// ubacivanje fajla u pp folder
+			Node onepp = pp.addNode("one", NodeType.NT_FILE);
+			Node contentpp = onepp.addNode("jcr:content", "nt:resource");
+			onepp.addMixin("my:metaPageData");
+
+			onepp.setProperty("my:lang", "en");
+			onepp.setProperty("my:reseller", "");
+
+			/**
+			 * add template file
+			 */
+			File fpp = new File("templatePP.ftl");
+			InputStream streampp = new BufferedInputStream(new FileInputStream(fpp));
+			Binary binarypp = session.getValueFactory().createBinary(streampp);
+			contentpp.setProperty("jcr:data", binarypp);
+
+			// ubacivanje fajla u signUp folder
+			Node onesu = signUp.addNode("one", NodeType.NT_FILE);
+			Node contentsu = onesu.addNode("jcr:content", "nt:resource");
+			onesu.addMixin("my:metaPageData");
+
+			onesu.setProperty("my:lang", "en");
+			onesu.setProperty("my:reseller", "centili");
+
+			/**
+			 * add template file
+			 */
+			File fsu = new File("signup.ftl");
+			InputStream streamsu = new BufferedInputStream(new FileInputStream(fsu));
+			Binary binarysu = session.getValueFactory().createBinary(streamsu);
+			contentsu.setProperty("jcr:data", binarysu);
 
 		} catch (RepositoryException e) {
 			e.printStackTrace();
@@ -632,8 +784,10 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 			String[] niz = node.getPath().split("/");
 
+
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
 					+ node.getPath(), ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
+
 
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
@@ -716,6 +870,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 					}
 					// children_list.add(getDocumentCvor(subNode.getPath(),
 					// language, reseller, ui));
+
 
 				}
 			}

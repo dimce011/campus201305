@@ -19,10 +19,12 @@ import javax.jcr.LoginException;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.Value;
 import javax.jcr.Workspace;
 import javax.jcr.nodetype.NodeType;
 import javax.jcr.query.Query;
@@ -178,42 +180,44 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
-//	public Response getDocuments(@PathParam("id") String id) {
-//		Session session = null;
-//		Repository repository = null;
-//		boolean error = false;
-//		InputStream input = null;
-//		OutputStream output = null;
-//		String result = null;
-//		System.out.println("POZVANA METODA getDocuments");
-//		try {
-//			InitialContext initialContext = new InitialContext();
-//			repository = (Repository) initialContext.lookup("java:jcr/local");
-//			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-//
-//			Node en = session.getNode("/help/pp/service/1/en");
-//			Node target = session.getNodeByIdentifier(en.getIdentifier());
-//
-//			printChildren(session.getNode("/"));
-//			Node content = target.getNode("jcr:content");
-//			input = content.getProperty("jcr:data").getBinary().getStream();
-//			result = RestAPIService.getStringFromInputStream(input).toString();
-//
-//		} catch (Exception ex) {
-//			error = true;
-//			ex.printStackTrace();
-//		} finally {
-//			if (session != null)
-//				session.logout();
-//			closeStreams(input, output);
-//		}
-//
-//		if (!error) {
-//			return Response.status(Response.Status.OK).entity(result).build();
-//		} else {
-//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-//		}
-//	}
+	// public Response getDocuments(@PathParam("id") String id) {
+	// Session session = null;
+	// Repository repository = null;
+	// boolean error = false;
+	// InputStream input = null;
+	// OutputStream output = null;
+	// String result = null;
+	// System.out.println("POZVANA METODA getDocuments");
+	// try {
+	// InitialContext initialContext = new InitialContext();
+	// repository = (Repository) initialContext.lookup("java:jcr/local");
+	// session = repository.login(new SimpleCredentials("admin",
+	// "admin".toCharArray()));
+	//
+	// Node en = session.getNode("/help/pp/service/1/en");
+	// Node target = session.getNodeByIdentifier(en.getIdentifier());
+	//
+	// printChildren(session.getNode("/"));
+	// Node content = target.getNode("jcr:content");
+	// input = content.getProperty("jcr:data").getBinary().getStream();
+	// result = RestAPIService.getStringFromInputStream(input).toString();
+	//
+	// } catch (Exception ex) {
+	// error = true;
+	// ex.printStackTrace();
+	// } finally {
+	// if (session != null)
+	// session.logout();
+	// closeStreams(input, output);
+	// }
+	//
+	// if (!error) {
+	// return Response.status(Response.Status.OK).entity(result).build();
+	// } else {
+	// return
+	// Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
+	// }
+	// }
 
 	// za staro drvo
 	// @Override
@@ -410,12 +414,12 @@ public class RestAPIService implements RestAPI {
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
-			System.out.println(""+it.getSize());
+			//System.out.println(""+it.getSize());
 			
 			Node node = null;
 			if (it.hasNext()) {
 				node = it.nextNode();
-				System.out.println("path " + node.getPath());
+				//System.out.println("path " + node.getPath());
 				Node content = node.getNode("jcr:content");
 				input = content.getProperty("jcr:data").getBinary().getStream();
 				result = RestAPIService.getStringFromInputStream(input).toString();
@@ -426,7 +430,7 @@ public class RestAPIService implements RestAPI {
 				}
 			} else {
 
-				System.out.println("else page "+langAndReseller+ " "+docPath);
+				System.out.println("else page " + langAndReseller + " " + docPath);
 				if (!langAndReseller) {
 					node = session.getNode(docPath);
 					System.out.println("trazi samo path " + docPath);
@@ -442,7 +446,7 @@ public class RestAPIService implements RestAPI {
 					input = content.getProperty("jcr:data").getBinary().getStream();
 					result = RestAPIService.getStringFromInputStream(input).toString();
 				}
-				//error = true;
+				// error = true;
 
 			}
 
@@ -609,10 +613,10 @@ public class RestAPIService implements RestAPI {
 			openSession();
 			result = (String) getDocument(docPath, "language=" + language + "&reseller=" + reseller, ui).getEntity();
 
-			System.out.println("get jason novi " +result );
+			System.out.println("get jason novi " + result);
 
-			if(result == null)
-				result ="";
+			if (result == null)
+				result = "";
 			Document doc = Jsoup.parse(result);
 			Elements divs = doc.getElementsByTag("div");
 			Map<String, String> paragraphs = new TreeMap<String, String>();
@@ -623,18 +627,19 @@ public class RestAPIService implements RestAPI {
 
 				}
 			}
-			
 
 			Node node = session.getNode("/" + docPath);
 			String[] niz = node.getPath().split("/");
-//			DocumentCvor dc = new DocumentCvor(node.getName(), niz[1].toUpperCase(), ui.getBaseUri().toString()
-//					+ "/documents" + node.getPath(), ui.getBaseUri().toString() + "/documents"
-//					+ node.getParent().getPath());
+			// DocumentCvor dc = new DocumentCvor(node.getName(),
+			// niz[1].toUpperCase(), ui.getBaseUri().toString()
+			// + "/documents" + node.getPath(), ui.getBaseUri().toString() +
+			// "/documents"
+			// + node.getParent().getPath());
 
 			// DocumentCvor dc = new DocumentCvor();
 
 			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
-					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui));
+					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui, language, reseller));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -681,7 +686,8 @@ public class RestAPIService implements RestAPI {
 		session.logout();
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui) {
+	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui,
+			String language, String reseller) {
 		openSession();
 		logger.info("PARENT: {}", parent);
 		Node node = null;
@@ -689,8 +695,48 @@ public class RestAPIService implements RestAPI {
 		try {
 			node = session.getNode(parent);
 			String[] niz = node.getPath().split("/");
-			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length()-1);
-			dnl = new DocumentCvor(node.getName(), niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
+			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length() - 1);
+
+			// ubacivanje title-a
+			String title = null;
+
+			if (reseller==null) {
+				reseller = "centili";
+			}
+			if (language==null) {
+				language = "en";
+			}
+
+			if (node.hasProperty("my:title")) {
+				Property p = node.getProperty("my:title");
+				Value[] v = p.getValues();
+				for (Value value : v) {
+					String[] mtitle = value.getString().split("#");
+
+					if (mtitle[1].equals(reseller)) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+					} else if (mtitle[1].equals("centili")) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+					}
+				}
+			}
+
+			if (title == null) {
+				System.out.println("Node " + node.getName() + " nema odgovarajuci properti");
+				title = node.getName();
+			}
+
+			
+
+			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
 					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
 
 			List<Paragraph> lista = new ArrayList<Paragraph>();
