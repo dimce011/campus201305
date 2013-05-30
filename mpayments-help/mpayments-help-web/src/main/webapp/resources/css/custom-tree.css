@@ -8,6 +8,10 @@ body {
 	margin: 0px;
 }
 
+a {
+	text-decoration: none;
+}
+
 .folder-open {
 	background:
 		url('#{facesContext.externalContext.requestContextPath}/resources/images/node-select16x16.png')
@@ -91,16 +95,15 @@ border-left-style: solid; */
 	border-radius: 0px;
 }
 
-.ui-treenode-label.ui-corner-all.ui-state-highlight, .ui-state-highlight a, .ui-widget-content .ui-state-highlight a, .ui-widget-header .ui-state-highlight a{
+.ui-treenode-label.ui-corner-all.ui-state-highlight,.ui-state-highlight a,.ui-widget-content .ui-state-highlight a,.ui-widget-header .ui-state-highlight a
+	{
 	background: rgb(48, 48, 48);
-	color: rgb(255,102, 0);
+	color: rgb(255, 102, 0);
 }
-
-
 
 .ui-treenode-label.ui-corner-all.ui-state-highlight {
 	background: rgb(48, 48, 48);
-	color: rgb(255,102, 0);
+	color: rgb(255, 102, 0);
 	-moz-border-radius: 0px;
 	-webkit-border-radius: 0px;
 	border-radius: 0px;
