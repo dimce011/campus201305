@@ -4,23 +4,32 @@
     Author     : John Yeary <jyeary@bluelotussoftware.com>
     Description: Custom CSS for modifying icons on a PrimeFaces tree component.
 */
+body {
+	margin: 0px;
+}
 
 .folder-open {
-    background: url('#{facesContext.externalContext.requestContextPath}/resources/images/node-select16x16.png')!important;
-    height: 16px;
-    width: 16px;
+	background:
+		url('#{facesContext.externalContext.requestContextPath}/resources/images/node-select16x16.png')
+		!important;
+	height: 16px;
+	width: 16px;
 }
 
 .folder-collapsed {
-    background: url('#{facesContext.externalContext.requestContextPath}/resources/images/node16x16.png')!important;
-    height: 16px;
-    width: 16px;
+	background:
+		url('#{facesContext.externalContext.requestContextPath}/resources/images/node16x16.png')
+		!important;
+	height: 16px;
+	width: 16px;
 }
 
 .document-node {
-    background: url('#{facesContext.externalContext.requestContextPath}/resources/images/document-node16x16.png')!important;
-    height: 16px;
-    width: 16px;
+	background:
+		url('#{facesContext.externalContext.requestContextPath}/resources/images/document-node16x16.png')
+		!important;
+	height: 16px;
+	width: 16px;
 }
 
 .menux {
@@ -47,25 +56,52 @@
 	border-left-color: #ccc;
 	border-left-width: 2px;
 	border-left-style: solid;
-	
-}
-
-.ui-widget-content {
-	border:none;
-
 }
 
 .json {
 	width: 30%;
 	height: 100%;
-	background-color: white;
+	background-color: rgb(48, 48, 48);
 	position: fixed;
 	right: 0;
 	float: right;
-	padding-left: 15px;
+	padding-left: 13px;
 	margin-right: -15px;
-	border-left-color: #ccc;
-	border-left-width: 2px;
-	border-left-style: solid;
+	/* border-left-color: #ccc;
+border-left-width: 2px;
+border-left-style: solid; */
+	color: rgb(255, 102, 0);
+}
 
+.ui-widget {
+	font-size: 1em;
+}
+
+.ui-widget-content {
+	border: none;
+}
+
+.ui-treenode-label.ui-corner-all.ui-state-hover {
+	background: rgb(255, 102, 0);
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+
+.ui-treenode-label.ui-corner-all.ui-state-highlight, .ui-state-highlight a, .ui-widget-content .ui-state-highlight a, .ui-widget-header .ui-state-highlight a{
+	background: rgb(48, 48, 48);
+	color: rgb(255,102, 0);
+}
+
+
+
+.ui-treenode-label.ui-corner-all.ui-state-highlight {
+	background: rgb(48, 48, 48);
+	color: rgb(255,102, 0);
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
 }
