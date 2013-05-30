@@ -9,7 +9,8 @@ public class DocumentCvor {
 	String parent_href;
 
 	String children_href;
-	String content_href = "http://localhost:8080/mpayments-help-web/emptyState.html";
+	final static String URL_EMPTY_STATE="http://localhost:8080/mpayments-help-web/empty.html";
+	String content_href = URL_EMPTY_STATE;
 	List<Paragraph> paragraphs;
 
 	public DocumentCvor() {
@@ -73,7 +74,7 @@ public class DocumentCvor {
 
 	public void setContent_href(String content_href) {
 		if (content_href.equals("")) {
-			this.content_href = "http://localhost:8080/mpayments-help-web/emptyState.html";
+			this.content_href = URL_EMPTY_STATE;
 		} else {
 			this.content_href = content_href;
 		}
