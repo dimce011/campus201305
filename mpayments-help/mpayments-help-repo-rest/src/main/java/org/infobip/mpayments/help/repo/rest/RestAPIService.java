@@ -459,10 +459,10 @@ public class RestAPIService implements RestAPI {
 					result = RestAPIService.getStringFromInputStream(input).toString();
 				}
 				// error = true;
-<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
-
-=======
->>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
+//<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
+//
+//=======
+//>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 			}
 
 			res = null;
@@ -663,7 +663,7 @@ public class RestAPIService implements RestAPI {
 				// fieldPars += "&language=en";
 			}
 			if (reseller == null) {
-				reseller = "1";
+				reseller = "";
 				// fieldPars += "&reseller=1";
 			}
 
@@ -705,11 +705,12 @@ public class RestAPIService implements RestAPI {
 			// DocumentCvor dc = new DocumentCvor();
 
 			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
-<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
-					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui, language, reseller));
-=======
-					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui));
->>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
+					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui,language,reseller));
+//<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
+//					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui, language, reseller));
+//=======
+//					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui));
+//>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
