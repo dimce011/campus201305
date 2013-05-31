@@ -38,8 +38,8 @@
 			</p:selectOneMenu>
 			<p:editor id="editor" value="#{editorBean.page}" resizable="true" />
 		</h:panelGrid>
-		<p:commandButton id="saveButton" value="Save" update=":form1:tree1" icon="ui-icon-disk"
-			actionListener="#{editorBean.saveFile}"
+		<p:commandButton id="saveButton" value="Save" update=":form1:tree1"
+			icon="ui-icon-disk" actionListener="#{editorBean.saveFile}"
 			oncomplete="dlgAddContent.close())" />
 	</p:dialog>
 </h:form>
@@ -51,10 +51,9 @@
 		<h:panelGrid columns="2" cellpadding="5">
 			<p:inputText value="#{editorBean.f_name}" id="folder_name"
 				required="true" label="folder_name" />
-			<p:commandButton id="saveButton" value="Save"  icon="ui-icon-disk"
+			<p:commandButton id="saveButton" value="Save" icon="ui-icon-disk"
 				actionListener="#{editorBean.saveFolder}"
-				oncomplete="dlgAddFolder.close())"
-				update=":form1:tree1" />
+				oncomplete="dlgAddFolder.close())" update=":form1:tree1" />
 		</h:panelGrid>
 	</p:dialog>
 </h:form>
@@ -64,7 +63,8 @@
 		widgetVar="dlgEditContent" resizable="true" modal="true">
 		<h:panelGrid columns="2" cellpadding="5">
 			<p:editor id="editContent" value="#{editorBean.content}" width="600" />
-			<p:commandButton id="saveButton" value="Save" update=":form1:tree1" icon="ui-icon-disk"
+			<p:commandButton id="saveButton" value="Save" update=":form1:tree1"
+				icon="ui-icon-disk"
 				actionListener="#{editorBean.editContent('true')}"
 				oncomplete="dlgEditContent.close())" />
 		</h:panelGrid>
@@ -89,9 +89,10 @@
 			<p:growl id="growl1" showSummary="true" showDetail="true"
 				autoUpdate="true" />
 
-			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node" 
-				dynamic="true" selectionMode="single" 
-				selection="#{treeBeanCvor.selectedNode}" autoUpdate="true"  cache="false"  >
+			<p:tree id="tree1" value="#{treeBeanCvor.model}" var="node"
+				dynamic="true" selectionMode="single"
+				selection="#{treeBeanCvor.selectedNode}" autoUpdate="true"
+				cache="false">
 				<p:ajax event="select" listener="#{treeBeanCvor.onNodeSelect}"
 					update=":form2:label" />
 
@@ -132,10 +133,6 @@
 				icon="ui-icon-plus" />
 			<p:menuitem value="Add folder" oncomplete="dlgAddFolder.show()"
 				icon="ui-icon-plus" />
-			<p:menuitem value="Edit content"
-				actionListener="#{editorBean.setNodeContent}"
-				update=":formEditContent:dlgEditContent"
-				oncomplete="dlgEditContent.show()" icon="ui-icon-pencil" />
 			<p:menuitem value="Edit folder name"
 				actionListener="#{editorBean.setNewFolderName}"
 				update=":formEditFolderName:dlgEditFolderName"
