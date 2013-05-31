@@ -112,7 +112,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// ubacivanje fajla u signUp folder
 //			Node signUp = session.getNode("/help/pp/singUp");
 //			Node onesu = signUp.addNode("one", NodeType.NT_FILE);
-			Node contentsu = session.getNode("/help/pp/singUp/one/jcr:content");
+//			Node contentsu = session.getNode("/help/pp/singUp/one/jcr:content");
 //			onesu.addMixin("my:metaPageData");
 
 //			onesu.setProperty("my:lang", "en");
@@ -121,10 +121,10 @@ public class RestHelpRepoService implements RestHelpRepo {
 			/**
 			 * add template file
 			 */
-			File fsu = new File("signup.ftl");
-			InputStream streamsu = new BufferedInputStream(new FileInputStream(fsu));
-			Binary binarysu = session.getValueFactory().createBinary(streamsu);
-			contentsu.setProperty("jcr:data", binarysu);
+//			File fsu = new File("signup.ftl");
+//			InputStream streamsu = new BufferedInputStream(new FileInputStream(fsu));
+//			Binary binarysu = session.getValueFactory().createBinary(streamsu);
+//			contentsu.setProperty("jcr:data", binarysu);
 
 			// session.save();
 
@@ -457,7 +457,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 			// dodavanje title propertija
 			help.addMixin("my:metaFolderData");
-			String[] nizHelp = { "en#centili#Partner panel", "de#centili#Hilfe Centili", "en#frogy#Help Frogy" };
+			String[] nizHelp = { "en#centili#Help", "de#centili#Hilfe", "en#frogy#Help Frogy" };
 			help.setProperty("my:title", nizHelp);
 
 			pp.addMixin("my:metaFolderData");

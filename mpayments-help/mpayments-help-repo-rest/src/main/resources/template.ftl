@@ -5,7 +5,7 @@
 
 </ul>
 
-<h1> 	Hello <#if telefon??>${telefon}<#else>, <#if firma??>${firma}<#else>  </h1>
+<h1> 	Hello <#if telefon??>${telefon}</#if>, <#if firma??>${firma}</#if>  </h1>
 
 </div>
 
