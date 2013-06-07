@@ -445,7 +445,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			Node content = one.addNode("jcr:content", "nt:resource");
 			one.addMixin("my:metaPageData");
 			one.setProperty("my:lang", "en");
-			one.setProperty("my:reseller", "1");
+			one.setProperty("my:reseller", "");
 
 			/**
 			 * add template file
@@ -520,7 +520,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			onesu.addMixin("my:metaPageData");
 
 			onesu.setProperty("my:lang", "en");
-			onesu.setProperty("my:reseller", "centili");
+			onesu.setProperty("my:reseller", "");
 
 			/**
 			 * add template file
@@ -974,10 +974,6 @@ public class RestHelpRepoService implements RestHelpRepo {
 		return false;
 	}
 
-	public static ObjectMapper getJsonMapper() {
-		// TODO Auto-generated method stub
-		return jsonMapper;
-	}
 
 	@Override
 	public Response getSaveStatus(@QueryParam("node_path") String node_path, @QueryParam("html_page") String html_page,

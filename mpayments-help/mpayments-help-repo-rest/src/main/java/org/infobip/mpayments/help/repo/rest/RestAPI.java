@@ -56,6 +56,21 @@ public interface RestAPI {
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
 	
 	
+	@GET
+	@Path("documents/{parent:.*}/children/{fieldPars}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
+			@PathParam("fieldPars") String fieldPars,
+			@QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+	
+	@GET
+	@Path("documents/{parent:.*}/children/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getChildrenLinksJSON2(@PathParam("parent") String parent,
+			@QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+	
 //	@DELETE
 //	@Path("/documents/{docPath:.*}")
 //	@Produces(MediaType.TEXT_HTML)

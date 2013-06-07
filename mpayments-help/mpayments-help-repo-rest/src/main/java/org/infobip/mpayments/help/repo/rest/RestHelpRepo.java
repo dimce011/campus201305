@@ -25,35 +25,35 @@ public interface RestHelpRepo {
 			@QueryParam("action") String action);
 
 	@GET
-	@Path("/sayHello")
+	@Path("old/sayHello")
 	@Produces(MediaType.TEXT_HTML)
 	public String sayHtmlHello();
 
 	@GET
-	@Path("/document")
+	@Path("old/document")
 	@Produces(MediaType.TEXT_HTML)
 	public String getDocument(@QueryParam("language") String language,
 			@QueryParam("test") String test);
 
 	@GET
-	@Path("/testJSON")
+	@Path("old/testJSON")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getJSON();
 
 	@GET
-	@Path("/getOneLevelJSON/{nodePath:.*}")
+	@Path("old/getOneLevelJSON/{nodePath:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOneLevelJSON(@PathParam("nodePath") String nodePath);
 
 	@GET
-	@Path("/root/{path:.*}")
+	@Path("old/root/{path:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getLinksJSON(@PathParam("path") String path,
 			@QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
 
 	@GET
-	@Path("documents/{parent:.*}/children/{fieldPars}")
+	@Path("old/documents/{parent:.*}/children/{fieldPars}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
 			@PathParam("fieldPars") String fieldPars,
@@ -61,7 +61,7 @@ public interface RestHelpRepo {
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
 	
 	@GET
-	@Path("documents/{parent:.*}/children/")
+	@Path("old/documents/{parent:.*}/children/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getChildrenLinksJSON2(@PathParam("parent") String parent,
 			@QueryParam("language") String language,

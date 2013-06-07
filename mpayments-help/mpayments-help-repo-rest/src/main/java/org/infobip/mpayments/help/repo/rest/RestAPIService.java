@@ -40,6 +40,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.infobip.mpayments.help.dto.DocumentCvor;
 import org.infobip.mpayments.help.dto.DocumentCvorWrapper;
 import org.infobip.mpayments.help.dto.Paragraph;
@@ -54,7 +55,14 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class RestAPIService implements RestAPI {
 
+	private Session session = null;
+	private Repository repository = null;
+	private InitialContext initialContext;
+	
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
+	private static ObjectMapper jsonMapper = new ObjectMapper();
+	
+	/***************** REST API METHODS *******************/
 
 	@Override
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @Context UriInfo ui) {
@@ -133,10 +141,7 @@ public class RestAPIService implements RestAPI {
 				FreeMarker fm = new FreeMarker();
 				result = fm.process(mapParameters, result);
 			}
-
-//			res = null;
-//			it = null;
-
+			
 		} catch (Exception ex) {
 			error = true;
 			ex.printStackTrace();
@@ -165,144 +170,6 @@ public class RestAPIService implements RestAPI {
 		}
 	}
 
-	// public Response getDocuments(@PathParam("id") String id) {
-	// Session session = null;
-	// Repository repository = null;
-	// boolean error = false;
-	// InputStream input = null;
-	// OutputStream output = null;
-	// String result = null;
-	// System.out.println("POZVANA METODA getDocuments");
-	// try {
-	// InitialContext initialContext = new InitialContext();
-	// repository = (Repository) initialContext.lookup("java:jcr/local");
-	// session = repository.login(new SimpleCredentials("admin",
-	// "admin".toCharArray()));
-	//
-	// Node en = session.getNode("/help/pp/service/1/en");
-	// Node target = session.getNodeByIdentifier(en.getIdentifier());
-	//
-	// printChildren(session.getNode("/"));
-	// Node content = target.getNode("jcr:content");
-	// input = content.getProperty("jcr:data").getBinary().getStream();
-	// result = RestAPIService.getStringFromInputStream(input).toString();
-	//
-	// } catch (Exception ex) {
-	// error = true;
-	// ex.printStackTrace();
-	// } finally {
-	// if (session != null)
-	// session.logout();
-	// closeStreams(input, output);
-	// }
-	//
-	// if (!error) {
-	// return Response.status(Response.Status.OK).entity(result).build();
-	// } else {
-	// return
-	// Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-	// }
-	// }
-
-	// za staro drvo
-	// @Override
-	public Response getDoc(@PathParam("rPath") String rPath) {
-		Session session = null;
-		Repository repository = null;
-		boolean error = false;
-		InputStream input = null;
-		OutputStream output = null;
-		String result = null;
-		System.out.println("POZVANA METODA getDoc");
-		try {
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-
-			System.out.println("rpath " + rPath);
-			Node target = session.getNode("/" + rPath);
-			input = target.getProperty("jcr:data").getBinary().getStream();
-			result = RestAPIService.getStringFromInputStream(input).toString();
-
-		} catch (Exception ex) {
-			error = true;
-			ex.printStackTrace();
-		} finally {
-			if (session != null)
-				session.logout();
-			closeStreams(input, output);
-		}
-
-		if (!error) {
-			return Response.status(Response.Status.OK).entity(result).build();
-		} else {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error").build();
-		}
-	}
-
-	public static StringBuilder getStringFromInputStream(InputStream is) {
-		BufferedReader br = null;
-		StringBuilder sb = new StringBuilder();
-		String line;
-		try {
-			br = new BufferedReader(new InputStreamReader(is));
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return sb;
-	}
-
-	private void closeStreams(InputStream input, OutputStream output) {
-		if (input != null)
-			try {
-				input.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		if (output != null)
-			try {
-				output.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-	}
-
-	@SuppressWarnings("unused")
-	private String readFile(File file) throws IOException {
-		StringBuilder fileContents = new StringBuilder((int) file.length());
-		Scanner scanner = new Scanner(file);
-		String lineSeparator = System.getProperty("line.separator");
-		try {
-			while (scanner.hasNextLine()) {
-				fileContents.append(scanner.nextLine() + lineSeparator);
-			}
-			return fileContents.toString();
-		} finally {
-			scanner.close();
-		}
-	}
-
-	private void printChildren(Node node) throws RepositoryException {
-		if (node.hasNodes()) {
-			NodeIterator it = node.getNodes();
-			while (it.hasNext()) {
-				Node child = it.nextNode();
-				printChildren(child);
-			}
-		}
-	}
-
 	@Override
 	public Response getDocument(@PathParam("docPath") String docPath, @Context UriInfo ui) {
 		return getDocument(docPath, "", ui);
@@ -315,14 +182,14 @@ public class RestAPIService implements RestAPI {
 		Repository repository = null;
 		boolean error = false;
 		InputStream input = null;
-		OutputStream output = null;
+		//OutputStream output = null;
 		String result = "";
 		StringTokenizer stringTokenizer = null;
 		Map<String, Object> mapParameters = new HashMap<String, Object>();
 		String reseller = null;
 		String language = null;
-		boolean hasChild = false;
-		boolean langAndReseller = false;
+		String resellerOld = reseller;
+		String languageOld = language;
 		System.out.println("POZVANA METODA getDocument");
 		try {
 			System.out.println("field par uri " + fieldPars + " lang " + language + " res " + reseller);
@@ -347,12 +214,12 @@ public class RestAPIService implements RestAPI {
 					String second = stringTokenizer.nextToken();
 					if ("reseller".equalsIgnoreCase(first)) {
 						reseller = second;
-						langAndReseller = true;
+						resellerOld = reseller;
 						continue;
 					}
 					if ("language".equalsIgnoreCase(first)) {
 						language = second;
-						langAndReseller = true;
+						languageOld = language;
 						continue;
 					}
 					System.out.println(first + " " + second);
@@ -362,6 +229,14 @@ public class RestAPIService implements RestAPI {
 
 			if (language == null) {
 				language = "en";
+			}
+
+			if (languageOld == null) {
+				languageOld = "";
+			}
+
+			if (resellerOld == null) {
+				resellerOld = "";
 			}
 
 			if (language.equals("")) {
@@ -392,96 +267,73 @@ public class RestAPIService implements RestAPI {
 				docPath = "/" + docPath;
 			}
 
-			// StringBuffer bufferPath = new StringBuffer("");
-			// StringTokenizer st = new StringTokenizer(docPath,">");
-			//
-			// while(st.hasMoreTokens()){
-			// bufferPath.append("/"+st.nextToken());
-			// }
-
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
-			// System.out.println("query " +
-			// "SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+
-			// "' and [my:reseller] = '" +reseller+"'");
-			// Query query =
-			// qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '"+language+
-			// "' and [my:reseller] = '" +reseller+"'", Query.JCR_SQL2);
 			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
 					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
 			QueryResult res = query.execute();
 			NodeIterator it = res.getNodes();
 
-			//System.out.println(""+it.getSize());
-			
+			// System.out.println(""+it.getSize());
+
 			Node node = null;
+
 			if (it.hasNext()) {
 				node = it.nextNode();
-				//System.out.println("path " + node.getPath());
+				System.out.println("path 1" + node.getPath());
+			} else {
+				boolean path2 = false;
+				if (!resellerOld.equals("")) {
+					// Query for the specified reseller and default language.
+					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + "en"
+							+ "' and [my:reseller] = '" + resellerOld + "' and ISCHILDNODE([" + docPath + "])",
+							Query.JCR_SQL2);
+					res = query.execute();
+					it = res.getNodes();
+					System.out.println("path 2");
+					path2 = true;
+					if (it.hasNext()) {
+						node = it.nextNode();
+					}
+				}
+				
+				if (!path2) {
+					// Query for default reseller and the specified language.
+					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
+							+ "' and [my:reseller] = '" + "" + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
+					res = query.execute();
+					it = res.getNodes();
+					System.out.println("path 3");
+					if (it.hasNext()) {
+						node = it.nextNode();
+					} else{
+						// Query for default reseller and default language.
+						query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + "en"
+								+ "' and [my:reseller] = '" + "" + "' and ISCHILDNODE([" + docPath + "])",
+								Query.JCR_SQL2);
+						res = query.execute();
+						it = res.getNodes();
+						System.out.println("path 4");
+						if (it.hasNext()) {
+							node = it.nextNode();
+
+						} else {
+							return Response.status(Response.Status.NOT_FOUND).entity("Not Found!").build();
+						}
+					}
+				}
+			}
+
+			if(node != null){
 				Node content = node.getNode("jcr:content");
 				input = content.getProperty("jcr:data").getBinary().getStream();
 				result = RestAPIService.getStringFromInputStream(input).toString();
-
-				if (!mapParameters.isEmpty()) {
-					FreeMarker fm = new FreeMarker();
-					result = fm.process(mapParameters, result);
-				}
-			} else {
-
-				System.out.println("else page " + langAndReseller + " " + docPath);
-				if (!langAndReseller) {
-					node = session.getNode(docPath);
-					System.out.println("trazi samo path " + docPath);
-					NodeIterator nodeIt = node.getNodes();
-					Node node2 = null;
-					while (nodeIt.hasNext()) {
-						node2 = nodeIt.nextNode();
-						if (node2.isNodeType(NodeType.NT_FILE)) {
-							hasChild = true;
-							break;
-						}
-					}
-					if(hasChild){
-						Node content = node2.getNode("jcr:content");
-						input = content.getProperty("jcr:data").getBinary().getStream();
-						result = RestAPIService.getStringFromInputStream(input).toString();
-
-						if (!mapParameters.isEmpty()) {
-							FreeMarker fm = new FreeMarker();
-							result = fm.process(mapParameters, result);
-						}
-					}
-				}else{
-					node = session.getNode(docPath);
-					System.out.println("trazi samo path " + docPath);
-					NodeIterator nodeIt = node.getNodes();
-					Node node2 = null;
-					while (nodeIt.hasNext()) {
-						node2 = nodeIt.nextNode();
-						if (node2.isNodeType(NodeType.NT_FILE)) {
-							break;
-						}
-					}
-				
-					Node content = node2.getNode("jcr:content");
-					input = content.getProperty("jcr:data").getBinary().getStream();
-					result = RestAPIService.getStringFromInputStream(input).toString();
-					
-					if (!mapParameters.isEmpty()) {
-						FreeMarker fm = new FreeMarker();
-						result = fm.process(mapParameters, result);
-					}
-					
-				}
-				// error = true;
-//<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
-//
-//=======
-//>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
 			}
 
-			res = null;
-			it = null;
+			if (!result.equals("") && !mapParameters.isEmpty()) {
+					FreeMarker fm = new FreeMarker();
+					result = fm.process(mapParameters, result);		
+			}
 
 		} catch (Exception ex) {
 			error = true;
@@ -489,7 +341,7 @@ public class RestAPIService implements RestAPI {
 		} finally {
 			if (session != null)
 				session.logout();
-			closeStreams(input, output);
+			closeStreams(input, null);
 		}
 
 		if (!error) {
@@ -627,12 +479,6 @@ public class RestAPIService implements RestAPI {
 				
 	}
 
-//	@Override
-//	public Response delDocument(@PathParam("docPath") String docPath) {
-//		return delDocument(docPath, "");
-//	}
-//	
-
 	@Override
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
@@ -755,7 +601,7 @@ public class RestAPIService implements RestAPI {
 
 			// DocumentCvor dc = new DocumentCvor();
 System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
-			response = RestHelpRepoService.getJsonMapper().defaultPrettyPrintingWriter()
+			response = jsonMapper.defaultPrettyPrintingWriter()
 					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui,language,reseller));
 //<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
 //					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui, language, reseller));
@@ -781,10 +627,138 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
+	
+	@Override
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @PathParam("fieldPars") String fieldPars,
+			@QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
-	Session session = null;
-	Repository repository = null;
-	InitialContext initialContext;
+		openSession();
+		Map<String, String> mapParameters = new HashMap<String, String>();
+		System.out.println("getChildrenLinksJSON " + fieldPars);
+
+		if (!fieldPars.equals("")) {
+			StringTokenizer stringTokenizer = new StringTokenizer(fieldPars, "&=");
+			System.out.println("FIELD PARAMS " + fieldPars);
+			while (stringTokenizer.hasMoreTokens()) {
+				String first = stringTokenizer.nextToken();
+				String second = stringTokenizer.nextToken();
+				if ("reseller".equalsIgnoreCase(first)) {
+					reseller = second;
+
+					continue;
+				}
+				if ("language".equalsIgnoreCase(first)) {
+					language = second;
+
+					continue;
+				}
+				System.out.println(first + " " + second);
+
+				mapParameters.put(first, second);
+			}
+		}
+
+		if (reseller == null) {
+			reseller = "1";
+		}
+		if (language == null) {
+			language = "en";
+		}
+
+		String response = null;
+		Node node = null;
+		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
+		try {
+			node = session.getNode("/" + parent);
+			if (node.hasNodes()) {
+				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
+					Node subNode = nodeIterator.nextNode();
+
+					if (!subNode.isNodeType("nt:file")) {
+						children_list.add(getDocumentCvor(subNode.getPath(), fieldPars, language, reseller, ui));
+					}
+					// children_list.add(getDocumentCvor(subNode.getPath(),
+					// language, reseller, ui));
+
+				}
+			}
+			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
+			dcw.documents = children_list;
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dcw);
+
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (JsonGenerationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
+		}
+		return Response.status(Response.Status.OK).entity(response).build();
+	}
+	
+	@Override
+	public Response getChildrenLinksJSON2(@PathParam("parent") String parent, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
+		return getChildrenLinksJSON(parent, "", language, reseller, ui);
+	}
+	
+//	@Override
+//	public Response delDocument(@PathParam("docPath") String docPath) {
+//		return delDocument(docPath, "");
+//	}
+//	
+	/******************* UTIL METHODS *************************/
+	private void printChildren(Node node) throws RepositoryException {
+		if (node.hasNodes()) {
+			NodeIterator it = node.getNodes();
+			while (it.hasNext()) {
+				Node child = it.nextNode();
+				printChildren(child);
+			}
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private String readFile(File file) throws IOException {
+		StringBuilder fileContents = new StringBuilder((int) file.length());
+		Scanner scanner = new Scanner(file);
+		String lineSeparator = System.getProperty("line.separator");
+		try {
+			while (scanner.hasNextLine()) {
+				fileContents.append(scanner.nextLine() + lineSeparator);
+			}
+			return fileContents.toString();
+		} finally {
+			scanner.close();
+		}
+	}
+	
+	private void closeStreams(InputStream input, OutputStream output) {
+		if (input != null)
+			try {
+				input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		if (output != null)
+			try {
+				output.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
 
 	public void openSession() {
 		try {
@@ -905,6 +879,92 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 
 	}
 
+	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
+			@Context UriInfo ui) {
+
+		openSession();
+		Node node = null;
+		DocumentCvor dnl = null;
+		try {
+			node = session.getNode(parent);
+			String title = null;
+
+			if (reseller == null) {
+				reseller = "centili";
+			}
+			if (language == null) {
+				language = "en";
+			}
+
+			System.out.println("fp u getDocumentCvor " + fieldPars);
+
+			if (node.hasProperty("my:title")) {
+				Property p = node.getProperty("my:title");
+				Value[] v = p.getValues();
+				for (Value value : v) {
+					String[] mtitle = value.getString().split("#");
+
+					if (mtitle[1].equals(reseller)) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+					} else if (mtitle[1].equals("centili")) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+
+					}
+				}
+			}
+
+			if (title == null) {
+				System.out.println("Node " + node.getName() + " nema odgovarajuci properti");
+				title = node.getName();
+			}
+
+			String[] niz = node.getPath().split("/");
+
+			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
+					+ node.getPath() + "/" + fieldPars, ui.getBaseUri().toString() + "documents"
+					+ node.getParent().getPath());
+
+			if (node.hasNodes()) {
+				if (hasFolder(node)) {
+					String children_href = node.getPath() + "/children/" + fieldPars;
+					dnl.setChildren_href(ui.getBaseUri().toString() + "documents" + children_href);
+				} else {
+					dnl.setChildren_href("");
+				}
+
+				if (hasFiles(node)) {
+					String content_href = node.getPath() + "/content/" + fieldPars;
+					dnl.setContent_href(ui.getBaseUri().toString() + "documents" + content_href);
+				} else {
+					dnl.setContent_href("");
+				}
+			} else {
+				dnl.setChildren_href("");
+				dnl.setContent_href("");
+			}
+
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			if (session != null)
+				closeSession();
+		}
+		return dnl;
+
+	}
+
 	public boolean hasFolder(Node node) throws RepositoryException {
 		openSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
@@ -915,7 +975,30 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		}
 		return false;
 	}
-
+	
+	public static StringBuilder getStringFromInputStream(InputStream is) {
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+		String line;
+		try {
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return sb;
+	}
+	
 	public boolean hasFiles(Node node) throws RepositoryException {
 		openSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
