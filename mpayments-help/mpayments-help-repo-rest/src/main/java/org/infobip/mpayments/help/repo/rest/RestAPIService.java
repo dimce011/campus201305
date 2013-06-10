@@ -59,6 +59,9 @@ public class RestAPIService implements RestAPI {
 	private Repository repository = null;
 	private InitialContext initialContext;
 	
+	private static final String defualtLanguage = "en";
+	private static final String defualtReseller = "";
+	
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 	private static ObjectMapper jsonMapper = new ObjectMapper();
 	
@@ -228,7 +231,7 @@ public class RestAPIService implements RestAPI {
 			}
 
 			if (language == null) {
-				language = "en";
+				language = defualtLanguage;
 			}
 
 			if (languageOld == null) {
@@ -240,11 +243,11 @@ public class RestAPIService implements RestAPI {
 			}
 
 			if (language.equals("")) {
-				language = "en";
+				language = defualtLanguage;
 			}
 
 			if (reseller == null) {
-				reseller = "";
+				reseller = defualtReseller;
 			}
 
 			System.out.println("jezik= " + language + " preprodavac= " + reseller);
@@ -285,7 +288,7 @@ public class RestAPIService implements RestAPI {
 				boolean path2 = false;
 				if (!resellerOld.equals("")) {
 					// Query for the specified reseller and default language.
-					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + "en"
+					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
 							+ "' and [my:reseller] = '" + resellerOld + "' and ISCHILDNODE([" + docPath + "])",
 							Query.JCR_SQL2);
 					res = query.execute();
@@ -300,7 +303,7 @@ public class RestAPIService implements RestAPI {
 				if (!path2) {
 					// Query for default reseller and the specified language.
 					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-							+ "' and [my:reseller] = '" + "" + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
+							+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
 					res = query.execute();
 					it = res.getNodes();
 					System.out.println("path 3");
@@ -308,8 +311,8 @@ public class RestAPIService implements RestAPI {
 						node = it.nextNode();
 					} else{
 						// Query for default reseller and default language.
-						query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + "en"
-								+ "' and [my:reseller] = '" + "" + "' and ISCHILDNODE([" + docPath + "])",
+						query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
+								+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])",
 								Query.JCR_SQL2);
 						res = query.execute();
 						it = res.getNodes();
