@@ -55,9 +55,14 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class RestAPIService implements RestAPI {
 
-	private Session session = null;
+	//private Session session = null;
 	private Repository repository = null;
-	private InitialContext initialContext;
+	private InitialContext initialContext = null;
+	private final static String jcrLocal = "java:jcr/local";
+	private final static SimpleCredentials cred;
+	static{
+		cred = new SimpleCredentials("admin", "admin".toCharArray());
+	}
 	
 	private static final String defualtLanguage = "en";
 	private static final String defualtReseller = "";
@@ -75,9 +80,8 @@ public class RestAPIService implements RestAPI {
 	@Override
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
 			@PathParam("fieldPars") String fieldPars, @Context UriInfo ui) {
-
+		
 		Session session = null;
-		Repository repository = null;
 		boolean error = false;
 		InputStream input = null;
 		OutputStream output = null;
@@ -89,6 +93,7 @@ public class RestAPIService implements RestAPI {
 		String noSuchID = "No such ID!";
 		StringBuffer returnResult = new StringBuffer();
 		System.out.println("POZVANA METODA getParagraph");
+		
 		try {
 			System.out.println("field par uri " + fieldPars);
 
@@ -100,9 +105,8 @@ public class RestAPIService implements RestAPI {
 			if (fieldPars.startsWith("?"))
 				fieldPars = fieldPars.substring(1);
 
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			session = makeSession();
+			
 			if (!fieldPars.equals("")) {
 				stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
@@ -149,8 +153,7 @@ public class RestAPIService implements RestAPI {
 			error = true;
 			ex.printStackTrace();
 		} finally {
-			if (session != null)
-				session.logout();
+			closeSession(session);	
 			closeStreams(input, output);
 		}
 
@@ -182,7 +185,6 @@ public class RestAPIService implements RestAPI {
 	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars,
 			@Context UriInfo ui) {
 		Session session = null;
-		Repository repository = null;
 		boolean error = false;
 		InputStream input = null;
 		//OutputStream output = null;
@@ -194,6 +196,7 @@ public class RestAPIService implements RestAPI {
 		String resellerOld = reseller;
 		String languageOld = language;
 		System.out.println("POZVANA METODA getDocument");
+		
 		try {
 			System.out.println("field par uri " + fieldPars + " lang " + language + " res " + reseller);
 			System.out.println("docPath" + docPath);
@@ -206,9 +209,8 @@ public class RestAPIService implements RestAPI {
 			if (fieldPars.startsWith("?"))
 				fieldPars = fieldPars.substring(1);
 
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			session = makeSession();
+			
 			if (!fieldPars.equals("")) {
 				stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
@@ -342,8 +344,7 @@ public class RestAPIService implements RestAPI {
 			error = true;
 			ex.printStackTrace();
 		} finally {
-			if (session != null)
-				session.logout();
+			closeSession(session);	
 			closeStreams(input, null);
 		}
 
@@ -356,13 +357,12 @@ public class RestAPIService implements RestAPI {
 
 	@Override
 	public Response delDocument(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
+
 		Session session = null;
-		Repository repository = null;
 		boolean error = false;
 		InputStream input = null;
 		OutputStream output = null;
-		String result = null;
-		StringTokenizer stringTokenizer = null;
+
 		boolean notEmpty = false;
 		boolean notFound = false;
 		// StringBuffer bufferPath = new StringBuffer("");
@@ -378,9 +378,7 @@ public class RestAPIService implements RestAPI {
 
 //			/
 
-			InitialContext initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			session = makeSession();
 //			if (!fieldPars.equals("")) {
 //				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
 //				System.out.println("FIELD PARAMS " + fieldPars);
@@ -463,8 +461,7 @@ public class RestAPIService implements RestAPI {
 			error = true;
 			ex.printStackTrace();
 		} finally {
-			if (session != null)
-				session.logout();
+			closeSession(session);	
 			closeStreams(input, output);
 		}
 
@@ -485,6 +482,8 @@ public class RestAPIService implements RestAPI {
 	@Override
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
+		
+		Session session = null;
 		String response = null;
 		InputStream input = null;
 		String result = null;
@@ -524,9 +523,7 @@ public class RestAPIService implements RestAPI {
 					mapParameters.put(first, second);
 				}
 			}
-			
-			
-			
+
 			// Map<String, List<String>> callParameters =
 			// ui.getQueryParameters();
 			//
@@ -566,23 +563,18 @@ public class RestAPIService implements RestAPI {
 				reseller = "";
 				// fieldPars += "&reseller=1";
 			}
-//
-//			if (language != null) {
-//				langResel += "language=" + language;
-//			}
-//			if (reseller != null) {
-//				langResel += (language == null ? "reseller=" + reseller : "&reseller=" + reseller);
-//			}
 
-			openSession();
-			// result = (String) getDocument(docPath, "language=" + language +
-			// "&reseller=" + reseller+fieldPars, ui).getEntity();
+			InitialContext initialContext = new InitialContext();
+			Repository repository = (Repository) initialContext.lookup("java:jcr/local");
+			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+
 			result = (String) getDocument(docPathShort, fieldPars, ui).getEntity();
 
 			System.out.println("get jason novi " + result);
 
 			if (result == null)
 				result = "";
+			
 			Document doc = Jsoup.parse(result);
 			Elements divs = doc.getElementsByTag("div");
 			Map<String, String> paragraphs = new TreeMap<String, String>();
@@ -603,14 +595,11 @@ public class RestAPIService implements RestAPI {
 			// + node.getParent().getPath());
 
 			// DocumentCvor dc = new DocumentCvor();
-System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
+			System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
+			
 			response = jsonMapper.defaultPrettyPrintingWriter()
 					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui,language,reseller));
-//<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
-//					.writeValueAsString(getDocumentCvor("/" + docPath, paragraphs, langResel, ui, language, reseller));
-//=======
-//					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui));
-//>>>>>>> b67f029 Rest API v7 DocumentCvorWrapper renamed RestHelpRepoService changed a bit about DocumentCvorWrapper
+
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -627,6 +616,9 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		} catch (RepositoryException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
@@ -635,7 +627,8 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @PathParam("fieldPars") String fieldPars,
 			@QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
-		openSession();
+		//openSession();
+		Session session = null;
 		Map<String, String> mapParameters = new HashMap<String, String>();
 		System.out.println("getChildrenLinksJSON " + fieldPars);
 
@@ -672,6 +665,12 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		Node node = null;
 		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
 		try {
+			logger.info("start OPEN SESSION in RestAPIService.");
+			InitialContext initialContext = new InitialContext();
+			Repository repository = (Repository) initialContext.lookup("java:jcr/local");
+			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+			logger.info("SESSION OPENED in RestAPIService.");
+			
 			node = session.getNode("/" + parent);
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
@@ -704,9 +703,11 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
-			if (session != null)
-				closeSession();
+			closeSession(session);	
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
@@ -762,13 +763,17 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 				e.printStackTrace();
 			}
 	}
+	
 
-	public void openSession() {
+	/*public void openSession() {
 		try {
-			initialContext = new InitialContext();
-			repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-			logger.info("SESSION OPENED");
+			if(session == null){
+				logger.info("start OPEN SESSION in RestAPIService.");
+				initialContext = new InitialContext();
+				repository = (Repository) initialContext.lookup("java:jcr/local");
+				session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+				logger.info("SESSION OPENED in RestAPIService.");
+			}
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -782,20 +787,30 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 	}
 
 	public void closeSession() {
-		session.logout();
-	}
+		if(session != null ){
+			session.logout();
+			// release memory 
+			session = null;
+			repository = null;
+			initialContext = null;
+			logger.info("SESSION CLOSED in RestAPIService.");
+		}
+	}*/
 
 	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui,
 			String language, String reseller) {
-		openSession();
+
 		logger.info("PARENT: {}", parent);
 		Node node = null;
+		Session session = null;
 		DocumentCvor dnl = null;
 		try {
+			
+			session = makeSession();
+		
 			node = session.getNode(parent);
 			String[] niz = node.getPath().split("/");
 			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length() - 1);
-//<<<<<<< Upstream, based on branch 'master' of https://github.com/dimce011/campus201305.git
 
 			// ubacivanje title-a
 			String title = null;
@@ -874,9 +889,11 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		} catch (RepositoryException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
-			if (session != null)
-				closeSession();
+			closeSession(session);	
 		}
 		return dnl;
 
@@ -885,10 +902,13 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
 			@Context UriInfo ui) {
 
-		openSession();
+	    Session session = null;
 		Node node = null;
 		DocumentCvor dnl = null;
 		try {
+			
+			session = makeSession();
+		
 			node = session.getNode(parent);
 			String title = null;
 
@@ -960,22 +980,26 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		} catch (RepositoryException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
-			if (session != null)
-				closeSession();
+			closeSession(session);	
 		}
 		return dnl;
 
 	}
 
-	public boolean hasFolder(Node node) throws RepositoryException {
-		openSession();
+	public boolean hasFolder(Node node) throws RepositoryException, NamingException {
+		Session session = makeSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 			Node subNode = nodeIterator.nextNode();
 			if (subNode.getPrimaryNodeType().getName().equals("nt:folder")) {
 				return true;
 			}
 		}
+		
+		closeSession(session);	
 		return false;
 	}
 	
@@ -1002,16 +1026,35 @@ System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 		return sb;
 	}
 	
-	public boolean hasFiles(Node node) throws RepositoryException {
-		openSession();
+	public boolean hasFiles(Node node) throws RepositoryException, NamingException {
+
+		Session session = makeSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 			Node subNode = nodeIterator.nextNode();
 			if (subNode.getPrimaryNodeType().getName().equals("nt:file")) {
 				return true;
 			}
 		}
+		
+		closeSession(session);	
 		return false;
-
 	}
+	
+    private Session makeSession() throws NamingException, LoginException, RepositoryException  {
+		    InitialContext initialContext = new InitialContext();
+    		Repository repository = (Repository) initialContext.lookup(jcrLocal);
+    		Session session = repository.login(cred);
+            return session;
+    }
+    
+    private Session closeSession(Session session){	
+		if(session != null){
+			session.logout();
+			return null;
+		}
+		return session;
+    }
+    
+    
 
 }
