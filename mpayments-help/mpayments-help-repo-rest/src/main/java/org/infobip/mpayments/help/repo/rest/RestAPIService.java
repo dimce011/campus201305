@@ -100,12 +100,12 @@ public class RestAPIService implements RestAPI {
 			System.out.println("field par uri " + fieldPars);
 
 			if (fieldPars == null) {
-				error = true;
+				//error = true;
 				fieldPars = "";
 			}
 
-			if (fieldPars.startsWith("?"))
-				fieldPars = fieldPars.substring(1);
+			//if (fieldPars.startsWith("?"))
+			//	fieldPars = fieldPars.substring(1);
 
 			session = makeSession();
 
@@ -201,12 +201,12 @@ public class RestAPIService implements RestAPI {
 			System.out.println("docPath" + docPath);
 
 			if (fieldPars == null) {
-				error = true;
+				//error = true;
 				fieldPars = "";
 			}
 
-			if (fieldPars.startsWith("?"))
-				fieldPars = fieldPars.substring(1);
+			//if (fieldPars.startsWith("?"))
+			//	fieldPars = fieldPars.substring(1);
 
 			session = makeSession();
 
@@ -437,9 +437,7 @@ public class RestAPIService implements RestAPI {
 
 		Session session = null;
 		String response = null;
-		InputStream input = null;
 		String result = null;
-		String langResel = "";
 		String fieldPars = "";
 		Map<String, String> mapParameters = new HashMap<String, String>();
 		String docPathShort;
@@ -804,6 +802,7 @@ public class RestAPIService implements RestAPI {
 
 	}
 
+	// old getDocumentCvor
 	private DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
 			@Context UriInfo ui) {
 
