@@ -646,6 +646,7 @@ public class RestAPIService implements RestAPI {
 	// }
 	//
 	/******************* UTIL METHODS *************************/
+	
 	private void printChildren(Node node) throws RepositoryException {
 		if (node.hasNodes()) {
 			NodeIterator it = node.getNodes();
@@ -703,7 +704,7 @@ public class RestAPIService implements RestAPI {
 	 * logger.info("SESSION CLOSED in RestAPIService."); } }
 	 */
 
-	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui,
+	private DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui,
 			String language, String reseller) {
 
 		logger.info("PARENT: {}", parent);
@@ -803,7 +804,7 @@ public class RestAPIService implements RestAPI {
 
 	}
 
-	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
+	private DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
 			@Context UriInfo ui) {
 
 		Session session = null;
@@ -894,7 +895,7 @@ public class RestAPIService implements RestAPI {
 
 	}
 
-	public boolean hasFolder(Node node) throws RepositoryException, NamingException {
+	private boolean hasFolder(Node node) throws RepositoryException, NamingException {
 		Session session = makeSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 			Node subNode = nodeIterator.nextNode();
@@ -907,7 +908,7 @@ public class RestAPIService implements RestAPI {
 		return false;
 	}
 
-	public static StringBuilder getStringFromInputStream(InputStream is) {
+	private static StringBuilder getStringFromInputStream(InputStream is) {
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
 		String line;
@@ -930,7 +931,7 @@ public class RestAPIService implements RestAPI {
 		return sb;
 	}
 
-	public boolean hasFiles(Node node) throws RepositoryException, NamingException {
+	private boolean hasFiles(Node node) throws RepositoryException, NamingException {
 
 		Session session = makeSession();
 		for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
