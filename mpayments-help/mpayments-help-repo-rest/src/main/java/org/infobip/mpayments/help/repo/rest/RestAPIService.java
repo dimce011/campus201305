@@ -55,32 +55,34 @@ import org.slf4j.LoggerFactory;
 @Stateless
 public class RestAPIService implements RestAPI {
 
-	//private Session session = null;
+	// private Session session = null;
 	private Repository repository = null;
 	private InitialContext initialContext = null;
 	private final static String jcrLocal = "java:jcr/local";
 	private final static SimpleCredentials cred;
-	static{
+
+	static {
 		cred = new SimpleCredentials("admin", "admin".toCharArray());
 	}
-	
+
 	private static final String defualtLanguage = "en";
 	private static final String defualtReseller = "";
-	
+
 	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
 	private static ObjectMapper jsonMapper = new ObjectMapper();
-	
+
 	/***************** REST API METHODS *******************/
 
 	@Override
-	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @Context UriInfo ui) {
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
+			@Context UriInfo ui) {
 		return getParagraph(docPath, parID, "", ui);
 	}
 
 	@Override
 	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
 			@PathParam("fieldPars") String fieldPars, @Context UriInfo ui) {
-		
+
 		Session session = null;
 		boolean error = false;
 		InputStream input = null;
@@ -93,7 +95,7 @@ public class RestAPIService implements RestAPI {
 		String noSuchID = "No such ID!";
 		StringBuffer returnResult = new StringBuffer();
 		System.out.println("POZVANA METODA getParagraph");
-		
+
 		try {
 			System.out.println("field par uri " + fieldPars);
 
@@ -106,7 +108,7 @@ public class RestAPIService implements RestAPI {
 				fieldPars = fieldPars.substring(1);
 
 			session = makeSession();
-			
+
 			if (!fieldPars.equals("")) {
 				stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
@@ -127,10 +129,10 @@ public class RestAPIService implements RestAPI {
 			}
 
 			if (language == null) {
-				language = "en";
+				language = defualtLanguage;
 			}
 			if (reseller == null) {
-				reseller = "";
+				reseller = defualtReseller;
 			}
 
 			System.out.println("ispis mape");
@@ -141,19 +143,19 @@ public class RestAPIService implements RestAPI {
 			if (!docPath.startsWith("/")) {
 				docPath = "/" + docPath;
 			}
-			
+
 			result = getDocument(docPath, fieldPars, ui).getEntity().toString();
-	
+
 			if (!mapParameters.isEmpty()) {
 				FreeMarker fm = new FreeMarker();
 				result = fm.process(mapParameters, result);
 			}
-			
+
 		} catch (Exception ex) {
 			error = true;
 			ex.printStackTrace();
 		} finally {
-			closeSession(session);	
+			closeSession(session);
 			closeStreams(input, output);
 		}
 
@@ -187,16 +189,14 @@ public class RestAPIService implements RestAPI {
 		Session session = null;
 		boolean error = false;
 		InputStream input = null;
-		//OutputStream output = null;
+		// OutputStream output = null;
 		String result = "";
 		StringTokenizer stringTokenizer = null;
 		Map<String, Object> mapParameters = new HashMap<String, Object>();
 		String reseller = null;
 		String language = null;
-		String resellerOld = reseller;
-		String languageOld = language;
 		System.out.println("POZVANA METODA getDocument");
-		
+
 		try {
 			System.out.println("field par uri " + fieldPars + " lang " + language + " res " + reseller);
 			System.out.println("docPath" + docPath);
@@ -210,7 +210,7 @@ public class RestAPIService implements RestAPI {
 				fieldPars = fieldPars.substring(1);
 
 			session = makeSession();
-			
+
 			if (!fieldPars.equals("")) {
 				stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
@@ -219,50 +219,36 @@ public class RestAPIService implements RestAPI {
 					String second = stringTokenizer.nextToken();
 					if ("reseller".equalsIgnoreCase(first)) {
 						reseller = second;
-						resellerOld = reseller;
 						continue;
 					}
 					if ("language".equalsIgnoreCase(first)) {
 						language = second;
-						languageOld = language;
 						continue;
 					}
-					System.out.println(first + " " + second);
+					//System.out.println(first + " " + second);
 					mapParameters.put(first, second);
 				}
 			}
 
-			if (language == null) {
+			if (language == null || "null".equals(language)) {
 				language = defualtLanguage;
+				System.out.println("language je null " + language);
 			}
-
-			if (languageOld == null) {
-				languageOld = "";
-			}
-
-			if (resellerOld == null) {
-				resellerOld = "";
+			if (reseller == null || "null".equals(reseller)) {
+				reseller = defualtReseller;
+				System.out.println("reseller je null " + reseller);
 			}
 
 			if (language.equals("")) {
 				language = defualtLanguage;
 			}
-
-			if (reseller == null) {
+			
+			if (reseller.equals("")) {
 				reseller = defualtReseller;
 			}
 
-			System.out.println("jezik= " + language + " preprodavac= " + reseller);
-
-			if (language == null || "null".equals(language)) {
-				language = "en";
-				System.out.println("language je null " + language);
-			}
-			if (reseller == null || "null".equals(reseller)) {
-				reseller = "1";
-				System.out.println("reseller je null " + reseller);
-			}
-
+			System.out.println("language = " + language + " reseller = " + reseller +".");
+			
 			System.out.println("ispis mape");
 			for (Map.Entry<String, Object> entry : mapParameters.entrySet()) {
 				System.out.println(entry.getKey() + " = " + entry.getValue());
@@ -274,77 +260,78 @@ public class RestAPIService implements RestAPI {
 
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
-			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-					+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
-			QueryResult res = query.execute();
-			NodeIterator it = res.getNodes();
-
-			// System.out.println(""+it.getSize());
-
+			Query query = null;
+			QueryResult res = null;
+			NodeIterator it = null;
 			Node node = null;
 
-			if (it.hasNext()) {
-				node = it.nextNode();
-				System.out.println("path 1" + node.getPath());
+			if (!language.equals(defualtLanguage) && !reseller.equals(defualtReseller)) {
+				// Query for the specified reseller and language...
+				query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
+								+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
+				res = query.execute();
+				it = res.getNodes();
+				System.out.println("path 1 " + it.getSize());
+				if (it.hasNext()) {
+					node = it.nextNode();
+				}
 			} else {
-				boolean path2 = false;
-				if (!resellerOld.equals("")) {
+				
+				if (!reseller.equals(defualtReseller)) {
 					// Query for the specified reseller and default language.
 					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
-							+ "' and [my:reseller] = '" + resellerOld + "' and ISCHILDNODE([" + docPath + "])",
-							Query.JCR_SQL2);
+									+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
 					res = query.execute();
 					it = res.getNodes();
 					System.out.println("path 2");
-					path2 = true;
 					if (it.hasNext()) {
 						node = it.nextNode();
 					}
 				}
 				
-				if (!path2) {
+				if (!language.equals(defualtLanguage) && node == null) {
 					// Query for default reseller and the specified language.
 					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-							+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])", Query.JCR_SQL2);
+							+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
 					res = query.execute();
 					it = res.getNodes();
 					System.out.println("path 3");
 					if (it.hasNext()) {
 						node = it.nextNode();
-					} else{
-						// Query for default reseller and default language.
-						query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
-								+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])",
-								Query.JCR_SQL2);
-						res = query.execute();
-						it = res.getNodes();
-						System.out.println("path 4");
-						if (it.hasNext()) {
-							node = it.nextNode();
-
-						} else {
-							return Response.status(Response.Status.NOT_FOUND).entity("Not Found!").build();
-						}
+					}
+				} 
+				
+				if (node == null) {
+					// Query for default reseller and default language.
+					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
+							+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
+					res = query.execute();
+					it = res.getNodes();
+					System.out.println("path 4");
+					if (it.hasNext()) {
+						node = it.nextNode();
+					} else {
+						return Response.status(Response.Status.NOT_FOUND).entity("Not Found!").build();
 					}
 				}
 			}
 
-			if(node != null){
+			if (node != null) {
 				Node content = node.getNode("jcr:content");
 				input = content.getProperty("jcr:data").getBinary().getStream();
 				result = RestAPIService.getStringFromInputStream(input).toString();
 			}
 
 			if (!result.equals("") && !mapParameters.isEmpty()) {
-					FreeMarker fm = new FreeMarker();
-					result = fm.process(mapParameters, result);		
+				FreeMarker fm = new FreeMarker();
+				result = fm.process(mapParameters, result);
 			}
 
 		} catch (Exception ex) {
 			error = true;
 			ex.printStackTrace();
 		} finally {
-			closeSession(session);	
+			closeSession(session);
 			closeStreams(input, null);
 		}
 
@@ -356,7 +343,8 @@ public class RestAPIService implements RestAPI {
 	}
 
 	@Override
-	public Response delDocument(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
+	public Response delDocument(@PathParam("docPath") String docPath, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
 		Session session = null;
 		boolean error = false;
@@ -369,32 +357,32 @@ public class RestAPIService implements RestAPI {
 		String errorString = "error";
 		System.out.println("POZVANA METODA delDocument");
 		try {
-//			System.out.println("field par uri " + fieldPars);
+			// System.out.println("field par uri " + fieldPars);
 
-//			if (fieldPars == null) {
-//				error = true;
-//				fieldPars = "";
-//			}
+			// if (fieldPars == null) {
+			// error = true;
+			// fieldPars = "";
+			// }
 
-//			/
+			// /
 
 			session = makeSession();
-//			if (!fieldPars.equals("")) {
-//				stringTokenizer = new StringTokenizer(fieldPars, "?&=");
-//				System.out.println("FIELD PARAMS " + fieldPars);
-//				while (stringTokenizer.hasMoreTokens()) {
-//					String first = stringTokenizer.nextToken();
-//					String second = stringTokenizer.nextToken();
-//					if ("reseller".equalsIgnoreCase(first)) {
-//						reseller = second;
-//						continue;
-//					}
-//					if ("language".equalsIgnoreCase(first)) {
-//						language = second;
-//						continue;
-//					}
-//				}
-//			}
+			// if (!fieldPars.equals("")) {
+			// stringTokenizer = new StringTokenizer(fieldPars, "?&=");
+			// System.out.println("FIELD PARAMS " + fieldPars);
+			// while (stringTokenizer.hasMoreTokens()) {
+			// String first = stringTokenizer.nextToken();
+			// String second = stringTokenizer.nextToken();
+			// if ("reseller".equalsIgnoreCase(first)) {
+			// reseller = second;
+			// continue;
+			// }
+			// if ("language".equalsIgnoreCase(first)) {
+			// language = second;
+			// continue;
+			// }
+			// }
+			// }
 
 			if (language == null && reseller == null) {
 				language = "";
@@ -438,7 +426,7 @@ public class RestAPIService implements RestAPI {
 					if (!node.hasNodes()) {
 						node = session.getNode(docPath);
 						node.remove();
-					}else{
+					} else {
 						notEmpty = true;
 						errorString = "Folder not empty!";
 					}
@@ -453,15 +441,14 @@ public class RestAPIService implements RestAPI {
 			res = null;
 			it = null;
 
-		}catch (PathNotFoundException ex) {
+		} catch (PathNotFoundException ex) {
 			notFound = true;
 			errorString = "Not found!";
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			error = true;
 			ex.printStackTrace();
 		} finally {
-			closeSession(session);	
+			closeSession(session);
 			closeStreams(input, output);
 		}
 
@@ -476,13 +463,13 @@ public class RestAPIService implements RestAPI {
 		} else {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorString).build();
 		}
-				
+
 	}
 
 	@Override
 	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
-		
+
 		Session session = null;
 		String response = null;
 		InputStream input = null;
@@ -500,8 +487,7 @@ public class RestAPIService implements RestAPI {
 				fieldPars = "";
 				docPathShort = docPath;
 			}
-			
-			
+
 			if (!fieldPars.equals("")) {
 				StringTokenizer stringTokenizer = new StringTokenizer(fieldPars, "&=");
 				System.out.println("FIELD PARAMS " + fieldPars);
@@ -510,16 +496,16 @@ public class RestAPIService implements RestAPI {
 					String second = stringTokenizer.nextToken();
 					if ("reseller".equalsIgnoreCase(first)) {
 						reseller = second;
-					
+
 						continue;
 					}
 					if ("language".equalsIgnoreCase(first)) {
 						language = second;
-						
+
 						continue;
 					}
 					System.out.println(first + " " + second);
-					
+
 					mapParameters.put(first, second);
 				}
 			}
@@ -556,11 +542,11 @@ public class RestAPIService implements RestAPI {
 			System.out.println("get jason " + docPath + " fp " + fieldPars);
 
 			if (language == null) {
-				language = "en";
+				language = defualtLanguage;
 				// fieldPars += "&language=en";
 			}
 			if (reseller == null) {
-				reseller = "";
+				reseller = defualtReseller;
 				// fieldPars += "&reseller=1";
 			}
 
@@ -574,7 +560,7 @@ public class RestAPIService implements RestAPI {
 
 			if (result == null)
 				result = "";
-			
+
 			Document doc = Jsoup.parse(result);
 			Elements divs = doc.getElementsByTag("div");
 			Map<String, String> paragraphs = new TreeMap<String, String>();
@@ -596,10 +582,9 @@ public class RestAPIService implements RestAPI {
 
 			// DocumentCvor dc = new DocumentCvor();
 			System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
-			
-			response = jsonMapper.defaultPrettyPrintingWriter()
-					.writeValueAsString(getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui,language,reseller));
 
+			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
+					getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui, language, reseller));
 
 		} catch (JsonGenerationException e) {
 			// TODO Auto-generated catch block
@@ -622,12 +607,12 @@ public class RestAPIService implements RestAPI {
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
-	
+
 	@Override
 	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @PathParam("fieldPars") String fieldPars,
 			@QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
-		//openSession();
+		// openSession();
 		Session session = null;
 		Map<String, String> mapParameters = new HashMap<String, String>();
 		System.out.println("getChildrenLinksJSON " + fieldPars);
@@ -655,10 +640,10 @@ public class RestAPIService implements RestAPI {
 		}
 
 		if (reseller == null) {
-			reseller = "1";
+			reseller = defualtReseller;
 		}
 		if (language == null) {
-			language = "en";
+			language = defualtLanguage;
 		}
 
 		String response = null;
@@ -670,7 +655,7 @@ public class RestAPIService implements RestAPI {
 			Repository repository = (Repository) initialContext.lookup("java:jcr/local");
 			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
 			logger.info("SESSION OPENED in RestAPIService.");
-			
+
 			node = session.getNode("/" + parent);
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
@@ -707,22 +692,22 @@ public class RestAPIService implements RestAPI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			closeSession(session);	
+			closeSession(session);
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
-	
+
 	@Override
 	public Response getChildrenLinksJSON2(@PathParam("parent") String parent, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui) {
 		return getChildrenLinksJSON(parent, "", language, reseller, ui);
 	}
-	
-//	@Override
-//	public Response delDocument(@PathParam("docPath") String docPath) {
-//		return delDocument(docPath, "");
-//	}
-//	
+
+	// @Override
+	// public Response delDocument(@PathParam("docPath") String docPath) {
+	// return delDocument(docPath, "");
+	// }
+	//
 	/******************* UTIL METHODS *************************/
 	private void printChildren(Node node) throws RepositoryException {
 		if (node.hasNodes()) {
@@ -733,7 +718,7 @@ public class RestAPIService implements RestAPI {
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private String readFile(File file) throws IOException {
 		StringBuilder fileContents = new StringBuilder((int) file.length());
@@ -748,7 +733,7 @@ public class RestAPIService implements RestAPI {
 			scanner.close();
 		}
 	}
-	
+
 	private void closeStreams(InputStream input, OutputStream output) {
 		if (input != null)
 			try {
@@ -763,39 +748,23 @@ public class RestAPIService implements RestAPI {
 				e.printStackTrace();
 			}
 	}
-	
 
-	/*public void openSession() {
-		try {
-			if(session == null){
-				logger.info("start OPEN SESSION in RestAPIService.");
-				initialContext = new InitialContext();
-				repository = (Repository) initialContext.lookup("java:jcr/local");
-				session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-				logger.info("SESSION OPENED in RestAPIService.");
-			}
-		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (LoginException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RepositoryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public void closeSession() {
-		if(session != null ){
-			session.logout();
-			// release memory 
-			session = null;
-			repository = null;
-			initialContext = null;
-			logger.info("SESSION CLOSED in RestAPIService.");
-		}
-	}*/
+	/*
+	 * public void openSession() { try { if(session == null){
+	 * logger.info("start OPEN SESSION in RestAPIService."); initialContext =
+	 * new InitialContext(); repository = (Repository)
+	 * initialContext.lookup("java:jcr/local"); session = repository.login(new
+	 * SimpleCredentials("admin", "admin".toCharArray()));
+	 * logger.info("SESSION OPENED in RestAPIService."); } } catch
+	 * (NamingException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } catch (LoginException e) { // TODO Auto-generated
+	 * catch block e.printStackTrace(); } catch (RepositoryException e) { //
+	 * TODO Auto-generated catch block e.printStackTrace(); } }
+	 * 
+	 * public void closeSession() { if(session != null ){ session.logout(); //
+	 * release memory session = null; repository = null; initialContext = null;
+	 * logger.info("SESSION CLOSED in RestAPIService."); } }
+	 */
 
 	public DocumentCvor getDocumentCvor(String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui,
 			String language, String reseller) {
@@ -805,9 +774,9 @@ public class RestAPIService implements RestAPI {
 		Session session = null;
 		DocumentCvor dnl = null;
 		try {
-			
+
 			session = makeSession();
-		
+
 			node = session.getNode(parent);
 			String[] niz = node.getPath().split("/");
 			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length() - 1);
@@ -815,11 +784,11 @@ public class RestAPIService implements RestAPI {
 			// ubacivanje title-a
 			String title = null;
 
-			if (reseller==null) {
-				reseller = "centili";
+			if (reseller == null) {
+				reseller = defualtReseller;
 			}
-			if (language==null) {
-				language = "en";
+			if (language == null) {
+				language = defualtLanguage;
 			}
 
 			if (node.hasProperty("my:title")) {
@@ -848,8 +817,6 @@ public class RestAPIService implements RestAPI {
 				System.out.println("Node " + node.getName() + " nema odgovarajuci properti");
 				title = node.getName();
 			}
-
-			
 
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
 					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
@@ -893,7 +860,7 @@ public class RestAPIService implements RestAPI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			closeSession(session);	
+			closeSession(session);
 		}
 		return dnl;
 
@@ -902,21 +869,21 @@ public class RestAPIService implements RestAPI {
 	public DocumentCvor getDocumentCvor(String parent, String fieldPars, String language, String reseller,
 			@Context UriInfo ui) {
 
-	    Session session = null;
+		Session session = null;
 		Node node = null;
 		DocumentCvor dnl = null;
 		try {
-			
+
 			session = makeSession();
-		
+
 			node = session.getNode(parent);
 			String title = null;
 
 			if (reseller == null) {
-				reseller = "centili";
+				reseller = defualtReseller;
 			}
 			if (language == null) {
-				language = "en";
+				language = defualtLanguage;
 			}
 
 			System.out.println("fp u getDocumentCvor " + fieldPars);
@@ -984,7 +951,7 @@ public class RestAPIService implements RestAPI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			closeSession(session);	
+			closeSession(session);
 		}
 		return dnl;
 
@@ -998,11 +965,11 @@ public class RestAPIService implements RestAPI {
 				return true;
 			}
 		}
-		
-		closeSession(session);	
+
+		closeSession(session);
 		return false;
 	}
-	
+
 	public static StringBuilder getStringFromInputStream(InputStream is) {
 		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
@@ -1025,7 +992,7 @@ public class RestAPIService implements RestAPI {
 		}
 		return sb;
 	}
-	
+
 	public boolean hasFiles(Node node) throws RepositoryException, NamingException {
 
 		Session session = makeSession();
@@ -1035,26 +1002,24 @@ public class RestAPIService implements RestAPI {
 				return true;
 			}
 		}
-		
-		closeSession(session);	
+
+		closeSession(session);
 		return false;
 	}
-	
-    private Session makeSession() throws NamingException, LoginException, RepositoryException  {
-		    InitialContext initialContext = new InitialContext();
-    		Repository repository = (Repository) initialContext.lookup(jcrLocal);
-    		Session session = repository.login(cred);
-            return session;
-    }
-    
-    private Session closeSession(Session session){	
-		if(session != null){
+
+	private Session makeSession() throws NamingException, LoginException, RepositoryException {
+		InitialContext initialContext = new InitialContext();
+		Repository repository = (Repository) initialContext.lookup(jcrLocal);
+		Session session = repository.login(cred);
+		return session;
+	}
+
+	private Session closeSession(Session session) {
+		if (session != null) {
 			session.logout();
 			return null;
 		}
 		return session;
-    }
-    
-    
+	}
 
 }
