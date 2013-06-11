@@ -104,8 +104,8 @@ public class RestAPIService implements RestAPI {
 				fieldPars = "";
 			}
 
-			//if (fieldPars.startsWith("?"))
-			//	fieldPars = fieldPars.substring(1);
+			if (fieldPars.startsWith("?"))
+				fieldPars = fieldPars.substring(1);
 
 			session = makeSession();
 
@@ -127,10 +127,20 @@ public class RestAPIService implements RestAPI {
 				}
 			}
 
-			if (language == null) {
+			if (language == null || "null".equals(language)) {
+				language = defualtLanguage;
+				//System.out.println("language je null " + language);
+			}
+			if (reseller == null || "null".equals(reseller)) {
+				reseller = defualtReseller;
+				//System.out.println("reseller je null " + reseller);
+			}
+
+			if (language.equals("")) {
 				language = defualtLanguage;
 			}
-			if (reseller == null) {
+			
+			if (reseller.equals("")) {
 				reseller = defualtReseller;
 			}
 
@@ -145,10 +155,10 @@ public class RestAPIService implements RestAPI {
 
 			result = getDocument(docPath, fieldPars, ui).getEntity().toString();
 
-			if (!mapParameters.isEmpty()) {
+		/*	if (!mapParameters.isEmpty()) {
 				FreeMarker fm = new FreeMarker();
 				result = fm.process(mapParameters, result);
-			}
+			}*/
 
 		} catch (Exception ex) {
 			error = true;
@@ -205,8 +215,8 @@ public class RestAPIService implements RestAPI {
 				fieldPars = "";
 			}
 
-			//if (fieldPars.startsWith("?"))
-			//	fieldPars = fieldPars.substring(1);
+			if (fieldPars.startsWith("?"))
+				fieldPars = fieldPars.substring(1);
 
 			session = makeSession();
 
@@ -472,14 +482,17 @@ public class RestAPIService implements RestAPI {
 
 			System.out.println("get jason " + docPath + " fp " + fieldPars);
 
-			if (language == null) {
+			if (language == null || "null".equals(language))
 				language = defualtLanguage;
-				// fieldPars += "&language=en";
-			}
-			if (reseller == null) {
+
+			if (reseller == null || "null".equals(reseller))
 				reseller = defualtReseller;
-				// fieldPars += "&reseller=1";
-			}
+
+			if (language.equals(""))
+				language = defualtLanguage;
+
+			if (reseller.equals(""))
+				reseller = defualtReseller;
 
 			session = makeSession();
 			
@@ -559,12 +572,17 @@ public class RestAPIService implements RestAPI {
 			}
 		}
 
-		if (reseller == null) {
-			reseller = defualtReseller;
-		}
-		if (language == null) {
+		if (language == null || "null".equals(language))
 			language = defualtLanguage;
-		}
+
+		if (reseller == null || "null".equals(reseller))
+			reseller = defualtReseller;
+
+		if (language.equals(""))
+			language = defualtLanguage;
+
+		if (reseller.equals(""))
+			reseller = defualtReseller;
 
 		String response = null;
 		Node node = null;
