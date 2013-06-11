@@ -549,12 +549,10 @@ public class RestAPIService implements RestAPI {
 				String second = stringTokenizer.nextToken();
 				if ("reseller".equalsIgnoreCase(first)) {
 					reseller = second;
-
 					continue;
 				}
 				if ("language".equalsIgnoreCase(first)) {
 					language = second;
-
 					continue;
 				}
 				System.out.println(first + " " + second);
@@ -573,20 +571,12 @@ public class RestAPIService implements RestAPI {
 		String response = null;
 		Node node = null;
 		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
-		String docPathShort;
+
 		try {
-
-			if (parentPath.contains("=")) {
-				fieldPars = parentPath.substring(parentPath.lastIndexOf("/") + 1, parentPath.length());
-				docPathShort = parentPath.substring(0, parentPath.lastIndexOf("/"));
-			} else {
-				fieldPars = "";
-				docPathShort = parentPath;
-			}
-
 			session = makeSession();
 			node = session.getNode("/" + parentPath);
 		
+			System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
