@@ -123,7 +123,6 @@ public class RestAPIService implements RestAPI {
 						language = second;
 						continue;
 					}
-
 					mapParameters.put(first, second);
 				}
 			}
@@ -350,39 +349,13 @@ public class RestAPIService implements RestAPI {
 		boolean error = false;
 		InputStream input = null;
 		OutputStream output = null;
-
 		boolean notEmpty = false;
 		boolean notFound = false;
-		// StringBuffer bufferPath = new StringBuffer("");
 		String errorString = "error";
 		System.out.println("POZVANA METODA delDocument");
+		
 		try {
-			// System.out.println("field par uri " + fieldPars);
-
-			// if (fieldPars == null) {
-			// error = true;
-			// fieldPars = "";
-			// }
-
-			// /
-
 			session = makeSession();
-			// if (!fieldPars.equals("")) {
-			// stringTokenizer = new StringTokenizer(fieldPars, "?&=");
-			// System.out.println("FIELD PARAMS " + fieldPars);
-			// while (stringTokenizer.hasMoreTokens()) {
-			// String first = stringTokenizer.nextToken();
-			// String second = stringTokenizer.nextToken();
-			// if ("reseller".equalsIgnoreCase(first)) {
-			// reseller = second;
-			// continue;
-			// }
-			// if ("language".equalsIgnoreCase(first)) {
-			// language = second;
-			// continue;
-			// }
-			// }
-			// }
 
 			if (language == null && reseller == null) {
 				language = "";
@@ -393,14 +366,6 @@ public class RestAPIService implements RestAPI {
 				docPath = "/" + docPath;
 			}
 
-			// bufferPath = new StringBuffer("");
-			// StringTokenizer st = new StringTokenizer(docPath,">");
-			//
-			// while(st.hasMoreTokens()){
-			// bufferPath.append("/"+st.nextToken());
-			// }
-
-			// path = "/help/" + app + "/" + topic;
 			Workspace ws = session.getWorkspace();
 			QueryManager qm = ws.getQueryManager();
 			Query query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
@@ -496,47 +461,15 @@ public class RestAPIService implements RestAPI {
 					String second = stringTokenizer.nextToken();
 					if ("reseller".equalsIgnoreCase(first)) {
 						reseller = second;
-
 						continue;
 					}
 					if ("language".equalsIgnoreCase(first)) {
 						language = second;
-
 						continue;
 					}
 					System.out.println(first + " " + second);
-
 					mapParameters.put(first, second);
 				}
-			}
-
-			// Map<String, List<String>> callParameters =
-			// ui.getQueryParameters();
-			//
-			//
-			//
-			// for (Map.Entry<String, List<String>> entry :
-			// callParameters.entrySet()) {
-			// if (entry.getKey().equals("language")) {
-			// language = entry.getValue().get(0);
-			// continue;
-			// }
-			// if (entry.getKey().equals("reseller")) {
-			// reseller = entry.getValue().get(0);
-			// continue;
-			// }
-			//
-			// // callParameters.put(entry.getKey(), entry.getValue().get(0);
-			// fieldPars += entry.getKey() + "=" + entry.getValue().get(0) +
-			// "&";
-			// }
-
-			if (fieldPars.endsWith("&")) {
-				// fieldPars = fieldPars.substring(0, fieldPars.length() - 1);
-			}
-
-			if (fieldPars.startsWith("&")) {
-				// fieldPars = "&"+ fieldPars;
 			}
 
 			System.out.println("get jason " + docPath + " fp " + fieldPars);
@@ -550,16 +483,12 @@ public class RestAPIService implements RestAPI {
 				// fieldPars += "&reseller=1";
 			}
 
-			InitialContext initialContext = new InitialContext();
-			Repository repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-
+			session = makeSession();
+			
 			result = (String) getDocument(docPathShort, fieldPars, ui).getEntity();
-
-			System.out.println("get jason novi " + result);
-
 			if (result == null)
 				result = "";
+			System.out.println("get jason novi " + result);
 
 			Document doc = Jsoup.parse(result);
 			Elements divs = doc.getElementsByTag("div");
@@ -574,15 +503,8 @@ public class RestAPIService implements RestAPI {
 
 			Node node = session.getNode("/" + docPathShort);
 			String[] niz = node.getPath().split("/");
-			// DocumentCvor dc = new DocumentCvor(node.getName(),
-			// niz[1].toUpperCase(), ui.getBaseUri().toString()
-			// + "/documents" + node.getPath(), ui.getBaseUri().toString() +
-			// "/documents"
-			// + node.getParent().getPath());
-
-			// DocumentCvor dc = new DocumentCvor();
 			System.out.println("LANGUAGE >>> " + language + " RESELLER >>> " + reseller);
-
+			
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(
 					getDocumentCvor("/" + docPathShort, paragraphs, "/" + fieldPars, ui, language, reseller));
 
@@ -604,12 +526,14 @@ public class RestAPIService implements RestAPI {
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally {
+			closeSession(session);
 		}
 		return Response.status(Response.Status.OK).entity(response).build();
 	}
 
 	@Override
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @PathParam("fieldPars") String fieldPars,
+	public Response getChildrenLinksJSON(@PathParam("parent") String parentPath, @PathParam("fieldPars") String fieldPars,
 			@QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui) {
 
 		// openSession();
@@ -649,24 +573,47 @@ public class RestAPIService implements RestAPI {
 		String response = null;
 		Node node = null;
 		ArrayList<DocumentCvor> children_list = new ArrayList<DocumentCvor>();
+		String docPathShort;
 		try {
-			logger.info("start OPEN SESSION in RestAPIService.");
-			InitialContext initialContext = new InitialContext();
-			Repository repository = (Repository) initialContext.lookup("java:jcr/local");
-			session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-			logger.info("SESSION OPENED in RestAPIService.");
 
-			node = session.getNode("/" + parent);
+			if (parentPath.contains("=")) {
+				fieldPars = parentPath.substring(parentPath.lastIndexOf("/") + 1, parentPath.length());
+				docPathShort = parentPath.substring(0, parentPath.lastIndexOf("/"));
+			} else {
+				fieldPars = "";
+				docPathShort = parentPath;
+			}
+
+			session = makeSession();
+			node = session.getNode("/" + parentPath);
+		
 			if (node.hasNodes()) {
 				for (NodeIterator nodeIterator = node.getNodes(); nodeIterator.hasNext();) {
 					Node subNode = nodeIterator.nextNode();
 
 					if (!subNode.isNodeType("nt:file")) {
-						children_list.add(getDocumentCvor(subNode.getPath(), fieldPars, language, reseller, ui));
+						//children_list.add(getDocumentCvor(subNode.getPath(), fieldPars, language, reseller, ui));
+						String  result = (String) getDocument(subNode.getPath(), fieldPars, ui).getEntity();
+
+						//System.out.println("get jason novi " + result);
+
+						if (result == null)
+							result = "";
+
+						Document doc = Jsoup.parse(result);
+						Elements divs = doc.getElementsByTag("div");
+						Map<String, String> paragraphs = new TreeMap<String, String>();
+						for (Element elem : divs) {
+							if (!elem.id().isEmpty()) {
+								paragraphs.put(elem.id(), ui.getBaseUri().toString() + "documents" + subNode.getPath()
+										+ "/content/paragraph/" + elem.id() + "/" + fieldPars);
+
+							}
+						}
+						children_list.add(getDocumentCvor(subNode.getPath(), paragraphs, "/" + fieldPars, ui, language, reseller));										
 					}
 					// children_list.add(getDocumentCvor(subNode.getPath(),
 					// language, reseller, ui));
-
 				}
 			}
 			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
