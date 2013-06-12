@@ -15,81 +15,55 @@ import javax.ws.rs.core.UriInfo;
 @Local
 @Path("/")
 public interface RestAPI {
-	
-//	@GET
-//	@Path("/documents/{id}/content")
-//	@Produces(MediaType.TEXT_HTML)
-//	public Response getDocuments(@PathParam("id") String id);
-//	
 
 	@GET
 	@Path("/documents/{docPath:.*}/content/paragraph/{parID}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @Context UriInfo ui);
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
+			@Context UriInfo ui);
 
 	@GET
 	@Path("/documents/{docPath:.*}/content/paragraph/{parID}/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID, @PathParam("fieldPars") String fieldPars, @Context UriInfo ui);
-	
-	//@Path("/mypath{param1 : (/param1)?}") {fuel : (/fuel/[^/]+)?}
+	public Response getParagraph(@PathParam("docPath") String docPath, @PathParam("parID") String parID,
+			@PathParam("fieldPars") String fieldPars, @Context UriInfo ui);
+
+	// @Path("/mypath{param1 : (/param1)?}") {fuel : (/fuel/[^/]+)?}
 	@GET
-	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
+	// @Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
 	@Path("/documents/{docPath:.*}/content/{fieldPars}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars, @Context UriInfo ui);
-	
+	public Response getDocument(@PathParam("docPath") String docPath, @PathParam("fieldPars") String fieldPars,
+			@Context UriInfo ui);
+
 	@GET
-	//@Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
+	// @Path("/{app}/{topic}/content{fieldPars : (/fieldPars)?}")
 	@Path("/documents/{docPath:.*}/content")
 	@Produces(MediaType.TEXT_HTML)
 	public Response getDocument(@PathParam("docPath") String docPath, @Context UriInfo ui);
-	
+
 	@DELETE
 	@Path("/documents/{docPath:.*}")
 	@Produces(MediaType.TEXT_HTML)
-	public Response delDocument(@PathParam("docPath") String docPath,  @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
-	
+	public Response delDocument(@PathParam("docPath") String docPath, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+
 	@GET
 	@Path("/documents/{docPath:.*}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
-	
-	
+	public Response getJSON(@PathParam("docPath") String docPath, @QueryParam("language") String language,
+			@QueryParam("reseller") String reseller, @Context UriInfo ui);
+
 	@GET
 	@Path("documents/{parent:.*}/children/{fieldPars}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getChildrenLinksJSON(@PathParam("parent") String parent,
-			@PathParam("fieldPars") String fieldPars,
-			@QueryParam("language") String language,
-			@QueryParam("reseller") String reseller, @Context UriInfo ui);
-	
+	public Response getChildrenLinksJSON(@PathParam("parent") String parent, @PathParam("fieldPars") String fieldPars,
+			@QueryParam("language") String language, @QueryParam("reseller") String reseller, @Context UriInfo ui);
+
 	@GET
 	@Path("documents/{parent:.*}/children/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getChildrenLinksJSON2(@PathParam("parent") String parent,
-			@QueryParam("language") String language,
+	public Response getChildrenLinksJSON2(@PathParam("parent") String parent, @QueryParam("language") String language,
 			@QueryParam("reseller") String reseller, @Context UriInfo ui);
-	
-//	@DELETE
-//	@Path("/documents/{docPath:.*}")
-//	@Produces(MediaType.TEXT_HTML)
-//	public Response delDocument(@PathParam("docPath") String docPath);
-	
-//	@GET
-//	@Path("/documents/{docPath:.*}/")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getJSON(@PathParam("docPath") String docPath);
-	
-	
-
-	
-//  za staro drvo!
-//	@GET
-//	//@Path("/{apppath}/content")
-//	@Path("/{rPath:.*}/content")
-//	@Produces(MediaType.TEXT_HTML)
-//	public Response getDoc(@PathParam("rPath") String rPath);
-	
 
 }

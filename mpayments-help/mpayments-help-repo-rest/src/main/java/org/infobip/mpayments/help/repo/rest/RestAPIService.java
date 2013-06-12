@@ -58,18 +58,18 @@ public class RestAPIService implements RestAPI {
 	// private Session session = null;
 	private Repository repository = null;
 	private InitialContext initialContext = null;
-	private final static String jcrLocal = "java:jcr/local";
-	private final static SimpleCredentials cred;
-
-	static {
-		cred = new SimpleCredentials("admin", "admin".toCharArray());
-	}
-
-	private static final String defualtLanguage = "en";
-	private static final String defualtReseller = "";
-
-	static final Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
+	
 	private static ObjectMapper jsonMapper = new ObjectMapper();
+
+	private final static Logger logger = LoggerFactory.getLogger(RestHelpRepoService.class);
+	private final static String JCRLOCAL = "java:jcr/local";
+	private final static SimpleCredentials CRED;
+	private final static String DEFAULTLANGUAGE = "en";
+	private final static String DEFAULTRESELLER = "";
+	
+	static {
+		CRED = new SimpleCredentials("admin", "admin".toCharArray());
+	}
 
 	/***************** REST API METHODS *******************/
 
@@ -128,20 +128,20 @@ public class RestAPIService implements RestAPI {
 			}
 
 			if (language == null || "null".equals(language)) {
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 				//System.out.println("language je null " + language);
 			}
 			if (reseller == null || "null".equals(reseller)) {
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 				//System.out.println("reseller je null " + reseller);
 			}
 
 			if (language.equals("")) {
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 			}
 			
 			if (reseller.equals("")) {
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 			}
 
 			System.out.println("ispis mape");
@@ -240,20 +240,20 @@ public class RestAPIService implements RestAPI {
 			}
 
 			if (language == null || "null".equals(language)) {
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 				System.out.println("language je null " + language);
 			}
 			if (reseller == null || "null".equals(reseller)) {
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 				System.out.println("reseller je null " + reseller);
 			}
 
 			if (language.equals("")) {
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 			}
 			
 			if (reseller.equals("")) {
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 			}
 
 			System.out.println("language = " + language + " reseller = " + reseller +".");
@@ -274,7 +274,7 @@ public class RestAPIService implements RestAPI {
 			NodeIterator it = null;
 			Node node = null;
 
-			if (!language.equals(defualtLanguage) && !reseller.equals(defualtReseller)) {
+			if (!language.equals(DEFAULTLANGUAGE) && !reseller.equals(DEFAULTRESELLER)) {
 				// Query for the specified reseller and language...
 				query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
 								+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
@@ -286,9 +286,9 @@ public class RestAPIService implements RestAPI {
 				}
 			} else {
 				
-				if (!reseller.equals(defualtReseller)) {
+				if (!reseller.equals(DEFAULTRESELLER)) {
 					// Query for the specified reseller and default language.
-					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
+					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + DEFAULTLANGUAGE
 									+ "' and [my:reseller] = '" + reseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
 					res = query.execute();
 					it = res.getNodes();
@@ -298,10 +298,10 @@ public class RestAPIService implements RestAPI {
 					}
 				}
 				
-				if (!language.equals(defualtLanguage) && node == null) {
+				if (!language.equals(DEFAULTLANGUAGE) && node == null) {
 					// Query for default reseller and the specified language.
 					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + language
-							+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
+							+ "' and [my:reseller] = '" + DEFAULTRESELLER + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
 					res = query.execute();
 					it = res.getNodes();
 					System.out.println("path 3");
@@ -312,8 +312,8 @@ public class RestAPIService implements RestAPI {
 				
 				if (node == null) {
 					// Query for default reseller and default language.
-					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + defualtLanguage
-							+ "' and [my:reseller] = '" + defualtReseller + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
+					query = qm.createQuery("SELECT * FROM [mix:title]  WHERE [my:lang] = '" + DEFAULTLANGUAGE
+							+ "' and [my:reseller] = '" + DEFAULTRESELLER + "' and ISCHILDNODE([" + docPath + "])",Query.JCR_SQL2);
 					res = query.execute();
 					it = res.getNodes();
 					System.out.println("path 4");
@@ -483,16 +483,16 @@ public class RestAPIService implements RestAPI {
 			System.out.println("get jason " + docPath + " fp " + fieldPars);
 
 			if (language == null || "null".equals(language))
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 
 			if (reseller == null || "null".equals(reseller))
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 
 			if (language.equals(""))
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 
 			if (reseller.equals(""))
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 
 			session = makeSession();
 			
@@ -573,16 +573,16 @@ public class RestAPIService implements RestAPI {
 		}
 
 		if (language == null || "null".equals(language))
-			language = defualtLanguage;
+			language = DEFAULTLANGUAGE;
 
 		if (reseller == null || "null".equals(reseller))
-			reseller = defualtReseller;
+			reseller = DEFAULTRESELLER;
 
 		if (language.equals(""))
-			language = defualtLanguage;
+			language = DEFAULTLANGUAGE;
 
 		if (reseller.equals(""))
-			reseller = defualtReseller;
+			reseller = DEFAULTRESELLER;
 
 		String response = null;
 		Node node = null;
@@ -739,10 +739,10 @@ public class RestAPIService implements RestAPI {
 			String title = null;
 
 			if (reseller == null) {
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 			}
 			if (language == null) {
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 			}
 
 			if (node.hasProperty("my:title")) {
@@ -835,10 +835,10 @@ public class RestAPIService implements RestAPI {
 			String title = null;
 
 			if (reseller == null) {
-				reseller = defualtReseller;
+				reseller = DEFAULTRESELLER;
 			}
 			if (language == null) {
-				language = defualtLanguage;
+				language = DEFAULTLANGUAGE;
 			}
 
 			System.out.println("fp u getDocumentCvor " + fieldPars);
@@ -964,8 +964,8 @@ public class RestAPIService implements RestAPI {
 
 	private Session makeSession() throws NamingException, LoginException, RepositoryException {
 		InitialContext initialContext = new InitialContext();
-		Repository repository = (Repository) initialContext.lookup(jcrLocal);
-		Session session = repository.login(cred);
+		Repository repository = (Repository) initialContext.lookup(JCRLOCAL);
+		Session session = repository.login(CRED);
 		return session;
 	}
 
