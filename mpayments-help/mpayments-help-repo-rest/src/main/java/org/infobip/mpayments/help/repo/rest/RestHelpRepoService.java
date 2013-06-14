@@ -93,6 +93,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 		try {
 			openSession();
 
+			logger.info("Test method with action: "+action);
 			if ("delete".equals(action)) {
 				deleteHelpTree("/help");
 			} else if ("create".equals(action)) {
@@ -108,6 +109,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 			}
 
 			ispisiSvuDecu(session.getNode("/"));
+			session.save();
 
 			// ubacivanje fajla u signUp folder
 //			Node signUp = session.getNode("/help/pp/singUp");
@@ -344,8 +346,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 			// Binary binary = session.getValueFactory().createBinary(stream);
 			// content.setProperty("jcr:data", binary);
 
-			ispisiSvuDecu(session.getNode("/"));
-			session.save();
+			//ispisiSvuDecu(session.getNode("/"));
+			//session.save();
 
 		} catch (Exception ex) {
 			error = true;
@@ -374,8 +376,8 @@ public class RestHelpRepoService implements RestHelpRepo {
 
 		// pravljenje novog tipa cvora sa novim propertijima
 
-		NamespaceRegistry nsReg = (NamespaceRegistry) session.getWorkspace().getNamespaceRegistry();
-		nsReg.registerNamespace("my", "com.infobip.jcr.my");
+		//NamespaceRegistry nsReg = (NamespaceRegistry) session.getWorkspace().getNamespaceRegistry();
+		//nsReg.registerNamespace("my", "com.infobip.jcr.my");
 	}
 
 	private void createProperty() throws RepositoryException {
@@ -927,7 +929,7 @@ public class RestHelpRepoService implements RestHelpRepo {
 				}
 			}
 			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
-			dcw.documents = children_list;
+			dcw.get_embedded().documents = children_list;
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dcw);
 
 		} catch (PathNotFoundException e1) {

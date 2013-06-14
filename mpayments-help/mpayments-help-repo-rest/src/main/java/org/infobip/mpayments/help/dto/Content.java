@@ -1,14 +1,12 @@
 package org.infobip.mpayments.help.dto;
 
-public class Paragraph {
-	String key;
-	public String getKey() {
-		return key;
+public class Content {
+	public String getHtml() {
+		return html;
 	}
-	public void setKey(String id) {
-		this.key = id;
+	public void setHtml(String html) {
+		this.html = html;
 	}
-
 	public SelfNodeLink get_links() {
 		return _links;
 	}
@@ -16,5 +14,6 @@ public class Paragraph {
 		this._links = _links;
 	}
 	
+	String html = "";
 	SelfNodeLink _links = new SelfNodeLink();
 }

@@ -26,7 +26,6 @@ import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 import javax.jcr.Value;
 import javax.jcr.Workspace;
-import javax.jcr.nodetype.NodeType;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryManager;
 import javax.jcr.query.QueryResult;
@@ -42,8 +41,10 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.infobip.mpayments.help.dto.DocumentCvor;
+import org.infobip.mpayments.help.dto.DocumentCvorChildren;
 import org.infobip.mpayments.help.dto.DocumentCvorWrapper;
 import org.infobip.mpayments.help.dto.Paragraph;
+import org.infobip.mpayments.help.dto.SelfHref;
 import org.infobip.mpayments.help.freemarker.FreeMarker;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -221,21 +222,23 @@ public class RestAPIService implements RestAPI {
 			session = makeSession();
 
 			if (!fieldPars.equals("")) {
-				stringTokenizer = new StringTokenizer(fieldPars, "&=");
-				System.out.println("FIELD PARAMS " + fieldPars);
-				while (stringTokenizer.hasMoreTokens()) {
-					String first = stringTokenizer.nextToken();
-					String second = stringTokenizer.nextToken();
-					if ("reseller".equalsIgnoreCase(first)) {
-						reseller = second;
-						continue;
+				if (fieldPars.contains("=")) {
+					stringTokenizer = new StringTokenizer(fieldPars, "&=");
+					System.out.println("FIELD PARAMS " + fieldPars);
+					while (stringTokenizer.hasMoreTokens()) {
+						String first = stringTokenizer.nextToken();
+						String second = stringTokenizer.nextToken();
+						if ("reseller".equalsIgnoreCase(first)) {
+							reseller = second;
+							continue;
+						}
+						if ("language".equalsIgnoreCase(first)) {
+							language = second;
+							continue;
+						}
+						// System.out.println(first + " " + second);
+						mapParameters.put(first, second);
 					}
-					if ("language".equalsIgnoreCase(first)) {
-						language = second;
-						continue;
-					}
-					//System.out.println(first + " " + second);
-					mapParameters.put(first, second);
 				}
 			}
 
@@ -623,7 +626,9 @@ public class RestAPIService implements RestAPI {
 				}
 			}
 			DocumentCvorWrapper dcw = new DocumentCvorWrapper();
-			dcw.documents = children_list;
+			dcw.get_embedded().get_links().setSelf(new SelfHref(ui.getBaseUri().toString() + "documents"
+					+ node.getPath() + fieldPars));
+			dcw.get_embedded().documents = children_list;
 			response = jsonMapper.defaultPrettyPrintingWriter().writeValueAsString(dcw);
 
 		} catch (PathNotFoundException e1) {
@@ -774,16 +779,127 @@ public class RestAPIService implements RestAPI {
 
 			dnl = new DocumentCvor(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
 					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
-
+			
+			dnl.setPath(node.getPath().startsWith("/")? node.getPath().substring(1) : node.getPath());
+			dnl.setMimeType("text");
+			dnl.setAccess("edit");
+			dnl.setVersion("1");
+			dnl.setCraetedBy("larsic");
+			
 			List<Paragraph> lista = new ArrayList<Paragraph>();
 			Paragraph p = null;
 			for (Map.Entry<String, String> entry : paragraphs.entrySet()) {
 				p = new Paragraph();
 				p.setKey(entry.getKey());
-				p.setLink(entry.getValue());
+				p.get_links().setSelf(new SelfHref(entry.getValue()));
 				lista.add(p);
 			}
-			dnl.setParagraphs(lista);
+			dnl.get_embedded().setParagraphs(lista);
+			if (node.hasNodes()) {
+				if (hasFolder(node)) {
+					String children_href = ui.getBaseUri().toString() + "documents" + node.getPath() + "/children";
+					dnl.setChildren_href(children_href + fieldPars);
+					
+				} else {
+					dnl.setChildren_href("");
+				}
+
+				if (hasFiles(node)) {
+					dnl.setLanguage(language);
+					dnl.setReseller(reseller);
+					String content_href = ui.getBaseUri().toString() + "documents" + node.getPath() + "/content";
+					dnl.setContent_href(content_href + fieldPars);
+				} else {
+					dnl.setContent_href("");
+				}
+				
+			} else {
+				dnl.setChildren_href("");
+				dnl.setContent_href("");
+			}
+
+		} catch (PathNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (RepositoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			closeSession(session);
+		}
+		return dnl;
+
+	}
+	
+	
+	private DocumentCvorChildren getDocumentCvorChildren (String parent, Map<String, String> paragraphs, String fieldPars, UriInfo ui,
+			String language, String reseller) {
+
+		logger.info("PARENT: {}", parent);
+		Node node = null;
+		Session session = null;
+		DocumentCvorChildren dnl = null;
+		try {
+
+			session = makeSession();
+
+			node = session.getNode(parent);
+			String[] niz = node.getPath().split("/");
+			String baseUri = ui.getBaseUri().toString().substring(0, ui.getBaseUri().toString().length() - 1);
+
+			// ubacivanje title-a
+			String title = null;
+
+			if (reseller == null) {
+				reseller = DEFAULTRESELLER;
+			}
+			if (language == null) {
+				language = DEFAULTLANGUAGE;
+			}
+
+			if (node.hasProperty("my:title")) {
+				Property p = node.getProperty("my:title");
+				Value[] v = p.getValues();
+				for (Value value : v) {
+					String[] mtitle = value.getString().split("#");
+
+					if (mtitle[1].equals(reseller)) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+					} else if (mtitle[1].equals("centili")) {
+						if (mtitle[0].equals(language)) {
+							title = mtitle[2];
+						} else if (mtitle[0].equals("en")) {
+							title = mtitle[2];
+						}
+					}
+				}
+			}
+
+			if (title == null) {
+				System.out.println("Node " + node.getName() + " nema odgovarajuci properti");
+				title = node.getName();
+			}
+
+			dnl = new DocumentCvorChildren(title, niz[1].toUpperCase(), ui.getBaseUri().toString() + "documents"
+					+ node.getPath() + fieldPars, ui.getBaseUri().toString() + "documents" + node.getParent().getPath());
+
+			/*List<Paragraph> lista = new ArrayList<Paragraph>();
+			Paragraph p = null;
+			for (Map.Entry<String, String> entry : paragraphs.entrySet()) {
+				p = new Paragraph();
+				p.setKey(entry.getKey());
+				p.get_links().setSelf(new SelfHref(entry.getValue()));
+				lista.add(p);
+			}
+			
+			dnl.get_embedded().setParagraphs(lista);*/
 			if (node.hasNodes()) {
 				if (hasFolder(node)) {
 					String children_href = ui.getBaseUri().toString() + "documents" + node.getPath() + "/children";
@@ -795,10 +911,15 @@ public class RestAPIService implements RestAPI {
 
 				if (hasFiles(node)) {
 					String content_href = ui.getBaseUri().toString() + "documents" + node.getPath() + "/content";
+					
+					/*String content = (String) getDocument(parent, fieldPars, ui).getEntity();
+					if(!content.equals("error"))
+						dnl.get_embedded().getContent().setHtml(content);*/
 					dnl.setContent_href(content_href + fieldPars);
 				} else {
 					dnl.setContent_href("");
 				}
+				
 			} else {
 				dnl.setChildren_href("");
 				dnl.setContent_href("");

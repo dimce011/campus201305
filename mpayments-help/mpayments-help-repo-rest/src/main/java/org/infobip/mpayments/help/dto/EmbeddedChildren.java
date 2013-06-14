@@ -1,14 +1,10 @@
 package org.infobip.mpayments.help.dto;
 
-public class Paragraph {
-	String key;
-	public String getKey() {
-		return key;
-	}
-	public void setKey(String id) {
-		this.key = id;
-	}
+import java.util.List;
 
+public class EmbeddedChildren {
+	public List<DocumentCvor> documents;
+	
 	public SelfNodeLink get_links() {
 		return _links;
 	}
